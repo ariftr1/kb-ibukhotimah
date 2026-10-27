@@ -1994,15 +1994,39 @@
     }
 
     function findMemberData(memberId, memberName) {
-      // 1. Search rawMembersList first (authoritative DB rows)
       let found = null;
+      const cleanName = memberName ? memberName.trim().toLowerCase() : null;
+
+      // 1. Search rawMembersList first (authoritative DB rows)
       if (rawMembersList && rawMembersList.length > 0) {
-        if (memberName) {
-          const cleanName = memberName.trim().toLowerCase();
+        if (cleanName) {
           found = rawMembersList.find(r => r.name && r.name.trim().toLowerCase() === cleanName);
         }
-        if (!found && memberId) {
+        if (!found && memberId && !memberName) {
           found = rawMembersList.find(r => r.id === memberId);
+        }
+      }
+
+      // Check localExtras for person-specific cache by name
+      let localExtras = {};
+      try { localExtras = JSON.parse(localStorage.getItem('family_member_extras') || '{}'); } catch(e) {}
+      const ext = cleanName ? localExtras[cleanName] : (memberId ? localExtras[memberId] : null);
+
+      // If this member is a spouse (stored in spouse_name of a child)
+      if (cleanName && !found && rawMembersList && rawMembersList.length > 0) {
+        const spouseRow = rawMembersList.find(r => r.spouse_name && r.spouse_name.trim().toLowerCase() === cleanName);
+        if (spouseRow) {
+          found = {
+            id: spouseRow.id,
+            name: memberName,
+            spouse_name: spouseRow.name,
+            isSpouse: true,
+            is_deceased: false,
+            birth_date: (ext && ext.birth_date) || spouseRow.spouse_birth_date || null,
+            photo_url: (ext && ext.photo_url) || spouseRow.spouse_photo_url || null,
+            nickname: (ext && ext.nickname) || null
+          };
+          return found;
         }
       }
       // 2. If not found in rawMembersList, or found but lacks photo_url/birth_date,
@@ -2362,28 +2386,41 @@
                   <!-- Kotak Penuh Baris Cucu (G3) -->
                   <div 
                     onclick="showMemberDetail(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
-                    class="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-blue-50/50 border border-blue-100 hover:bg-blue-100/50 transition-colors cursor-pointer group shadow-2xs ${
+                    class="flex items-center justify-between gap-3 p-3 rounded-xl bg-blue-50/50 border border-blue-100 hover:bg-blue-100/50 transition-colors cursor-pointer group shadow-2xs ${
                       childMatched ? 'ring-2 ring-blue-400 bg-blue-100/90 font-bold' : ''
                     }"
-                    title="Klik untuk melihat / edit profil Cucu: ${escapeHtml(child.name)}"
+                    title="Klik untuk melihat profil Cucu: ${escapeHtml(child.name)}"
                   >
-                    <!-- Sisi Kiri: Dot penanda biru, Nama Cucu, dan Badge G3 -->
-                    <div class="flex items-center gap-2 flex-wrap flex-1 min-w-0">
-                      <span class="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>
-                      <span class="font-semibold text-slate-800 text-sm whitespace-normal">${childNameHighlighted}</span>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-blue-100 text-blue-700 shrink-0 whitespace-nowrap">
-                        G3 • Cucu
-                      </span>
-                      ${child.isDeceased ? `
-                        <span class="text-[10px] text-slate-500 font-medium shrink-0 whitespace-nowrap">(Almarhum)</span>
-                      ` : ''}
-                      <svg class="w-3.5 h-3.5 text-blue-400 group-hover:text-blue-600 opacity-40 group-hover:opacity-100 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                      </svg>
+                    <!-- Sisi Kiri: 2 Baris Vertikal (Baris 1: Dot & Nama, Baris 2: Badge & Tombol Edit) -->
+                    <div class="flex-1 min-w-0">
+                      <!-- Baris 1: Titik warna sejajar horizontal di sebelah kiri teks nama -->
+                      <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-blue-500"></span>
+                        <span class="font-bold text-slate-800 text-base leading-snug break-words">${childNameHighlighted}</span>
+                      </div>
+                      <!-- Baris 2: Badge generasi dan ikon pensil edit tepat di bawah nama -->
+                      <div class="flex items-center gap-2 mt-1.5 pl-[18px]">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 whitespace-nowrap">
+                          G3 • Cucu
+                        </span>
+                        ${child.isDeceased ? `
+                          <span class="text-[10px] text-slate-500 font-medium shrink-0 whitespace-nowrap">(Almarhum)</span>
+                        ` : ''}
+                        <button 
+                          type="button"
+                          class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
+                          onclick="event.stopPropagation(); openEditMemberDirect(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
+                          title="Edit data Cucu: ${escapeHtml(child.name)}"
+                        >
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                          </svg>
+                        </button>
+                      </div>
                     </div>
 
-                    <!-- Sisi Kanan: Badge Cucu ke-X -->
-                    <span class="inline-flex items-center justify-center w-20 sm:w-24 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 shadow-sm shrink-0 whitespace-nowrap text-center">
+                    <!-- Sisi Kanan: Badge Urutan Cucu -->
+                    <span class="inline-flex items-center justify-center w-20 sm:w-24 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 shadow-sm shrink-0 whitespace-nowrap text-center ml-auto">
                       Cucu ke-${cucuIndex}
                     </span>
                   </div>
@@ -2392,26 +2429,38 @@
                   ${child.spouse ? `
                     <div 
                       onclick="showMemberDetail(${branch.branchId}, 'spouse', '${escapeHtml(child.spouse)}', ${child.id || null})"
-                      class="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-sky-50/50 border border-sky-100 hover:bg-sky-100/50 transition-colors mt-2 cursor-pointer group shadow-2xs ${
+                      class="flex items-center justify-between gap-3 p-3 rounded-xl bg-sky-50/50 border border-sky-100 hover:bg-sky-100/50 transition-colors mt-2 cursor-pointer group shadow-2xs ${
                         spouseMatched ? 'ring-2 ring-sky-400 bg-sky-100/90 font-bold' : ''
                       }"
-                      title="Klik untuk melihat / edit profil Menantu: ${escapeHtml(child.spouse)}"
+                      title="Klik untuk melihat profil Menantu: ${escapeHtml(child.spouse)}"
                     >
-                      <!-- Sisi Kiri: Titik Warna (Dot), Nama Menantu, dan Badge G3 -->
-                      <div class="flex items-center gap-2 flex-wrap flex-1 min-w-0">
-                        <span class="w-2 h-2 rounded-full bg-sky-500 shrink-0"></span>
-                        <span class="font-semibold text-slate-800 text-sm whitespace-normal">${spouseNameHighlighted}</span>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-sky-100 text-sky-700 shrink-0 whitespace-nowrap">
-                          G3 • Menantu
-                        </span>
-                        <!-- Tombol edit pensil -->
-                        <svg class="w-3.5 h-3.5 text-sky-400 group-hover:text-sky-600 opacity-40 group-hover:opacity-100 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                        </svg>
+                      <!-- Sisi Kiri: 2 Baris Vertikal (Baris 1: Dot & Nama, Baris 2: Badge & Tombol Edit) -->
+                      <div class="flex-1 min-w-0">
+                        <!-- Baris 1: Titik warna sejajar horizontal di sebelah kiri teks nama -->
+                        <div class="flex items-center gap-2">
+                          <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-sky-500"></span>
+                          <span class="font-bold text-slate-800 text-base leading-snug break-words">${spouseNameHighlighted}</span>
+                        </div>
+                        <!-- Baris 2: Badge generasi dan ikon pensil edit tepat di bawah nama -->
+                        <div class="flex items-center gap-2 mt-1.5 pl-[18px]">
+                          <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-700 whitespace-nowrap">
+                            G3 • Menantu
+                          </span>
+                          <button 
+                            type="button"
+                            class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
+                            onclick="event.stopPropagation(); openEditMemberDirect(${branch.branchId}, 'spouse', '${escapeHtml(child.spouse)}', ${child.id || null})"
+                            title="Edit data Menantu: ${escapeHtml(child.spouse)}"
+                          >
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                            </svg>
+                          </button>
+                        </div>
                       </div>
 
-                      <!-- Sisi Kanan: Badge Peran "Menantu" (Tepat Lurus di Bawah Badge "Cucu ke-X") -->
-                      <span class="inline-flex items-center justify-center w-20 sm:w-24 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 shadow-sm shrink-0 whitespace-nowrap text-center">
+                      <!-- Sisi Kanan: Badge Peran Menantu -->
+                      <span class="inline-flex items-center justify-center w-20 sm:w-24 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 shadow-sm shrink-0 whitespace-nowrap text-center ml-auto">
                         Menantu
                       </span>
                     </div>
@@ -2434,26 +2483,39 @@
                           return `
                             <div 
                               onclick="showMemberDetail(${branch.branchId}, 'grandchild', '${escapeHtml(gc.name)}', ${gc.id || null})"
-                              class="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-purple-50/60 border border-purple-100 hover:bg-purple-100/60 transition-colors cursor-pointer group shadow-2xs ${
+                              class="flex items-center justify-between gap-3 p-3 rounded-xl bg-purple-50/60 border border-purple-100 hover:bg-purple-100/60 transition-colors cursor-pointer group shadow-2xs ${
                                 gcMatched ? 'ring-2 ring-purple-400 bg-purple-100/90 font-bold' : ''
                               }"
                               title="Klik untuk melihat / edit profil Cicit: ${escapeHtml(gc.name)}"
                             >
-                              <!-- Sisi Kiri: Titik ungu, Nama Cicit, dan Badge G4 Cicit -->
-                              <div class="flex items-center gap-2 flex-wrap flex-1 min-w-0">
-                                <span class="w-2 h-2 rounded-full bg-purple-500 shrink-0"></span>
-                                <span class="font-semibold text-slate-800 text-sm whitespace-normal">${gcNameHighlighted}</span>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-purple-100 text-purple-700 shrink-0 whitespace-nowrap">
-                                  G4 • Cicit
-                                </span>
-                                ${gc.isDeceased ? `<span class="text-[10px] text-slate-500 font-medium shrink-0 whitespace-nowrap">(Almarhum)</span>` : ''}
-                                <svg class="w-3.5 h-3.5 text-purple-400 group-hover:text-purple-600 opacity-40 group-hover:opacity-100 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                                </svg>
+                              <!-- Sisi Kiri: 2 Baris Vertikal (Baris 1: Dot & Nama, Baris 2: Badge & Tombol Edit) -->
+                              <div class="flex-1 min-w-0">
+                                <!-- Baris 1: Titik warna sejajar horizontal di sebelah kiri teks nama -->
+                                <div class="flex items-center gap-2">
+                                  <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-purple-500"></span>
+                                  <span class="font-bold text-slate-800 text-base leading-snug break-words">${gcNameHighlighted}</span>
+                                </div>
+                                <!-- Baris 2: Badge generasi dan ikon pensil edit tepat di bawah nama -->
+                                <div class="flex items-center gap-2 mt-1.5 pl-[18px]">
+                                  <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 whitespace-nowrap">
+                                    G4 • Cicit
+                                  </span>
+                                  ${gc.isDeceased ? `<span class="text-[10px] text-slate-500 font-medium shrink-0 whitespace-nowrap">(Almarhum)</span>` : ''}
+                                  <button 
+                                    type="button"
+                                    class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
+                                    onclick="event.stopPropagation(); openEditMemberDirect(${branch.branchId}, 'grandchild', '${escapeHtml(gc.name)}', ${gc.id || null})"
+                                    title="Edit data Cicit: ${escapeHtml(gc.name)}"
+                                  >
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                    </svg>
+                                  </button>
+                                </div>
                               </div>
 
-                              <!-- Sisi Kanan: Badge Urutan (persis seperti posisi badge Cucu ke-X) -->
-                              <span class="inline-flex items-center justify-center w-20 sm:w-24 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 shadow-sm shrink-0 whitespace-nowrap text-center">
+                              <!-- Sisi Kanan: Badge Urutan Cicit -->
+                              <span class="inline-flex items-center justify-center w-20 sm:w-24 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 shadow-sm shrink-0 whitespace-nowrap text-center ml-auto">
                                 Cicit ke-${cicitIndex}
                               </span>
                             </div>
@@ -3195,6 +3257,14 @@
     /**
      * FORM MODAL: EDIT DATA ANGGOTA (ONLINE KE SUPABASE)
      */
+    /**
+     * Buka modal edit data langsung dari kartu anggota
+     */
+    function openEditMemberDirect(branchId, type, memberName, memberId = null) {
+      activeMemberContext = { branchId, type, memberName, memberId };
+      openEditMemberModalFromActive();
+    }
+
     function openEditMemberModalFromActive() {
       if (!activeMemberContext) return;
       const { branchId, type, memberName, memberId } = activeMemberContext;
