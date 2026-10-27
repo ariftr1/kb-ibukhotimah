@@ -518,171 +518,141 @@
   >
     <div 
       id="modal-profile-card" 
-      class="bg-white rounded-2xl shadow-2xl w-[92%] sm:w-full max-w-lg mx-auto overflow-hidden border border-slate-200 transform scale-95 transition-transform duration-200 max-h-[90vh] overflow-y-auto flex flex-col"
+      class="bg-white rounded-3xl shadow-2xl w-[92%] sm:w-full max-w-lg mx-auto overflow-hidden border border-slate-200 transform scale-95 transition-transform duration-200 max-h-[90vh] flex flex-col"
     >
-      <!-- Modal Header Banner -->
-      <div class="flex items-start gap-3.5 p-4 sm:p-5 text-white bg-emerald-900 rounded-t-2xl relative">
-        <!-- Kolom Avatar & Tombol Zoom (Kiri) -->
-        <div class="flex flex-col items-center shrink-0">
-          <div 
-            id="modal-avatar-container"
-            onclick="handleAvatarClick()"
-            class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden relative border-2 border-white/20 shadow-sm bg-emerald-400 text-emerald-950 flex items-center justify-center font-bold text-2xl sm:text-3xl"
-          >
-            <div 
-              id="modal-avatar" 
-              class="w-full h-full flex items-center justify-center"
-            >
-              SU
-            </div>
-            <img 
-              id="modal-photo" 
-              src="" 
-              alt="Foto Profil" 
-              class="absolute inset-0 w-full h-full object-cover hidden cursor-pointer"
-              onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden'); const b = document.getElementById('modal-zoom-btn'); if(b) b.classList.add('hidden');"
-            />
-          </div>
-
-          <!-- Tombol Perbesar di Bawah Kotak Foto -->
-          <button 
-            type="button" 
-            id="modal-zoom-btn"
-            onclick="handleAvatarClick()"
-            class="mt-1.5 flex items-center justify-center gap-1 text-[11px] font-medium text-emerald-100 hover:text-white bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded-md transition w-full hidden cursor-pointer"
-            title="Perbesar Foto Profil"
-          >
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
-            </svg>
-            <span>Perbesar</span>
-          </button>
-        </div>
-
-        <!-- Kolom Teks (Tersusun ke Bawah: Sub-judul -> Nama -> Panggilan -> Badge) -->
-        <div class="flex-1 min-w-0 pr-6">
-          <!-- Baris 1: Sub-judul Kategori -->
-          <span id="modal-branch-title" class="text-xs text-emerald-200/90 font-medium block leading-tight">Cucu dari Anak ke-3</span>
-          <!-- Baris 2: Nama Lengkap -->
-          <h3 id="modal-name" class="text-lg sm:text-xl font-bold text-white leading-snug break-words mt-1">
-            <span id="modal-primary-name">Arif Tri Prawito</span>
-          </h3>
-          <!-- Baris 3: Nama Panggilan -->
-          <span id="modal-nickname" class="text-xs text-emerald-100/80 font-normal block mt-0.5 hidden">(Nama Panggilan)</span>
-          <!-- Baris 4: Badge Generasi -->
-          <div class="flex items-center gap-1.5 flex-wrap mt-2.5">
-            <span id="modal-role-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold shadow-xs bg-blue-600 text-white">
-              G3 • Cucu
-            </span>
-            <span id="modal-deceased-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-200 text-slate-700">
-              (Almarhum)
-            </span>
-          </div>
-        </div>
-
-        <!-- Tombol Tutup X di Pojok Kanan Atas -->
+      <!-- 1. Header Hijau Terpusat (Foto Profil Besar di Atas) -->
+      <div class="text-center flex flex-col items-center p-6 bg-gradient-to-b from-emerald-800 to-emerald-900 text-white relative rounded-t-3xl shrink-0">
+        <!-- Tombol Tutup (X) -->
         <button 
           type="button" 
           onclick="closeMemberModal()"
-          class="absolute top-4 right-4 text-white/80 hover:text-white p-1 rounded-lg transition hover:bg-white/10 cursor-pointer"
+          class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/20 hover:bg-black/35 text-white flex items-center justify-center transition cursor-pointer"
           title="Tutup (Esc)"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
-      </div>
 
-      <!-- Quick Action Toolbar inside Modal -->
-      <div class="px-6 py-3 bg-emerald-50/70 border-b border-emerald-100 flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <!-- Tombol Edit Data (Sebelah Kiri - Hijau) -->
-          <button 
-            type="button" 
-            onclick="openEditMemberModalFromActive()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition hover:shadow"
-            title="Ubah nama, pasangan, atau status anggota ini"
+        <!-- Foto Profil Besar: w-24 h-24 sm:w-28 sm:h-28 -->
+        <div 
+          id="modal-avatar-container"
+          onclick="handleAvatarClick()"
+          class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden shadow-lg border-2 border-white/30 bg-emerald-700 flex items-center justify-center mb-2 shrink-0 cursor-pointer relative"
+        >
+          <div 
+            id="modal-avatar" 
+            class="w-full h-full flex items-center justify-center font-bold text-3xl sm:text-4xl text-emerald-100"
           >
-            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-            </svg>
-            <span>Edit Data</span>
-          </button>
-
-          <!-- Tombol Tambah Anak (Sebelah Kanan - Putih) -->
-          <button 
-            type="button" 
-            onclick="openAddChildModalFromActive()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-semibold shadow-2xs transition"
-            title="Tambah keturunan / anak untuk anggota ini"
-          >
-            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-            </svg>
-            <span>Tambah Anak</span>
-          </button>
+            SU
+          </div>
+          <img 
+            id="modal-photo" 
+            src="" 
+            alt="Foto Profil" 
+            class="absolute inset-0 w-full h-full object-cover hidden cursor-pointer"
+            onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden'); const b = document.getElementById('modal-zoom-btn'); if(b) b.classList.add('hidden');"
+          />
         </div>
-      </div>
 
-      <!-- Modal Body (Hubungan Keluarga) -->
-      <div class="p-6 sm:p-7 space-y-4 text-sm text-slate-700 max-h-[60vh] overflow-y-auto">
+        <!-- Tombol Zoom Foto (di bawah foto) -->
+        <button 
+          type="button" 
+          id="modal-zoom-btn"
+          onclick="handleAvatarClick()"
+          class="mb-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium text-emerald-100 bg-white/10 hover:bg-white/20 transition cursor-pointer hidden"
+          title="Perbesar Foto Profil"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
+          </svg>
+          <span>Perbesar Foto</span>
+        </button>
+
+        <!-- Urutan Teks Header -->
+        <!-- 1. Hubungan -->
+        <span class="text-xs font-medium text-emerald-200 block" id="detailRelation">Anak ke-1 dari Ibu Khotimah</span>
         
-        <!-- Pasangan -->
-        <div id="modal-spouse-container" class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
-          <span id="modal-spouse-label" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-            Pasangan:
-          </span>
-          <span id="modal-spouse" class="font-semibold text-slate-800 text-base">
-            -
-          </span>
+        <!-- 2. Nama Lengkap -->
+        <h3 class="text-xl sm:text-2xl font-bold text-white mt-0.5 leading-snug break-words px-4" id="detailFullName">
+          -
+        </h3>
+
+        <!-- 3. Nama Panggilan -->
+        <p class="text-xs sm:text-sm text-emerald-100/90 mt-0.5 hidden" id="detailNickName">-</p>
+
+        <!-- 4. Badge Generasi & Status Almarhum -->
+        <div class="flex items-center justify-center gap-1.5 flex-wrap mt-2">
+          <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-600/70 text-emerald-50" id="detailBadgeGeneration">G2 • Anak</span>
+          <span id="detailBadgeDeceased" class="hidden px-2.5 py-0.5 rounded-full text-xs font-medium bg-black/25 text-emerald-100 border border-white/20">Almarhum</span>
+        </div>
+      </div>
+
+      <!-- 2. Tombol Aksi di Atas Konten -->
+      <div class="flex items-center justify-center gap-3 px-6 py-3 border-b border-slate-100 bg-slate-50/70 shrink-0">
+        <button 
+          type="button" 
+          onclick="triggerEditData()" 
+          class="flex-1 max-w-[150px] inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-emerald-700 bg-white hover:bg-emerald-50 border border-emerald-200 transition shadow-2xs hover:shadow-xs"
+        >
+          <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+          </svg>
+          <span>Edit Data</span>
+        </button>
+        <button 
+          type="button" 
+          onclick="triggerAddChild()" 
+          class="flex-1 max-w-[150px] inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition shadow-2xs hover:shadow-xs"
+        >
+          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+          </svg>
+          <span>Tambah Anak</span>
+        </button>
+      </div>
+
+      <!-- 3. Konten Utama Full Layout (Bebas Card / Garis Pembatas Bersih) -->
+      <div class="p-6 space-y-4 text-left overflow-y-auto flex-1">
+        
+        <!-- PASANGAN (SUAMI / ISTRI) -->
+        <div id="detailSpouseContainer" class="pb-3 border-b border-slate-100">
+          <span id="detailSpouseLabel" class="text-[11px] font-bold tracking-wider text-slate-400 uppercase block mb-1">PASANGAN</span>
+          <p class="text-base font-semibold text-slate-800" id="detailSpouse">-</p>
         </div>
 
-        <!-- Orang Tua -->
-        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
-          <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-            Orang Tua / Nasab Atas:
-          </span>
-          <span id="modal-parents" class="font-semibold text-slate-800 text-base">
-            -
-          </span>
+        <!-- ORANG TUA / NASAB ATAS -->
+        <div class="pb-3 border-b border-slate-100">
+          <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase block mb-1">ORANG TUA / NASAB ATAS</span>
+          <p class="text-base font-semibold text-slate-800" id="detailParents">-</p>
         </div>
 
-        <!-- Tanggal Lahir & Usia -->
-        <div id="modal-birth-container" class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
-          <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-            Tanggal Lahir:
-          </span>
-          <span id="modal-birth" class="font-semibold text-slate-800 text-base">
-            -
-          </span>
+        <!-- TANGGAL LAHIR -->
+        <div id="detailBirthContainer" class="pb-3 border-b border-slate-100">
+          <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase block mb-1">TANGGAL LAHIR</span>
+          <p class="text-base font-semibold text-slate-800" id="detailBirthDate">-</p>
         </div>
 
-        <!-- Keturunan / Anak -->
-        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
+        <!-- KETURUNAN / ANAK -->
+        <div class="pt-1">
           <div class="flex items-center justify-between mb-2">
-            <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Keturunan / Anak:
-            </span>
-            <span id="modal-children-count" class="text-xs font-semibold text-emerald-700">
-              0 Anak
-            </span>
+            <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">KETURUNAN / ANAK</span>
+            <span class="text-xs font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full" id="detailChildrenCount">0 Anggota</span>
           </div>
-          <div id="modal-children-list" class="flex flex-wrap gap-1.5">
-            <span class="text-xs text-slate-400 italic">Belum ada anak tercatat</span>
-          </div>
+          <div id="detailChildrenList" class="flex flex-wrap gap-2"></div>
         </div>
 
       </div>
 
-      <!-- Modal Footer -->
-      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+      <!-- 4. Footer Modal -->
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
         <span class="text-xs text-slate-500 font-medium">
           Arsip Silsilah Keluarga Besar
         </span>
         <button 
           type="button" 
           onclick="closeMemberModal()"
-          class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-xs transition"
+          class="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-xs sm:text-sm transition cursor-pointer"
         >
           Tutup
         </button>
@@ -2848,6 +2818,14 @@
       if (img) img.src = '';
     }
 
+        function triggerEditData() {
+      openEditMemberModalFromActive();
+    }
+
+    function triggerAddChild() {
+      openAddChildModalFromActive();
+    }
+
     function showMemberDetail(branchId, type, memberName, memberId = null) {
       const branch = familyData.find(b => b.branchId === branchId);
       if (!branch) return;
@@ -2979,54 +2957,72 @@
         }
       }
 
-      // Pasang Nama & Nama Panggilan
-      const nameEl = document.getElementById('modal-name');
-      const primaryNameEl = document.getElementById('modal-primary-name');
-      const nicknameEl = document.getElementById('modal-nickname');
-      const cleanNick = nickname && String(nickname).trim() !== '' ? formatTitleCase(nickname) : null;
-
-      if (primaryNameEl) {
-        primaryNameEl.textContent = name;
-      } else if (nameEl) {
-        nameEl.textContent = name;
+      // 1. Hubungan
+      const detailRelation = document.getElementById('detailRelation');
+      if (detailRelation) {
+        detailRelation.textContent = subTitle || `Anak ke-${branch.branchId} dari Ibu Khotimah`;
       }
 
-      if (nicknameEl) {
+      // 2. Nama Lengkap
+      const detailFullName = document.getElementById('detailFullName');
+      if (detailFullName) {
+        detailFullName.textContent = name;
+      }
+
+      // 3. Nama Panggilan
+      const detailNickName = document.getElementById('detailNickName');
+      const cleanNick = nickname && String(nickname).trim() !== '' ? formatTitleCase(nickname) : null;
+      if (detailNickName) {
         if (cleanNick) {
-          nicknameEl.textContent = `(${cleanNick})`;
-          nicknameEl.classList.remove('hidden');
+          detailNickName.textContent = `(${cleanNick})`;
+          detailNickName.classList.remove('hidden');
         } else {
-          nicknameEl.textContent = '';
-          nicknameEl.classList.add('hidden');
+          detailNickName.textContent = '';
+          detailNickName.classList.add('hidden');
         }
       }
 
-      // Perkecil ukuran font otomatis jika nama panjang agar nama lengkap terlihat utuh tanpa terpotong
-      const nameLen = (name || '').trim().length;
-      if (nameLen > 28) {
-        nameEl.className = "text-base sm:text-lg font-bold text-white leading-snug break-words mt-1";
-      } else if (nameLen > 18) {
-        nameEl.className = "text-lg sm:text-xl font-bold text-white leading-snug break-words mt-1";
-      } else {
-        nameEl.className = "text-lg sm:text-xl font-bold text-white leading-snug break-words mt-1";
+      // 4. Badge Generasi & Status Almarhum
+      const detailBadgeGen = document.getElementById('detailBadgeGeneration');
+      if (detailBadgeGen) {
+        detailBadgeGen.textContent = roleText;
       }
 
-      document.getElementById('modal-branch-title').textContent = subTitle || `Anak ke-${branch.branchId} dari Ibu Khotimah`;
-
-      const roleBadge = document.getElementById('modal-role-badge');
-      roleBadge.textContent = roleText;
-      roleBadge.className = `inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold shadow-sm border border-emerald-400/30 ${roleClass}`;
-
-      const deceasedBadge = document.getElementById('modal-deceased-badge');
-      if (isDeceased) {
-        deceasedBadge.classList.remove('hidden');
-      } else {
-        deceasedBadge.classList.add('hidden');
+      const detailBadgeDeceased = document.getElementById('detailBadgeDeceased');
+      if (detailBadgeDeceased) {
+        if (isDeceased) {
+          detailBadgeDeceased.classList.remove('hidden');
+        } else {
+          detailBadgeDeceased.classList.add('hidden');
+        }
       }
 
-      // Tanggal Lahir & Hitung Usia Otomatis
-      const birthContainer = document.getElementById('modal-birth-container');
-      const birthVal = document.getElementById('modal-birth');
+      // PASANGAN (SUAMI / ISTRI)
+      const hasSpouse = Boolean(spouseText && spouseText.trim() !== '' && spouseText !== '-' && !spouseText.toLowerCase().includes('belum') && !spouseText.toLowerCase().includes('tidak'));
+      const spouseContainer = document.getElementById('detailSpouseContainer');
+      const spouseLabel = document.getElementById('detailSpouseLabel');
+      const spouseValue = document.getElementById('detailSpouse');
+
+      if (hasSpouse) {
+        if (spouseContainer) spouseContainer.classList.remove('hidden');
+        if (spouseLabel) {
+          spouseLabel.textContent = isFemaleName(name) ? 'SUAMI' : 'ISTRI';
+        }
+        if (spouseValue) spouseValue.textContent = spouseText;
+      } else {
+        if (spouseContainer) spouseContainer.classList.add('hidden');
+        if (spouseValue) spouseValue.textContent = '-';
+      }
+
+      // ORANG TUA / NASAB ATAS
+      const detailParents = document.getElementById('detailParents');
+      if (detailParents) {
+        detailParents.textContent = parentsText;
+      }
+
+      // TANGGAL LAHIR
+      const birthContainer = document.getElementById('detailBirthContainer');
+      const birthVal = document.getElementById('detailBirthDate');
       if (birthContainer) birthContainer.classList.remove('hidden');
       if (birthDate && String(birthDate).trim() !== '' && String(birthDate).trim() !== '-') {
         const formattedDate = formatIndonesianDate(birthDate);
@@ -3040,40 +3036,27 @@
         if (birthVal) birthVal.textContent = '-';
       }
 
-      // Logika Dinamis Pasangan (SUAMI / ISTRI)
-      const hasSpouse = Boolean(spouseText && spouseText.trim() !== '' && spouseText !== '-' && !spouseText.toLowerCase().includes('belum') && !spouseText.toLowerCase().includes('tidak'));
-      const spouseContainer = document.getElementById('modal-spouse-container');
-      const spouseLabel = document.getElementById('modal-spouse-label');
-      const spouseValue = document.getElementById('modal-spouse');
+      // KETURUNAN / ANAK
+      const childrenCountEl = document.getElementById('detailChildrenCount');
+      const childrenListEl = document.getElementById('detailChildrenList');
 
-      if (hasSpouse) {
-        if (spouseContainer) spouseContainer.classList.remove('hidden');
-        if (spouseLabel) {
-          spouseLabel.textContent = isFemaleName(name) ? 'SUAMI:' : 'ISTRI:';
-        }
-        if (spouseValue) spouseValue.textContent = spouseText;
-      } else {
-        if (spouseContainer) spouseContainer.classList.add('hidden');
-        if (spouseValue) spouseValue.textContent = '-';
+      if (childrenCountEl) {
+        childrenCountEl.textContent = `${childrenList.length} Anggota`;
       }
-      document.getElementById('modal-parents').textContent = parentsText;
 
-      const childrenCountEl = document.getElementById('modal-children-count');
-      const childrenListEl = document.getElementById('modal-children-list');
-
-      childrenCountEl.textContent = `${childrenList.length} Anggota`;
-
-      if (childrenList.length > 0) {
-        childrenListEl.innerHTML = childrenList.map(cName => {
-          return `
-            <span class="inline-flex items-center px-2.5 py-1 rounded-xl bg-white text-slate-800 text-xs font-semibold border border-slate-200 shadow-2xs">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
-              ${escapeHtml(cName)}
-            </span>
-          `;
-        }).join('');
-      } else {
-        childrenListEl.innerHTML = `<span class="text-xs text-slate-400 italic">Belum ada anak/keturunan tercatat</span>`;
+      if (childrenListEl) {
+        if (childrenList.length > 0) {
+          childrenListEl.innerHTML = childrenList.map(cName => {
+            return `
+              <span class="inline-flex items-center px-3 py-1.5 rounded-xl bg-slate-50 text-slate-800 text-xs sm:text-sm font-semibold border border-slate-200 shadow-2xs">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 shrink-0"></span>
+                ${escapeHtml(cName)}
+              </span>
+            `;
+          }).join('');
+        } else {
+          childrenListEl.innerHTML = `<span class="text-xs sm:text-sm text-slate-400 italic">Belum ada anak/keturunan tercatat</span>`;
+        }
       }
 
       // Animasi Buka Modal
