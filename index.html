@@ -521,7 +521,7 @@
       class="bg-white rounded-3xl shadow-2xl w-[92%] sm:w-full max-w-lg mx-auto overflow-hidden border border-slate-200 transform scale-95 transition-transform duration-200 max-h-[90vh] flex flex-col"
     >
       <!-- 1. Header Hijau Terpusat (Foto Profil Besar di Atas) -->
-      <div class="text-center flex flex-col items-center p-6 bg-gradient-to-b from-emerald-800 to-emerald-900 text-white relative rounded-t-3xl shrink-0">
+      <div class="flex flex-col items-center text-center p-6 bg-gradient-to-b from-emerald-800 to-emerald-900 text-white relative rounded-t-3xl shrink-0">
         <!-- Tombol Tutup (X) -->
         <button 
           type="button" 
@@ -534,15 +534,14 @@
           </svg>
         </button>
 
-        <!-- Foto Profil Besar: w-24 h-24 sm:w-28 sm:h-28 -->
+        <!-- Foto Profil Besar: w-36 h-36 sm:w-44 sm:h-44 -->
         <div 
           id="modal-avatar-container"
-          onclick="handleAvatarClick()"
-          class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden shadow-lg border-2 border-white/30 bg-emerald-700 flex items-center justify-center mb-2 shrink-0 cursor-pointer relative"
+          class="w-36 h-36 sm:w-44 sm:h-44 rounded-3xl overflow-hidden shadow-xl border-4 border-white/20 bg-emerald-700/60 flex items-center justify-center mb-3 shrink-0 relative"
         >
           <div 
             id="modal-avatar" 
-            class="w-full h-full flex items-center justify-center font-bold text-3xl sm:text-4xl text-emerald-100"
+            class="w-full h-full flex items-center justify-center text-4xl sm:text-5xl font-extrabold text-white/90 select-none"
           >
             SU
           </div>
@@ -550,50 +549,36 @@
             id="modal-photo" 
             src="" 
             alt="Foto Profil" 
-            class="absolute inset-0 w-full h-full object-cover hidden cursor-pointer"
-            onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden'); const b = document.getElementById('modal-zoom-btn'); if(b) b.classList.add('hidden');"
+            class="absolute inset-0 w-full h-full object-cover hidden"
+            onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden');"
           />
         </div>
 
-        <!-- Tombol Zoom Foto (di bawah foto) -->
-        <button 
-          type="button" 
-          id="modal-zoom-btn"
-          onclick="handleAvatarClick()"
-          class="mb-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium text-emerald-100 bg-white/10 hover:bg-white/20 transition cursor-pointer hidden"
-          title="Perbesar Foto Profil"
-        >
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
-          </svg>
-          <span>Perbesar Foto</span>
-        </button>
-
-        <!-- Urutan Teks Header -->
-        <!-- 1. Hubungan -->
-        <span class="text-xs font-medium text-emerald-200 block" id="detailRelation">Anak ke-1 dari Ibu Khotimah</span>
+        <!-- Keterangan di Bawah Foto (Tersusun Rapi ke Bawah) -->
+        <!-- 1. Hubungan/Status -->
+        <span class="text-xs sm:text-sm font-medium text-emerald-200 block" id="detailRelation">Anak ke-1 dari Ibu Khotimah</span>
         
         <!-- 2. Nama Lengkap -->
-        <h3 class="text-xl sm:text-2xl font-bold text-white mt-0.5 leading-snug break-words px-4" id="detailFullName">
+        <h3 class="text-xl sm:text-2xl font-bold text-white mt-1 leading-snug break-words px-4" id="detailFullName">
           -
         </h3>
 
         <!-- 3. Nama Panggilan -->
-        <p class="text-xs sm:text-sm text-emerald-100/90 mt-0.5 hidden" id="detailNickName">-</p>
+        <p class="text-xs sm:text-sm text-emerald-100/80 font-normal mt-0.5 hidden" id="detailNickName">-</p>
 
         <!-- 4. Badge Generasi & Status Almarhum -->
-        <div class="flex items-center justify-center gap-1.5 flex-wrap mt-2">
-          <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-600/70 text-emerald-50" id="detailBadgeGeneration">G2 • Anak</span>
+        <div class="flex items-center justify-center gap-1.5 flex-wrap mt-2.5">
+          <span class="inline-flex items-center px-3.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-600/80 text-emerald-50 border border-emerald-400/30" id="detailBadgeGeneration">G2 • Anak</span>
           <span id="detailBadgeDeceased" class="hidden px-2.5 py-0.5 rounded-full text-xs font-medium bg-black/25 text-emerald-100 border border-white/20">Almarhum</span>
         </div>
       </div>
 
-      <!-- 2. Tombol Aksi di Atas Konten -->
-      <div class="flex items-center justify-center gap-3 px-6 py-3 border-b border-slate-100 bg-slate-50/70 shrink-0">
+      <!-- 2. Tombol Aksi Sama Lebar (50:50) -->
+      <div class="flex items-center gap-3 px-6 py-3 border-b border-slate-100 bg-slate-50/70 shrink-0">
         <button 
           type="button" 
           onclick="triggerEditData()" 
-          class="flex-1 max-w-[150px] inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-emerald-700 bg-white hover:bg-emerald-50 border border-emerald-200 transition shadow-2xs hover:shadow-xs"
+          class="flex-1 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-emerald-700 bg-white hover:bg-emerald-50 border border-emerald-200 shadow-xs transition cursor-pointer"
         >
           <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
@@ -603,7 +588,7 @@
         <button 
           type="button" 
           onclick="triggerAddChild()" 
-          class="flex-1 max-w-[150px] inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition shadow-2xs hover:shadow-xs"
+          class="flex-1 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 shadow-xs transition cursor-pointer"
         >
           <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
@@ -612,25 +597,25 @@
         </button>
       </div>
 
-      <!-- 3. Konten Utama Full Layout (Bebas Card / Garis Pembatas Bersih) -->
+      <!-- 3. Isi Informasi Full List (Menyatu tanpa Card Terpisah) -->
       <div class="p-6 space-y-4 text-left overflow-y-auto flex-1">
         
         <!-- PASANGAN (SUAMI / ISTRI) -->
         <div id="detailSpouseContainer" class="pb-3 border-b border-slate-100">
           <span id="detailSpouseLabel" class="text-[11px] font-bold tracking-wider text-slate-400 uppercase block mb-1">PASANGAN</span>
-          <p class="text-base font-semibold text-slate-800" id="detailSpouse">-</p>
+          <p class="text-sm sm:text-base font-semibold text-slate-800" id="detailSpouse">-</p>
         </div>
 
         <!-- ORANG TUA / NASAB ATAS -->
         <div class="pb-3 border-b border-slate-100">
           <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase block mb-1">ORANG TUA / NASAB ATAS</span>
-          <p class="text-base font-semibold text-slate-800" id="detailParents">-</p>
+          <p class="text-sm sm:text-base font-semibold text-slate-800" id="detailParents">-</p>
         </div>
 
         <!-- TANGGAL LAHIR -->
         <div id="detailBirthContainer" class="pb-3 border-b border-slate-100">
           <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase block mb-1">TANGGAL LAHIR</span>
-          <p class="text-base font-semibold text-slate-800" id="detailBirthDate">-</p>
+          <p class="text-sm sm:text-base font-semibold text-slate-800" id="detailBirthDate">-</p>
         </div>
 
         <!-- KETURUNAN / ANAK -->
@@ -975,17 +960,6 @@
   <!-- ========================================== -->
   <!-- FITUR PROTEKSI SANDI KELUARGA & ADMIN MODAL -->
   <!-- ========================================== -->
-
-  <!-- MODAL: Perbesar Foto Profil (Lightbox Popup) -->
-  <div id="imagePreviewModal" class="fixed inset-0 z-[70] hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-200" onclick="closeImagePreview()">
-    <div class="relative max-w-sm sm:max-w-md w-full bg-transparent flex flex-col items-center" onclick="event.stopPropagation()">
-      <button type="button" onclick="closeImagePreview()" class="absolute -top-10 right-0 text-white hover:text-emerald-400 p-2 transition cursor-pointer" title="Tutup">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-      <img id="previewImageElement" src="" alt="Foto Profil Penuh" class="max-w-full max-h-[75vh] rounded-2xl object-contain shadow-2xl border border-white/20" />
-      <p id="previewImageCaption" class="text-white text-center font-medium mt-3 text-sm sm:text-base"></p>
-    </div>
-  </div>
 
   <!-- Layar Kunci Keluarga (Lock Screen Overlay) -->
   <div 
@@ -2785,40 +2759,7 @@
     /**
      * MODAL DETAIL PROFIL ANGGOTA
      */
-    /**
-     * MODAL PRATINJAU FOTO PROFIL (LIGHTBOX ZOOM POPUP)
-     */
-    let currentModalPhotoUrl = "";
-    let currentModalMemberName = "";
-
-    function handleAvatarClick() {
-      if (currentModalPhotoUrl && currentModalPhotoUrl.trim() !== '') {
-        openImagePreview(currentModalPhotoUrl, currentModalMemberName);
-      }
-    }
-
-    function openImagePreview(imageUrl, memberName) {
-      const targetUrl = imageUrl || currentModalPhotoUrl;
-      const targetName = memberName || currentModalMemberName || 'Foto Profil';
-      if (!targetUrl) return;
-      const modal = document.getElementById('imagePreviewModal');
-      const img = document.getElementById('previewImageElement');
-      const caption = document.getElementById('previewImageCaption');
-      if (img) img.src = targetUrl;
-      if (caption) caption.textContent = targetName ? `Foto Profil: ${targetName}` : 'Foto Profil';
-      if (modal) {
-        modal.classList.remove('hidden');
-      }
-    }
-
-    function closeImagePreview() {
-      const modal = document.getElementById('imagePreviewModal');
-      const img = document.getElementById('previewImageElement');
-      if (modal) modal.classList.add('hidden');
-      if (img) img.src = '';
-    }
-
-        function triggerEditData() {
+    function triggerEditData() {
       openEditMemberModalFromActive();
     }
 
@@ -2923,41 +2864,25 @@
       const birthDate = memberData ? memberData.birth_date : null;
       const photoUrl = memberData ? memberData.photo_url : null;
 
-      // Simpan konteks aktif foto & nama untuk fitur zoom foto
-      currentModalMemberName = name;
-      currentModalPhotoUrl = (photoUrl && photoUrl.trim() !== '') ? photoUrl.trim() : "";
-
-      // Pasang Avatar Inisial & Foto Profil
+      // Pasang Avatar Inisial & Foto Profil Besar
       const avatarEl = document.getElementById('modal-avatar');
       const photoEl = document.getElementById('modal-photo');
-      const zoomBtn = document.getElementById('modal-zoom-btn');
-      const avatarContainer = document.getElementById('modal-avatar-container');
 
       if (avatarEl) avatarEl.textContent = getInitials(name);
       if (photoEl) {
-        if (currentModalPhotoUrl) {
-          photoEl.src = currentModalPhotoUrl;
+        if (photoUrl && photoUrl.trim() !== '') {
+          photoEl.src = photoUrl.trim();
           photoEl.alt = name;
           photoEl.classList.remove('hidden');
           if (avatarEl) avatarEl.classList.add('hidden');
-          if (zoomBtn) zoomBtn.classList.remove('hidden');
-          if (avatarContainer) {
-            avatarContainer.classList.add('cursor-pointer');
-            avatarContainer.title = `Klik untuk memperbesar foto ${name}`;
-          }
         } else {
           photoEl.src = '';
           photoEl.classList.add('hidden');
           if (avatarEl) avatarEl.classList.remove('hidden');
-          if (zoomBtn) zoomBtn.classList.add('hidden');
-          if (avatarContainer) {
-            avatarContainer.classList.remove('cursor-pointer');
-            avatarContainer.title = '';
-          }
         }
       }
 
-      // 1. Hubungan
+      // 1. Hubungan/Status
       const detailRelation = document.getElementById('detailRelation');
       if (detailRelation) {
         detailRelation.textContent = subTitle || `Anak ke-${branch.branchId} dari Ibu Khotimah`;
