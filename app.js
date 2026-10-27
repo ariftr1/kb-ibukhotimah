@@ -289,3 +289,11 @@ window.openAddMemberModal = openAddMemberModal;
 window.closeAddMemberModal = closeAddMemberModal;
 window.updateAddMemberGenInfo = updateAddMemberGenInfo;
 window.handleSaveNewMember = handleSaveNewMember;
+
+
+window.printOrExportPDF = function() {
+  if (typeof triggerPrintDocument === 'function') triggerPrintDocument();
+};
+window.showAdminOnlyNotice = function() {
+  if (typeof openAddMemberModal === 'function') openAddMemberModal();
+};
