@@ -522,45 +522,57 @@
     >
       <!-- Modal Header Banner -->
       <div class="flex items-start gap-3.5 p-4 sm:p-5 text-white bg-emerald-900 rounded-t-2xl relative">
-        <!-- Avatar Inisial / Foto (Kiri: w-20 h-20 sm:w-24 sm:h-24) -->
-        <div 
-          id="modal-avatar-container"
-          onclick="handleAvatarClick()"
-          class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0 relative group cursor-pointer border-2 border-white/30 shadow-md"
-        >
+        <!-- Kolom Avatar & Tombol Zoom (Kiri) -->
+        <div class="flex flex-col items-center shrink-0">
           <div 
-            id="modal-avatar" 
-            class="w-full h-full bg-emerald-400 text-emerald-950 flex items-center justify-center font-bold text-2xl sm:text-3xl"
+            id="modal-avatar-container"
+            onclick="handleAvatarClick()"
+            class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden relative border-2 border-white/20 shadow-sm bg-emerald-400 text-emerald-950 flex items-center justify-center font-bold text-2xl sm:text-3xl"
           >
-            SU
+            <div 
+              id="modal-avatar" 
+              class="w-full h-full flex items-center justify-center"
+            >
+              SU
+            </div>
+            <img 
+              id="modal-photo" 
+              src="" 
+              alt="Foto Profil" 
+              class="absolute inset-0 w-full h-full object-cover hidden cursor-pointer"
+              onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden'); const b = document.getElementById('modal-zoom-btn'); if(b) b.classList.add('hidden');"
+            />
           </div>
-          <img 
-            id="modal-photo" 
-            src="" 
-            alt="Foto Profil" 
-            class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 hidden"
-            onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden'); const z = document.getElementById('modal-photo-zoom-icon'); if(z) z.classList.add('hidden');"
-          />
-          <!-- Ikon Kaca Pembesar / Zoom di Sudut Avatar -->
-          <div id="modal-photo-zoom-icon" class="absolute bottom-1 right-1 bg-black/60 backdrop-blur-xs p-1 rounded-md text-white opacity-80 group-hover:opacity-100 hidden transition pointer-events-none">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+
+          <!-- Tombol Perbesar di Bawah Kotak Foto -->
+          <button 
+            type="button" 
+            id="modal-zoom-btn"
+            onclick="handleAvatarClick()"
+            class="mt-1.5 flex items-center justify-center gap-1 text-[11px] font-medium text-emerald-100 hover:text-white bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded-md transition w-full hidden cursor-pointer"
+            title="Perbesar Foto Profil"
+          >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
             </svg>
-          </div>
+            <span>Perbesar</span>
+          </button>
         </div>
 
-        <!-- Kolom Teks (Tersusun ke Bawah: Kategori -> Nama -> Badge) -->
-        <div class="flex-1 min-w-0 pr-8">
-          <!-- Baris 1: Kategori hubungan -->
-          <span id="modal-branch-title" class="text-xs text-emerald-200/90 font-medium block leading-tight">Anak ke-1 dari Ibu Khotimah</span>
-          <!-- Baris 2: Nama lengkap anggota -->
-          <h3 id="modal-name" class="text-lg sm:text-xl font-bold leading-snug break-words mt-0.5 text-white">
-            <span id="modal-primary-name">Suciyati</span> <span id="modal-nickname" class="text-sm font-normal text-emerald-200 block sm:inline hidden">(Nama Panggilan)</span>
+        <!-- Kolom Teks (Tersusun ke Bawah: Sub-judul -> Nama -> Panggilan -> Badge) -->
+        <div class="flex-1 min-w-0 pr-6">
+          <!-- Baris 1: Sub-judul Kategori -->
+          <span id="modal-branch-title" class="text-xs text-emerald-200/90 font-medium block leading-tight">Cucu dari Anak ke-3</span>
+          <!-- Baris 2: Nama Lengkap -->
+          <h3 id="modal-name" class="text-lg sm:text-xl font-bold text-white leading-snug break-words mt-1">
+            <span id="modal-primary-name">Arif Tri Prawito</span>
           </h3>
-          <!-- Baris 3: Badge generasi di bawah nama secara terpisah (tidak melayang) -->
-          <div class="flex items-center gap-1.5 flex-wrap mt-2">
-            <span id="modal-role-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold shadow-sm border border-emerald-400/30 bg-emerald-600 text-white">
-              G2 • Anak
+          <!-- Baris 3: Nama Panggilan -->
+          <span id="modal-nickname" class="text-xs text-emerald-100/80 font-normal block mt-0.5 hidden">(Nama Panggilan)</span>
+          <!-- Baris 4: Badge Generasi -->
+          <div class="flex items-center gap-1.5 flex-wrap mt-2.5">
+            <span id="modal-role-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold shadow-xs bg-blue-600 text-white">
+              G3 • Cucu
             </span>
             <span id="modal-deceased-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-200 text-slate-700">
               (Almarhum)
@@ -572,7 +584,7 @@
         <button 
           type="button" 
           onclick="closeMemberModal()"
-          class="absolute top-4 right-4 text-white/80 hover:text-white p-1 rounded-lg transition hover:bg-white/10"
+          class="absolute top-4 right-4 text-white/80 hover:text-white p-1 rounded-lg transition hover:bg-white/10 cursor-pointer"
           title="Tutup (Esc)"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2806,22 +2818,24 @@
     /**
      * MODAL PRATINJAU FOTO PROFIL (LIGHTBOX ZOOM POPUP)
      */
+    let currentModalPhotoUrl = "";
+    let currentModalMemberName = "";
+
     function handleAvatarClick() {
-      const photoEl = document.getElementById('modal-photo');
-      if (photoEl && !photoEl.classList.contains('hidden') && photoEl.src && photoEl.src.trim() !== '') {
-        const primaryName = document.getElementById('modal-primary-name');
-        const nameText = primaryName ? primaryName.textContent.trim() : 'Foto Profil';
-        openImagePreview(photoEl.src, nameText);
+      if (currentModalPhotoUrl && currentModalPhotoUrl.trim() !== '') {
+        openImagePreview(currentModalPhotoUrl, currentModalMemberName);
       }
     }
 
     function openImagePreview(imageUrl, memberName) {
-      if (!imageUrl) return;
+      const targetUrl = imageUrl || currentModalPhotoUrl;
+      const targetName = memberName || currentModalMemberName || 'Foto Profil';
+      if (!targetUrl) return;
       const modal = document.getElementById('imagePreviewModal');
       const img = document.getElementById('previewImageElement');
       const caption = document.getElementById('previewImageCaption');
-      if (img) img.src = imageUrl;
-      if (caption) caption.textContent = memberName ? `Foto Profil: ${memberName}` : 'Foto Profil';
+      if (img) img.src = targetUrl;
+      if (caption) caption.textContent = targetName ? `Foto Profil: ${targetName}` : 'Foto Profil';
       if (modal) {
         modal.classList.remove('hidden');
       }
@@ -2931,20 +2945,24 @@
       const birthDate = memberData ? memberData.birth_date : null;
       const photoUrl = memberData ? memberData.photo_url : null;
 
+      // Simpan konteks aktif foto & nama untuk fitur zoom foto
+      currentModalMemberName = name;
+      currentModalPhotoUrl = (photoUrl && photoUrl.trim() !== '') ? photoUrl.trim() : "";
+
       // Pasang Avatar Inisial & Foto Profil
       const avatarEl = document.getElementById('modal-avatar');
       const photoEl = document.getElementById('modal-photo');
-      const zoomIcon = document.getElementById('modal-photo-zoom-icon');
+      const zoomBtn = document.getElementById('modal-zoom-btn');
       const avatarContainer = document.getElementById('modal-avatar-container');
 
       if (avatarEl) avatarEl.textContent = getInitials(name);
       if (photoEl) {
-        if (photoUrl && photoUrl.trim() !== '') {
-          photoEl.src = photoUrl.trim();
+        if (currentModalPhotoUrl) {
+          photoEl.src = currentModalPhotoUrl;
           photoEl.alt = name;
           photoEl.classList.remove('hidden');
           if (avatarEl) avatarEl.classList.add('hidden');
-          if (zoomIcon) zoomIcon.classList.remove('hidden');
+          if (zoomBtn) zoomBtn.classList.remove('hidden');
           if (avatarContainer) {
             avatarContainer.classList.add('cursor-pointer');
             avatarContainer.title = `Klik untuk memperbesar foto ${name}`;
@@ -2953,7 +2971,7 @@
           photoEl.src = '';
           photoEl.classList.add('hidden');
           if (avatarEl) avatarEl.classList.remove('hidden');
-          if (zoomIcon) zoomIcon.classList.add('hidden');
+          if (zoomBtn) zoomBtn.classList.add('hidden');
           if (avatarContainer) {
             avatarContainer.classList.remove('cursor-pointer');
             avatarContainer.title = '';
@@ -2967,34 +2985,30 @@
       const nicknameEl = document.getElementById('modal-nickname');
       const cleanNick = nickname && String(nickname).trim() !== '' ? formatTitleCase(nickname) : null;
 
-      if (cleanNick) {
-        if (primaryNameEl && nicknameEl) {
-          primaryNameEl.textContent = name;
+      if (primaryNameEl) {
+        primaryNameEl.textContent = name;
+      } else if (nameEl) {
+        nameEl.textContent = name;
+      }
+
+      if (nicknameEl) {
+        if (cleanNick) {
           nicknameEl.textContent = `(${cleanNick})`;
           nicknameEl.classList.remove('hidden');
-        } else if (nameEl) {
-          nameEl.innerHTML = `${name} <span id="modal-nickname" class="text-sm font-normal text-emerald-200 block sm:inline">(${cleanNick})</span>`;
-        }
-      } else {
-        if (primaryNameEl) {
-          primaryNameEl.textContent = name;
-        } else if (nameEl) {
-          nameEl.textContent = name;
-        }
-        if (nicknameEl) {
+        } else {
           nicknameEl.textContent = '';
           nicknameEl.classList.add('hidden');
         }
       }
 
       // Perkecil ukuran font otomatis jika nama panjang agar nama lengkap terlihat utuh tanpa terpotong
-      const nameLen = (name || '').trim().length + (cleanNick ? cleanNick.length + 3 : 0);
+      const nameLen = (name || '').trim().length;
       if (nameLen > 28) {
-        nameEl.className = "text-base sm:text-lg font-bold text-white truncate whitespace-normal leading-tight break-words";
+        nameEl.className = "text-base sm:text-lg font-bold text-white leading-snug break-words mt-1";
       } else if (nameLen > 18) {
-        nameEl.className = "text-lg sm:text-xl font-bold text-white truncate whitespace-normal leading-tight break-words";
+        nameEl.className = "text-lg sm:text-xl font-bold text-white leading-snug break-words mt-1";
       } else {
-        nameEl.className = "text-xl sm:text-2xl font-bold text-white truncate whitespace-normal leading-tight break-words";
+        nameEl.className = "text-lg sm:text-xl font-bold text-white leading-snug break-words mt-1";
       }
 
       document.getElementById('modal-branch-title').textContent = subTitle || `Anak ke-${branch.branchId} dari Ibu Khotimah`;
