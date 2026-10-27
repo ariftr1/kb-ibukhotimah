@@ -534,16 +534,14 @@
           </svg>
         </button>
 
-        <!-- Foto Profil Ekstra Besar: w-64 h-64 sm:w-72 sm:h-72 (Sampai Penuh) -->
+        <!-- Foto Profil: w-36 h-36 sm:w-44 sm:h-44 -->
         <div 
           id="modal-avatar-container"
-          onclick="handlePhotoPreviewClick()"
-          class="w-64 h-64 sm:w-72 sm:h-72 max-w-[85vw] max-h-[85vw] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/25 bg-emerald-700/60 flex items-center justify-center mb-4 shrink-0 relative cursor-pointer"
-          title="Klik foto untuk melihat ukuran penuh"
+          class="w-36 h-36 sm:w-44 sm:h-44 rounded-3xl overflow-hidden shadow-xl border-4 border-white/20 bg-emerald-700/60 flex items-center justify-center mb-3 shrink-0 relative"
         >
           <div 
             id="modal-avatar" 
-            class="w-full h-full flex items-center justify-center text-6xl sm:text-7xl font-black text-white/90 select-none"
+            class="w-full h-full flex items-center justify-center text-4xl sm:text-5xl font-extrabold text-white/90 select-none"
           >
             SU
           </div>
@@ -962,30 +960,6 @@
   <!-- ========================================== -->
   <!-- FITUR PROTEKSI SANDI KELUARGA & ADMIN MODAL -->
   <!-- ========================================== -->
-
-    <!-- Modal Pratinjau Foto Penuh (Bila Foto Diklik) -->
-  <div 
-    id="photoLightboxModal" 
-    class="fixed inset-0 z-[70] hidden bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 cursor-pointer transition-opacity duration-200"
-    onclick="closePhotoLightbox()"
-  >
-    <button 
-      type="button" 
-      onclick="closePhotoLightbox()" 
-      class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition cursor-pointer"
-      title="Tutup (Esc)"
-    >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-    </button>
-    <img 
-      id="photoLightboxImg" 
-      src="" 
-      alt="Foto Profil Lengkap" 
-      class="max-w-full max-h-[85vh] rounded-2xl object-contain shadow-2xl cursor-default" 
-      onclick="event.stopPropagation()"
-    />
-    <p id="photoLightboxCaption" class="text-white/90 text-sm sm:text-base font-semibold mt-3 text-center"></p>
-  </div>
 
   <!-- Layar Kunci Keluarga (Lock Screen Overlay: Full Screen Tanpa Card) -->
   <div 
@@ -2781,28 +2755,8 @@
     }
 
     /**
-     * MODAL DETAIL PROFIL ANGGOTA & PRATINJAU FOTO
+     * MODAL DETAIL PROFIL ANGGOTA
      */
-    let activeDetailPhotoUrl = "";
-    let activeDetailMemberName = "";
-
-    function handlePhotoPreviewClick() {
-      if (activeDetailPhotoUrl && activeDetailPhotoUrl.trim() !== '') {
-        const modal = document.getElementById('photoLightboxModal');
-        const img = document.getElementById('photoLightboxImg');
-        const cap = document.getElementById('photoLightboxCaption');
-        if (img) img.src = activeDetailPhotoUrl;
-        if (cap) cap.textContent = activeDetailMemberName || 'Foto Profil';
-        if (modal) modal.classList.remove('hidden');
-      }
-    }
-
-    function closePhotoLightbox() {
-      const modal = document.getElementById('photoLightboxModal');
-      const img = document.getElementById('photoLightboxImg');
-      if (modal) modal.classList.add('hidden');
-      if (img) img.src = '';
-    }
 
     function openDetailModal(branchId, type, memberName, memberId = null) {
       if (typeof branchId === 'object' && branchId !== null) {
@@ -2931,9 +2885,6 @@
       const nickname = memberData ? memberData.nickname : null;
       const birthDate = memberData ? memberData.birth_date : null;
       const photoUrl = memberData ? memberData.photo_url : null;
-
-      activeDetailPhotoUrl = (photoUrl && photoUrl.trim() !== '') ? photoUrl.trim() : "";
-      activeDetailMemberName = name;
 
       // Pasang Avatar Inisial & Foto Profil Besar
       const avatarEl = document.getElementById('modal-avatar');
