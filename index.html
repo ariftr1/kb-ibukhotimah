@@ -2350,7 +2350,7 @@
                 }">
                   <!-- Kotak Penuh Baris Cucu (G3) -->
                   <div 
-                    onclick="showMemberDetail(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
+                    onclick="openDetailModal(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
                     class="flex items-center justify-between gap-3 p-3 rounded-xl bg-blue-50/50 border border-blue-100 hover:bg-blue-100/50 transition-colors cursor-pointer group shadow-2xs ${
                       childMatched ? 'ring-2 ring-blue-400 bg-blue-100/90 font-bold' : ''
                     }"
@@ -2374,8 +2374,8 @@
                         <button 
                           type="button"
                           class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
-                          onclick="event.stopPropagation(); openEditMemberDirect(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
-                          title="Edit data Cucu: ${escapeHtml(child.name)}"
+                          onclick="event.stopPropagation(); openDetailModal(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
+                          title="Lihat profil / detail Cucu: ${escapeHtml(child.name)}"
                         >
                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
@@ -2393,7 +2393,7 @@
                   <!-- Kotak Penuh Baris Menantu (G3 • Menantu) -->
                   ${child.spouse ? `
                     <div 
-                      onclick="showMemberDetail(${branch.branchId}, 'spouse', '${escapeHtml(child.spouse)}', ${child.id || null})"
+                      onclick="openDetailModal(${branch.branchId}, 'spouse', '${escapeHtml(child.spouse)}', ${child.id || null})"
                       class="flex items-center justify-between gap-3 p-3 rounded-xl bg-sky-50/50 border border-sky-100 hover:bg-sky-100/50 transition-colors mt-2 cursor-pointer group shadow-2xs ${
                         spouseMatched ? 'ring-2 ring-sky-400 bg-sky-100/90 font-bold' : ''
                       }"
@@ -2414,8 +2414,8 @@
                           <button 
                             type="button"
                             class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
-                            onclick="event.stopPropagation(); openEditMemberDirect(${branch.branchId}, 'spouse', '${escapeHtml(child.spouse)}', ${child.id || null})"
-                            title="Edit data Menantu: ${escapeHtml(child.spouse)}"
+                            onclick="event.stopPropagation(); openDetailModal(${branch.branchId}, 'spouse', '${escapeHtml(child.spouse)}', ${child.id || null})"
+                            title="Lihat profil / detail Menantu: ${escapeHtml(child.spouse)}"
                           >
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
@@ -2447,7 +2447,7 @@
                           const gcNameHighlighted = highlightText(gc.name, query);
                           return `
                             <div 
-                              onclick="showMemberDetail(${branch.branchId}, 'grandchild', '${escapeHtml(gc.name)}', ${gc.id || null})"
+                              onclick="openDetailModal(${branch.branchId}, 'grandchild', '${escapeHtml(gc.name)}', ${gc.id || null})"
                               class="flex items-center justify-between gap-3 p-3 rounded-xl bg-purple-50/60 border border-purple-100 hover:bg-purple-100/60 transition-colors cursor-pointer group shadow-2xs ${
                                 gcMatched ? 'ring-2 ring-purple-400 bg-purple-100/90 font-bold' : ''
                               }"
@@ -2469,8 +2469,8 @@
                                   <button 
                                     type="button"
                                     class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
-                                    onclick="event.stopPropagation(); openEditMemberDirect(${branch.branchId}, 'grandchild', '${escapeHtml(gc.name)}', ${gc.id || null})"
-                                    title="Edit data Cicit: ${escapeHtml(gc.name)}"
+                                    onclick="event.stopPropagation(); openDetailModal(${branch.branchId}, 'grandchild', '${escapeHtml(gc.name)}', ${gc.id || null})"
+                                    title="Lihat profil / detail Cicit: ${escapeHtml(gc.name)}"
                                   >
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
@@ -2626,7 +2626,7 @@
                       </div>
 
                       <div 
-                        onclick="showMemberDetail(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
+                        onclick="openDetailModal(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
                         class="font-bold text-slate-900 text-sm cursor-pointer hover:text-emerald-700 transition leading-snug"
                         title="Klik untuk melihat profil ${escapeHtml(child.name)}"
                       >
@@ -2637,7 +2637,7 @@
                       ${child.spouse ? `
                         <div class="text-[11px] text-slate-400 font-semibold my-0.5">&amp;</div>
                         <div 
-                          onclick="showMemberDetail(${branch.branchId}, 'spouse', '${escapeHtml(child.spouse)}', ${child.id || null})"
+                          onclick="openDetailModal(${branch.branchId}, 'spouse', '${escapeHtml(child.spouse)}', ${child.id || null})"
                           class="text-xs font-semibold text-slate-700 inline-flex items-center justify-center gap-1 cursor-pointer hover:text-emerald-700 transition"
                           title="Klik untuk melihat profil ${escapeHtml(child.spouse)}"
                         >
@@ -2675,7 +2675,7 @@
                               
                               <!-- G4 Cicit Card (Ungu Lembut) -->
                               <div 
-                                onclick="showMemberDetail(${branch.branchId}, 'grandchild', '${escapeHtml(gc.name)}', ${gc.id || null})"
+                                onclick="openDetailModal(${branch.branchId}, 'grandchild', '${escapeHtml(gc.name)}', ${gc.id || null})"
                                 class="tree-node bg-white p-2.5 rounded-xl border cursor-pointer ${
                                   gcMatched
                                     ? 'border-purple-400 ring-4 ring-purple-300 shadow-md bg-purple-50 font-bold'
@@ -2759,6 +2759,22 @@
     /**
      * MODAL DETAIL PROFIL ANGGOTA
      */
+    function openDetailModal(branchId, type, memberName, memberId = null) {
+      if (typeof branchId === 'object' && branchId !== null) {
+        const obj = branchId;
+        const bId = obj.branchId || (obj.branch ? obj.branch.branchId : 1);
+        const t = obj.type || (obj.generasi && obj.generasi.includes('Cicit') ? 'grandchild' : (obj.generasi && obj.generasi.includes('Menantu') ? 'spouse' : (obj.generasi && obj.generasi.includes('Cucu') ? 'child' : 'head')));
+        const mName = obj.nama_lengkap || obj.name || obj.memberName || '';
+        const mId = obj.id || obj.memberId || null;
+        return showMemberDetail(bId, t, mName, mId);
+      }
+      return showMemberDetail(branchId, type, memberName, memberId);
+    }
+
+    function renderMemberDetailModal(branchId, type, memberName, memberId = null) {
+      return openDetailModal(branchId, type, memberName, memberId);
+    }
+
     function triggerEditData() {
       openEditMemberModalFromActive();
     }
@@ -2768,6 +2784,13 @@
     }
 
     function showMemberDetail(branchId, type, memberName, memberId = null) {
+      if (typeof branchId === 'object' && branchId !== null) {
+        const obj = branchId;
+        branchId = obj.branchId || (obj.branch ? obj.branch.branchId : 1);
+        type = obj.type || (obj.generasi && obj.generasi.includes('Cicit') ? 'grandchild' : (obj.generasi && obj.generasi.includes('Menantu') ? 'spouse' : (obj.generasi && obj.generasi.includes('Cucu') ? 'child' : 'head')));
+        memberName = obj.nama_lengkap || obj.name || obj.memberName || '';
+        memberId = obj.id || obj.memberId || null;
+      }
       const branch = familyData.find(b => b.branchId === branchId);
       if (!branch) return;
 
@@ -2819,7 +2842,7 @@
 
       } else if (type === 'spouse') {
         const child = branch.children ? branch.children.find(c => c.spouse === memberName || (memberId && c.id === memberId)) : null;
-        roleText = "G3 • Cucu Menantu";
+        roleText = "G3 • Menantu";
         roleClass = "bg-sky-600/80 text-white";
         isDeceased = false;
         if (child && child.id) activeMemberContext.memberId = child.id;
