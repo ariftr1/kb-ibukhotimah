@@ -549,10 +549,10 @@
           </svg>
         </button>
 
-        <!-- Foto Profil: w-36 h-36 sm:w-44 sm:h-44 -->
+        <!-- Foto Profil: w-36 h-36 sm:w-44 sm:h-44 (object-contain, tanpa crop) -->
         <div 
           id="modal-avatar-container"
-          class="w-36 h-36 sm:w-44 sm:h-44 rounded-3xl overflow-hidden shadow-xl border-4 border-white/20 bg-emerald-700/60 flex items-center justify-center mb-3 shrink-0 relative"
+          class="w-36 h-36 sm:w-44 sm:h-44 rounded-3xl overflow-hidden shadow-xl border-4 border-white/20 bg-emerald-950/40 flex items-center justify-center mb-3 shrink-0 relative"
         >
           <div 
             id="modal-avatar" 
@@ -564,7 +564,7 @@
             id="modal-photo" 
             src="" 
             alt="Foto Profil" 
-            class="absolute inset-0 w-full h-full object-cover hidden"
+            class="w-full h-full object-contain rounded-2xl hidden"
             onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden');"
           />
         </div>
@@ -998,7 +998,7 @@
 
           <!-- Preview foto aktif saat ini -->
           <div id="editCurrentPhotoContainer" class="hidden items-center gap-3 pb-1">
-            <img id="editCurrentPhotoImg" class="w-12 h-12 rounded-xl object-cover border border-slate-200 shadow-xs" alt="Foto Saat Ini">
+            <img id="editCurrentPhotoImg" class="w-12 h-12 rounded-xl object-contain bg-slate-100 border border-slate-200 shadow-xs" alt="Foto Saat Ini">
             <span class="text-xs text-slate-500">Foto profil saat ini</span>
           </div>
 
@@ -1025,7 +1025,7 @@
 
           <!-- Preview foto baru yang dipilih -->
           <div id="photoPreviewContainer" class="hidden items-center gap-3 pt-1">
-            <img id="photoPreviewImg" class="w-14 h-14 rounded-xl object-cover border border-emerald-300 shadow-xs" alt="Preview">
+            <img id="photoPreviewImg" class="w-14 h-14 rounded-xl object-contain bg-emerald-50 border border-emerald-300 shadow-xs" alt="Preview">
             <span class="text-xs text-emerald-700 font-semibold">Pratinjau foto terpilih</span>
           </div>
         </div>
