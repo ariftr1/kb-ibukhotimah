@@ -1200,17 +1200,24 @@
      * Selalu terkunci setiap refresh halaman (F5) / tab baru
      */
     const MASTER_ADMIN_PASS = "arifpunya";
-    const DEFAULT_FAMILY_PASS = "1111";
+    const VALID_PASSWORD = "1111"; // Ganti dengan sandi pilihan Anda (hanya satu nilai)
     let isFamilyUnlocked = false;
 
     function getFamilyPass() {
-      return localStorage.getItem('family_active_pass') || localStorage.getItem('family_access_password') || DEFAULT_FAMILY_PASS;
+      const savedPass = localStorage.getItem('family_active_pass');
+      // Pastikan hanya menggunakan sandi kustom jika valid dan bukan sandi lama 'khotimah2026'
+      if (savedPass && savedPass.trim() !== '' && savedPass !== 'khotimah2026') {
+        return savedPass.trim();
+      }
+      return VALID_PASSWORD;
     }
     const getActiveFamilyPass = getFamilyPass;
+    const getValidPassword = getFamilyPass;
 
     function setFamilyPass(newPass) {
-      localStorage.setItem('family_active_pass', newPass);
-      localStorage.setItem('family_access_password', newPass);
+      if (newPass && newPass.trim() !== '') {
+        localStorage.setItem('family_active_pass', newPass.trim());
+      }
     }
 
     function isFamilyLoggedIn() {
@@ -1218,7 +1225,7 @@
     }
 
     function checkFamilyLockStatus() {
-      // 1. Bersihkan semua riwayat penyimpanan sesi auth lama di browser
+      // 1. Bersihkan semua riwayat penyimpanan sesi auth lama & sandi usang agar setiap refresh wajib memasukkan sandi aktif
       try {
         localStorage.removeItem('family_logged_in');
         sessionStorage.removeItem('family_logged_in');
@@ -1226,6 +1233,10 @@
         sessionStorage.removeItem('is_family_unlocked');
         localStorage.removeItem('isFamilyAuth');
         sessionStorage.removeItem('isFamilyAuth');
+        localStorage.removeItem('family_access_password');
+        if (localStorage.getItem('family_active_pass') === 'khotimah2026') {
+          localStorage.removeItem('family_active_pass');
+        }
       } catch (e) {}
 
       isFamilyUnlocked = false;
@@ -1250,18 +1261,19 @@
       if (event) event.preventDefault();
       const input = document.getElementById('familyPasswordInput') || document.getElementById('family-password-input');
       const errorMsg = document.getElementById('lock-error-msg');
-      const enteredPass = (input ? input.value : '').trim();
+      const inputPassword = (input ? input.value : '').trim();
 
-      // KONDISI 1: Pengguna mengetik kata sandi master admin ("arifpunya")
-      if (enteredPass === MASTER_ADMIN_PASS) {
+      // KONDISI 1: Akses Master Admin ("arifpunya") untuk membuka modal ubah sandi
+      if (inputPassword === MASTER_ADMIN_PASS) {
         if (input) input.value = '';
         if (errorMsg) errorMsg.classList.add('hidden');
         openAdminPasswordModal();
         return;
       }
 
-      // KONDISI 2: Pengguna mengetik kata sandi keluarga yang aktif
-      if (enteredPass === getActiveFamilyPass() || enteredPass === "1111" || enteredPass === DEFAULT_FAMILY_PASS) {
+      // KONDISI 2: Pengecekan ketat satu kata sandi tunggal (tanpa operator || atau sandi ganda)
+      const currentValidPass = getFamilyPass();
+      if (inputPassword === currentValidPass) {
         isFamilyUnlocked = true;
 
         if (errorMsg) errorMsg.classList.add('hidden');
