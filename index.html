@@ -961,36 +961,36 @@
   <!-- FITUR PROTEKSI SANDI KELUARGA & ADMIN MODAL -->
   <!-- ========================================== -->
 
-  <!-- Layar Kunci Keluarga (Lock Screen Overlay) -->
+  <!-- Layar Kunci Keluarga (Lock Screen Overlay: Full Screen Tanpa Card) -->
   <div 
     id="familyLockScreen" 
-    class="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300 opacity-100"
+    class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 sm:p-8 transition-opacity duration-300 opacity-100 overflow-y-auto"
     style="display: flex;"
   >
     <div 
       id="family-lock-card" 
-      class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl border border-slate-100 transform transition-all duration-300 scale-100"
+      class="w-full max-w-sm mx-auto text-center flex flex-col items-center justify-center py-6 my-auto"
     >
       <!-- Ikon Gembok Hijau Emerald (Klik 4x untuk Akses Rahasia Pengurus) -->
       <div 
         id="lock-icon-btn" 
         onclick="handleLockIconClick()"
-        class="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 shadow-sm cursor-pointer hover:bg-emerald-100/70 hover:scale-105 active:scale-95 transition select-none"
+        class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 sm:mb-5 shadow-xs cursor-pointer hover:bg-emerald-100/70 hover:scale-105 active:scale-95 transition select-none"
         title="Klik 4x untuk Pengaturan Admin"
       >
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
         </svg>
       </div>
 
       <!-- Judul & Keterangan -->
-      <h2 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Silsilah Ibu Khotimah</h2>
-      <p class="text-xs sm:text-sm text-slate-500 mt-1.5 mb-6 leading-relaxed">
+      <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Silsilah Ibu Khotimah</h2>
+      <p class="text-xs sm:text-sm text-slate-500 mt-2 mb-6 sm:mb-8 leading-relaxed max-w-xs mx-auto">
         Silsilah keluarga ini dilindungi kata sandi. Masukkan kata sandi keluarga untuk membuka akses.
       </p>
 
       <!-- Form Input Kata Sandi -->
-      <form id="familyLoginForm" onsubmit="handleFamilyUnlock(event)" class="space-y-3.5">
+      <form id="familyLoginForm" onsubmit="handleFamilyUnlock(event)" class="w-full space-y-4">
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1001,14 +1001,14 @@
             type="password" 
             id="familyPasswordInput" 
             placeholder="Masukkan kata sandi..." 
-            class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+            class="w-full pl-10 pr-10 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-2xs"
             autocomplete="current-password"
             required
           />
           <button 
             type="button" 
             onclick="toggleLockPasswordVisibility()" 
-            class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+            class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
             title="Tampilkan / Sembunyikan sandi"
           >
             <svg id="eye-icon-lock" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1027,7 +1027,7 @@
         <button 
           type="submit" 
           id="btn-unlock-family" 
-          class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-2xl font-bold text-sm shadow-md shadow-emerald-600/20 hover:shadow-lg transition cursor-pointer flex items-center justify-center gap-2"
+          class="w-full h-12 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-2xl font-bold text-sm shadow-md shadow-emerald-600/20 hover:shadow-lg transition cursor-pointer flex items-center justify-center gap-2"
         >
           <span>Buka Silsilah</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1037,7 +1037,7 @@
       </form>
 
       <!-- Teks Peringatan Privasi -->
-      <div class="mt-4 flex items-start justify-center gap-1.5 text-[11px] text-slate-400 text-center leading-relaxed px-2">
+      <div class="mt-6 flex items-start justify-center gap-1.5 text-[11px] text-slate-400 text-center leading-relaxed max-w-xs mx-auto">
         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
@@ -1045,11 +1045,12 @@
       </div>
 
       <!-- Atribusi Pengembang di Layar Kunci -->
-      <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-center">
+      <div class="mt-6 pt-4 border-t border-slate-100 w-full max-w-xs mx-auto flex items-center justify-center">
         <p class="text-[11px] text-slate-400">
           Dikembangkan oleh <span class="font-medium text-slate-600">Arif</span>
         </p>
       </div>
+
     </div>
   </div>
 
