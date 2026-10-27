@@ -521,21 +521,9 @@
       class="bg-white rounded-2xl shadow-2xl w-[92%] sm:w-full max-w-lg mx-auto overflow-hidden border border-slate-200 transform scale-95 transition-transform duration-200 max-h-[90vh] overflow-y-auto flex flex-col"
     >
       <!-- Modal Header Banner -->
-      <div class="relative bg-emerald-800 text-white p-5 rounded-t-2xl flex items-center gap-4">
-        <!-- Tombol Tutup X (Pojok Kanan Atas) -->
-        <button 
-          type="button" 
-          onclick="closeMemberModal()"
-          class="absolute top-4 right-4 text-white/80 hover:text-white p-1 rounded-lg transition hover:bg-white/10"
-          title="Tutup (Esc)"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-
-        <!-- Avatar Inisial (Kiri) -->
-        <div class="w-14 h-14 rounded-2xl bg-emerald-400 text-emerald-950 flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden shadow-md relative">
+      <div class="flex items-start gap-3.5 p-4 sm:p-5 text-white bg-emerald-900 rounded-t-2xl relative">
+        <!-- Avatar Inisial / Foto (Kiri) -->
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-400 text-emerald-950 flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden shadow-md relative">
           <div 
             id="modal-avatar" 
             class="w-full h-full flex items-center justify-center font-bold text-lg text-emerald-950"
@@ -551,23 +539,36 @@
           />
         </div>
 
-        <!-- Info Teks (Tengah) -->
-        <div class="flex-1 min-w-0 pr-12">
-          <p id="modal-branch-title" class="text-xs text-emerald-100 font-medium">Anak ke-1 dari Ibu Khotimah</p>
-          <h3 id="modal-name" class="text-xl sm:text-2xl font-bold leading-tight break-words text-white">
+        <!-- Kolom Teks (Tersusun ke Bawah: Kategori -> Nama -> Badge) -->
+        <div class="flex-1 min-w-0 pr-8">
+          <!-- Baris 1: Kategori hubungan -->
+          <span id="modal-branch-title" class="text-xs text-emerald-200/90 font-medium block leading-tight">Anak ke-1 dari Ibu Khotimah</span>
+          <!-- Baris 2: Nama lengkap anggota -->
+          <h3 id="modal-name" class="text-lg sm:text-xl font-bold leading-snug break-words mt-0.5 text-white">
             <span id="modal-primary-name">Suciyati</span> <span id="modal-nickname" class="text-sm font-normal text-emerald-200 block sm:inline hidden">(Nama Panggilan)</span>
           </h3>
+          <!-- Baris 3: Badge generasi di bawah nama secara terpisah (tidak melayang) -->
+          <div class="flex items-center gap-1.5 flex-wrap mt-2">
+            <span id="modal-role-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold shadow-sm border border-emerald-400/30 bg-emerald-600 text-white">
+              G2 • Anak
+            </span>
+            <span id="modal-deceased-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-200 text-slate-700">
+              (Almarhum)
+            </span>
+          </div>
         </div>
 
-        <!-- Badge Generasi (Pojok Kanan Bawah) -->
-        <div class="absolute bottom-4 right-4 flex items-center gap-1.5">
-          <span id="modal-role-badge" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-600/80 text-white shadow-sm border border-emerald-400/30">
-            G2 • Anak
-          </span>
-          <span id="modal-deceased-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-200 text-slate-700">
-            (Almarhum)
-          </span>
-        </div>
+        <!-- Tombol Tutup X di Pojok Kanan Atas -->
+        <button 
+          type="button" 
+          onclick="closeMemberModal()"
+          class="absolute top-4 right-4 text-white/80 hover:text-white p-1 rounded-lg transition hover:bg-white/10"
+          title="Tutup (Esc)"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
       </div>
 
       <!-- Quick Action Toolbar inside Modal -->
