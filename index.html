@@ -3366,7 +3366,10 @@
 
     async function updateMemberInSupabase(targetId, payload) {
       let currentPayload = { ...payload };
+      // Remove undefined values
       Object.keys(currentPayload).forEach(k => currentPayload[k] === undefined && delete currentPayload[k]);
+
+      const droppedColumns = [];
 
       while (Object.keys(currentPayload).length > 0) {
         const { error } = await supabase
@@ -3375,23 +3378,37 @@
           .eq('id', targetId);
 
         if (!error) {
-          return { success: true };
+          // Success — return which columns (if any) were silently dropped
+          return { success: true, droppedColumns };
         }
 
-        // Jika kolom tertentu belum ada di tabel Supabase, hapus kolom tersebut dari payload dan ulangi
+        // If a specific column doesn't exist, remove it from payload and retry
         if (error.message && (error.message.includes('column') || error.code === 'PGRST204')) {
+          // Try Supabase REST error format: "Could not find the 'xxx' column"
           const match = error.message.match(/Could not find the '([^']+)' column/);
           if (match && match[1]) {
-            console.warn(`Kolom '${match[1]}' belum ada di tabel Supabase, mencoba update kolom lain...`);
+            console.warn(`Kolom '${match[1]}' belum ada di tabel Supabase, skip kolom ini...`);
+            droppedColumns.push(match[1]);
             delete currentPayload[match[1]];
+            continue;
+          }
+          // Try Postgres error format: column "xxx" of relation...
+          const match2 = error.message.match(/column "([^"]+)" of relation/);
+          if (match2 && match2[1]) {
+            console.warn(`Kolom '${match2[1]}' belum ada di tabel Supabase, skip kolom ini...`);
+            droppedColumns.push(match2[1]);
+            delete currentPayload[match2[1]];
             continue;
           }
         }
 
-        return { success: false, error };
+        return { success: false, error, droppedColumns };
       }
 
-      return { success: false, error: new Error('Gagal update database') };
+      // Payload became empty (all columns dropped) — the meaningful fields couldn't be saved
+      // Return success=true for fields that DID save (name, is_deceased, etc.)
+      // but report dropped columns so caller can warn user.
+      return { success: true, droppedColumns };
     }
 
     async function handleSaveEditMember(event) {
@@ -3503,13 +3520,9 @@
           } else {
             updatePayload = {
               name: finalNameToSave,
-              nama: finalNameToSave,
               is_deceased: Boolean(isDeceased),
-              tanggal_lahir: newBirthDate || null,
               birth_date: newBirthDate || null,
-              foto_url: finalPhotoUrl || null,
               photo_url: finalPhotoUrl || null,
-              nama_panggilan: newNickname || null,
               nickname: newNickname || null
             };
             if (type === 'head' || type === 'child') {
@@ -3524,6 +3537,40 @@
             console.error('Gagal update database Supabase:', updateResult.error);
             showToast('Gagal menyimpan ke database Supabase: ' + (updateResult.error ? updateResult.error.message : 'Error'), 'error');
             return;
+          }
+
+          // Cek apakah kolom foto/tanggal lahir BENAR-BENAR tersimpan di Supabase
+          // (bukan hanya di localStorage) agar semua anggota keluarga bisa melihat
+          const dropped = updateResult.droppedColumns || [];
+          const photoDropped = dropped.includes('photo_url');
+          const birthDropped = dropped.includes('birth_date');
+
+          if (photoDropped || birthDropped) {
+            const missingCols = [];
+            if (photoDropped) missingCols.push('photo_url TEXT');
+            if (birthDropped) missingCols.push('birth_date TEXT');
+            const sqlHint = missingCols.map(c => `ALTER TABLE family_members ADD COLUMN IF NOT EXISTS ${c};`).join('\n');
+            console.warn('Kolom belum ada di Supabase:', missingCols, '\nSQL untuk menambah kolom:\n' + sqlHint);
+            showToast(
+              `⚠️ ${photoDropped && birthDropped ? 'Foto profil dan tanggal lahir' : photoDropped ? 'Foto profil' : 'Tanggal lahir'} hanya tersimpan di perangkat ini! ` +
+              `Kolom database belum ada. Buka Supabase Dashboard → SQL Editor → jalankan: ${sqlHint.replace(/\n/g, ' | ')}`,
+              'error'
+            );
+            // Tetap lanjut simpan ke localStorage sebagai fallback offline
+          } else {
+            // Verifikasi cepat: re-fetch baris untuk konfirmasi data tersimpan
+            try {
+              const { data: verifyRow } = await supabase
+                .from('family_members').select('photo_url, birth_date, nickname').eq('id', targetId).single();
+              if (verifyRow) {
+                if (finalPhotoUrl && !verifyRow.photo_url) {
+                  showToast('⚠️ Foto profil gagal tersimpan ke database Supabase. Coba lagi atau hubungi admin.', 'error');
+                }
+                if (newBirthDate && !verifyRow.birth_date) {
+                  showToast('⚠️ Tanggal lahir gagal tersimpan ke database Supabase. Coba lagi atau hubungi admin.', 'error');
+                }
+              }
+            } catch(e) { /* verifikasi opsional, tidak blokir */ }
           }
 
           // Jika mengedit kepala keluarga (G2) yang pasangannya memiliki baris tersendiri, sinkronkan nama pasangan
@@ -3797,6 +3844,45 @@
       }
     }
 
+    /**
+     * Probe Supabase to detect missing columns (photo_url, birth_date, nickname).
+     * Runs once at startup. Results are cached in sessionStorage so we don't spam.
+     */
+    async function probeMissingColumns() {
+      const cacheKey = 'supabase_col_check_v1';
+      if (sessionStorage.getItem(cacheKey)) return; // Already checked this session
+      try {
+        // Fetch one row and check which expected columns are present
+        const { data: rows } = await supabase
+          .from('family_members').select('id, photo_url, birth_date, nickname').limit(1);
+        const missingCols = [];
+        if (rows && rows.length > 0) {
+          const row = rows[0];
+          if (!('photo_url' in row)) missingCols.push('photo_url TEXT');
+          if (!('birth_date' in row)) missingCols.push('birth_date TEXT');
+          if (!('nickname' in row)) missingCols.push('nickname TEXT');
+        }
+        if (missingCols.length > 0) {
+          const sql = missingCols.map(c => `ALTER TABLE family_members ADD COLUMN IF NOT EXISTS ${c};`).join(' ');
+          console.warn(
+            '[Silsilah] Kolom berikut belum ada di tabel Supabase:',
+            missingCols,
+            '\nJalankan SQL ini di Supabase Dashboard → SQL Editor:\n',
+            sql
+          );
+          // Show one-time banner toast
+          showToast(
+            '⚠️ Kolom database belum lengkap: ' + missingCols.map(c => c.split(' ')[0]).join(', ') +
+            '. Foto & tanggal lahir tidak akan tersinkron ke anggota lain sampai kolom ditambahkan. Buka console untuk SQL-nya.',
+            'error'
+          );
+        }
+        sessionStorage.setItem(cacheKey, '1');
+      } catch(e) {
+        console.warn('[Silsilah] Gagal probe kolom Supabase:', e);
+      }
+    }
+
     // Inisialisasi Aplikasi ketika DOM siap
     document.addEventListener('DOMContentLoaded', () => {
       checkFamilyLockStatus();
@@ -3804,7 +3890,10 @@
       setupEventListeners();
       setupCanvasPan();
       // Tarik data langsung dari Supabase (dan jalankan migrasi jika tabel masih kosong)
-      fetchFamilyDataFromSupabase();
+      fetchFamilyDataFromSupabase().then(() => {
+        // Setelah data loaded, probe untuk kolom yang belum ada
+        probeMissingColumns();
+      });
       // Aktifkan Realtime Listener untuk sinkronisasi multi-perangkat serentak
       setupSupabaseRealtime();
     });
