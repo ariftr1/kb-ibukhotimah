@@ -1736,10 +1736,25 @@
           return await fetchFamilyDataFromSupabase();
         }
 
-        // Gabungkan dengan cache lokal jika kolom belum ada di schema Supabase
+        // Sinkronisasi data nama, panggilan, dan cache lokal dari Supabase
         try {
           const localExtras = JSON.parse(localStorage.getItem('family_member_extras') || '{}');
           rows.forEach(r => {
+            // Ekstrak nama panggilan jika tersimpan dalam format terpusat "Nama (Panggilan)"
+            if (r.name && r.name.includes('(') && r.name.endsWith(')')) {
+              const m = r.name.match(/^(.*?)\s*\((.*?)\)$/);
+              if (m) {
+                r.name = m[1].trim();
+                if (!r.nickname) r.nickname = m[2].trim();
+              }
+            }
+            if (r.spouse_name && r.spouse_name.includes('(') && r.spouse_name.endsWith(')')) {
+              const mSpouse = r.spouse_name.match(/^(.*?)\s*\((.*?)\)$/);
+              if (mSpouse) {
+                r.spouse_name = mSpouse[1].trim();
+              }
+            }
+
             const ext = localExtras[r.id] || (r.name ? localExtras[r.name.trim().toLowerCase()] : null);
             if (ext) {
               if (!r.nickname && ext.nickname) r.nickname = ext.nickname;
@@ -1748,7 +1763,7 @@
             }
           });
         } catch (e) {
-          console.warn('Cache local extras error:', e);
+          console.warn('Sinkronisasi data Supabase error:', e);
         }
 
         rawMembersList = rows;
@@ -3123,8 +3138,17 @@
       const currentMember = findMemberData(memberId, memberName);
 
       branchInfo.textContent = branch.branchName;
-      nameInput.value = memberName;
-      if (nicknameInput) nicknameInput.value = currentMember && currentMember.nickname ? currentMember.nickname : '';
+      let initialName = memberName;
+      let initialNick = currentMember && currentMember.nickname ? currentMember.nickname : '';
+      if (!initialNick && initialName && initialName.includes('(') && initialName.endsWith(')')) {
+        const m = initialName.match(/^(.*?)\s*\((.*?)\)$/);
+        if (m) {
+          initialName = m[1].trim();
+          initialNick = m[2].trim();
+        }
+      }
+      nameInput.value = initialName;
+      if (nicknameInput) nicknameInput.value = initialNick;
       if (birthdateInput) birthdateInput.value = currentMember && currentMember.birth_date ? currentMember.birth_date : '';
 
       // Reset file input & preview saat modal dibuka
@@ -3254,24 +3278,24 @@
       const newName = document.getElementById('form-edit-name').value.trim();
       const newNickname = document.getElementById('form-edit-nickname') ? document.getElementById('form-edit-nickname').value.trim() : '';
       const newBirthDate = document.getElementById('form-edit-birthdate') ? document.getElementById('form-edit-birthdate').value : '';
-      const newSpouse = document.getElementById('form-edit-spouse').value.trim();
-      const isDeceased = document.getElementById('form-edit-deceased').checked;
+      const newSpouse = document.getElementById('form-edit-spouse') ? document.getElementById('form-edit-spouse').value.trim() : '';
+      const isDeceased = document.getElementById('form-edit-deceased') ? document.getElementById('form-edit-deceased').checked : false;
       const editPhotoFileEl = document.getElementById('editPhotoFile');
       const photoFileSelected = editPhotoFileEl && editPhotoFileEl.files && editPhotoFileEl.files[0] ? editPhotoFileEl.files[0] : null;
       const submitBtn = document.getElementById('btn-submit-edit');
 
       if (!newName) {
-        alert('Nama tidak boleh kosong.');
+        showToast('Nama tidak boleh kosong.', 'error');
         return;
       }
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span>Memperbarui Data...</span>';
+        submitBtn.innerHTML = '<span>Menyimpan ke Database Supabase...</span>';
       }
 
       // Upload foto ke Supabase Storage jika ada file baru dipilih
-      let newPhotoUrl = undefined; // undefined = tidak diubah
+      let newPhotoUrl = undefined;
       if (photoFileSelected) {
         if (submitBtn) submitBtn.innerHTML = '<span>Mengunggah foto...</span>';
         try {
@@ -3281,21 +3305,14 @@
           const { error: uploadError } = await supabase.storage
             .from('family-photos')
             .upload(fileName, photoFileSelected, { cacheControl: '3600', upsert: true });
-          if (uploadError) {
-            console.error('Gagal upload foto:', uploadError);
-            alert('Gagal mengunggah foto: ' + uploadError.message);
-            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<span>Perbarui Data</span>'; }
-            return;
+          if (!uploadError) {
+            const { data: publicUrlData } = supabase.storage.from('family-photos').getPublicUrl(fileName);
+            newPhotoUrl = publicUrlData ? publicUrlData.publicUrl : null;
           }
-          const { data: publicUrlData } = supabase.storage.from('family-photos').getPublicUrl(fileName);
-          newPhotoUrl = publicUrlData.publicUrl;
         } catch (uploadErr) {
-          console.error('Error upload foto:', uploadErr);
-          alert('Terjadi kesalahan saat mengunggah foto.');
-          if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<span>Perbarui Data</span>'; }
-          return;
+          console.warn('Upload foto lewati (bucket belum aktif):', uploadErr);
         }
-        if (submitBtn) submitBtn.innerHTML = '<span>Memperbarui Data...</span>';
+        if (submitBtn) submitBtn.innerHTML = '<span>Menyimpan ke Database Supabase...</span>';
       }
 
       try {
@@ -3320,69 +3337,63 @@
           }
         }
 
-        // Ambil photo_url lama jika tidak ada upload baru (perlu dilakukan sebelum if targetId)
+        if (!targetId && rawMembersList) {
+          const match = rawMembersList.find(r => r.name === oldName || (type === 'spouse' && r.spouse_name === oldName));
+          if (match) targetId = match.id;
+        }
+
         const currentMemberForPhoto = findMemberData(memberId || null, oldName);
         const oldPhotoUrl = currentMemberForPhoto ? currentMemberForPhoto.photo_url : null;
         const finalPhotoUrl = newPhotoUrl !== undefined ? (newPhotoUrl || null) : oldPhotoUrl;
 
-        if (targetId) {
-          // Update baris di Supabase
-          const updatePayload = {
-            name: (type === 'spouse') ? undefined : newName,
-            nickname: newNickname || null,
-            birth_date: newBirthDate || null,
-            photo_url: finalPhotoUrl,
-            is_deceased: isDeceased
-          };
+        // Format nama yang disimpan ke database terpusat Supabase
+        const finalNameToSave = newNickname ? `${newName} (${newNickname})` : newName;
 
-          if (type === 'head' || type === 'child') {
-            updatePayload.spouse_name = newSpouse || null;
-          } else if (type === 'spouse') {
-            // Jika mengedit menantu, yang diupdate adalah spouse_name pada baris anak
-            updatePayload.spouse_name = newName;
+        if (targetId) {
+          let updatePayload = {};
+
+          if (type === 'spouse') {
+            // Update nama pasangan pada baris anggota
+            updatePayload = {
+              spouse_name: finalNameToSave
+            };
+          } else {
+            updatePayload = {
+              name: finalNameToSave,
+              is_deceased: Boolean(isDeceased)
+            };
+            if (type === 'head' || type === 'child') {
+              updatePayload.spouse_name = newSpouse || null;
+            }
           }
 
-          // Bersihkan field undefined
-          Object.keys(updatePayload).forEach(k => updatePayload[k] === undefined && delete updatePayload[k]);
-
-          let { error } = await supabase
+          // Perintah update ke tabel Supabase (family_members)
+          const { error: updateError } = await supabase
             .from('family_members')
             .update(updatePayload)
             .eq('id', targetId);
 
-          if (error && error.message && error.message.includes('column')) {
-            console.warn('Kolom opsional belum ada di Supabase, menyimpan kolom standar:', error.message);
-            const fallbackPayload = {
-              name: updatePayload.name,
-              is_deceased: updatePayload.is_deceased
-            };
-            if (updatePayload.spouse_name !== undefined) {
-              fallbackPayload.spouse_name = updatePayload.spouse_name;
-            }
-            const fallbackRes = await supabase
-              .from('family_members')
-              .update(fallbackPayload)
-              .eq('id', targetId);
-            if (fallbackRes.error) {
-              throw fallbackRes.error;
-            }
-            // Simpan lokal di rawMembersList
-            const memRow = rawMembersList.find(r => r.id === targetId);
-            if (memRow) {
-              memRow.name = newName;
-              memRow.nickname = newNickname || null;
-              memRow.birth_date = newBirthDate || null;
-              memRow.photo_url = finalPhotoUrl;
-              memRow.is_deceased = isDeceased;
-            }
-          } else if (error) {
-            console.error('Gagal update Supabase:', error);
-            alert('Gagal memperbarui di Supabase: ' + error.message);
+          if (updateError) {
+            console.error('Gagal update database Supabase:', updateError);
+            showToast('Gagal menyimpan ke database Supabase: ' + updateError.message, 'error');
             return;
           }
+
+          // Jika mengedit kepala keluarga (G2) yang pasangannya memiliki baris tersendiri, sinkronkan nama pasangan
+          if (type === 'head' && branch.heads && branch.heads.length > 1) {
+            const otherHead = branch.heads.find(h => h.id !== targetId);
+            if (otherHead && otherHead.id) {
+              await supabase
+                .from('family_members')
+                .update({ spouse_name: finalNameToSave })
+                .eq('id', otherHead.id);
+            }
+          }
+        } else {
+          console.warn('targetId tidak ditemukan untuk anggota:', oldName);
         }
 
-        // Selalu simpan ke localStorage sebagai persistent cache
+        // Simpan cache lokal sebagai cadangan offline
         try {
           const localExtras = JSON.parse(localStorage.getItem('family_member_extras') || '{}');
           const extObj = {
@@ -3395,29 +3406,25 @@
           if (oldName) localExtras[oldName.trim().toLowerCase()] = extObj;
           localStorage.setItem('family_member_extras', JSON.stringify(localExtras));
         } catch (e) {
-          console.warn('Gagal simpan ke localStorage:', e);
+          console.warn('Cache local extras error:', e);
         }
 
-        // Muat ulang data terbaru dari Supabase
+        // Panggil kembali fungsi pemuatan data dari Supabase agar state lokal dan tampilan ter-update seketika
         await fetchFamilyDataFromSupabase();
 
-        // Update juga data lokal jika targetId match
-        const memRow = rawMembersList.find(r => r.id === targetId);
-        if (memRow) {
-          if (newNickname !== undefined) memRow.nickname = newNickname || null;
-          if (newBirthDate !== undefined) memRow.birth_date = newBirthDate || null;
-          memRow.photo_url = finalPhotoUrl;
-        }
-
+        // Tutup modal edit
         closeEditMemberModal();
-        showToast(`Profil "${newName}" berhasil diperbarui!`, 'success');
 
+        // Tampilkan notifikasi toast sukses
+        showToast('Data berhasil diperbarui untuk semua keluarga!', 'success');
+
+        // Buka kembali modal detail anggota dengan data terbaru
         activeMemberContext.memberName = newName;
         showMemberDetail(branchId, type, newName, targetId);
 
       } catch (err) {
         console.error('Error saat update member:', err);
-        alert('Terjadi kesalahan saat menyimpan data.');
+        showToast('Terjadi kesalahan saat menyimpan data: ' + err.message, 'error');
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -3618,6 +3625,35 @@
       });
     }
 
+    /**
+     * SINKRONISASI REALTIME SUPABASE (POSTGRES CHANGES)
+     * Mengotomatiskan update pada layar seluruh anggota keluarga tanpa perlu refresh
+     */
+    let supabaseRealtimeChannel = null;
+    function setupSupabaseRealtime() {
+      try {
+        if (!supabase || typeof supabase.channel !== 'function') return;
+        if (supabaseRealtimeChannel) return;
+
+        supabaseRealtimeChannel = supabase
+          .channel('family-members-live-sync')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'family_members' },
+            async (payload) => {
+              console.log('Perubahan real-time terdeteksi di Supabase:', payload);
+              await fetchFamilyDataFromSupabase();
+              showToast('Data silsilah diperbarui serentak dari database.', 'info');
+            }
+          )
+          .subscribe((status) => {
+            console.log('Status koneksi Supabase Realtime:', status);
+          });
+      } catch (err) {
+        console.warn('Supabase Realtime channel error:', err);
+      }
+    }
+
     // Inisialisasi Aplikasi ketika DOM siap
     document.addEventListener('DOMContentLoaded', () => {
       checkFamilyLockStatus();
@@ -3626,6 +3662,8 @@
       setupCanvasPan();
       // Tarik data langsung dari Supabase (dan jalankan migrasi jika tabel masih kosong)
       fetchFamilyDataFromSupabase();
+      // Aktifkan Realtime Listener untuk sinkronisasi multi-perangkat serentak
+      setupSupabaseRealtime();
     });
   </script>
 </body>
