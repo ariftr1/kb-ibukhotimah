@@ -522,11 +522,15 @@
     >
       <!-- Modal Header Banner -->
       <div class="flex items-start gap-3.5 p-4 sm:p-5 text-white bg-emerald-900 rounded-t-2xl relative">
-        <!-- Avatar Inisial / Foto (Kiri) -->
-        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-400 text-emerald-950 flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden shadow-md relative">
+        <!-- Avatar Inisial / Foto (Kiri: w-20 h-20 sm:w-24 sm:h-24) -->
+        <div 
+          id="modal-avatar-container"
+          onclick="handleAvatarClick()"
+          class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0 relative group cursor-pointer border-2 border-white/30 shadow-md"
+        >
           <div 
             id="modal-avatar" 
-            class="w-full h-full flex items-center justify-center font-bold text-lg text-emerald-950"
+            class="w-full h-full bg-emerald-400 text-emerald-950 flex items-center justify-center font-bold text-2xl sm:text-3xl"
           >
             SU
           </div>
@@ -534,9 +538,15 @@
             id="modal-photo" 
             src="" 
             alt="Foto Profil" 
-            class="absolute inset-0 w-full h-full object-cover hidden"
-            onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden');"
+            class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 hidden"
+            onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden'); const z = document.getElementById('modal-photo-zoom-icon'); if(z) z.classList.add('hidden');"
           />
+          <!-- Ikon Kaca Pembesar / Zoom di Sudut Avatar -->
+          <div id="modal-photo-zoom-icon" class="absolute bottom-1 right-1 bg-black/60 backdrop-blur-xs p-1 rounded-md text-white opacity-80 group-hover:opacity-100 hidden transition pointer-events-none">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+            </svg>
+          </div>
         </div>
 
         <!-- Kolom Teks (Tersusun ke Bawah: Kategori -> Nama -> Badge) -->
@@ -983,6 +993,17 @@
   <!-- ========================================== -->
   <!-- FITUR PROTEKSI SANDI KELUARGA & ADMIN MODAL -->
   <!-- ========================================== -->
+
+  <!-- MODAL: Perbesar Foto Profil (Lightbox Popup) -->
+  <div id="imagePreviewModal" class="fixed inset-0 z-[70] hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-200" onclick="closeImagePreview()">
+    <div class="relative max-w-sm sm:max-w-md w-full bg-transparent flex flex-col items-center" onclick="event.stopPropagation()">
+      <button type="button" onclick="closeImagePreview()" class="absolute -top-10 right-0 text-white hover:text-emerald-400 p-2 transition cursor-pointer" title="Tutup">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <img id="previewImageElement" src="" alt="Foto Profil Penuh" class="max-w-full max-h-[75vh] rounded-2xl object-contain shadow-2xl border border-white/20" />
+      <p id="previewImageCaption" class="text-white text-center font-medium mt-3 text-sm sm:text-base"></p>
+    </div>
+  </div>
 
   <!-- Layar Kunci Keluarga (Lock Screen Overlay) -->
   <div 
@@ -2782,6 +2803,37 @@
     /**
      * MODAL DETAIL PROFIL ANGGOTA
      */
+    /**
+     * MODAL PRATINJAU FOTO PROFIL (LIGHTBOX ZOOM POPUP)
+     */
+    function handleAvatarClick() {
+      const photoEl = document.getElementById('modal-photo');
+      if (photoEl && !photoEl.classList.contains('hidden') && photoEl.src && photoEl.src.trim() !== '') {
+        const primaryName = document.getElementById('modal-primary-name');
+        const nameText = primaryName ? primaryName.textContent.trim() : 'Foto Profil';
+        openImagePreview(photoEl.src, nameText);
+      }
+    }
+
+    function openImagePreview(imageUrl, memberName) {
+      if (!imageUrl) return;
+      const modal = document.getElementById('imagePreviewModal');
+      const img = document.getElementById('previewImageElement');
+      const caption = document.getElementById('previewImageCaption');
+      if (img) img.src = imageUrl;
+      if (caption) caption.textContent = memberName ? `Foto Profil: ${memberName}` : 'Foto Profil';
+      if (modal) {
+        modal.classList.remove('hidden');
+      }
+    }
+
+    function closeImagePreview() {
+      const modal = document.getElementById('imagePreviewModal');
+      const img = document.getElementById('previewImageElement');
+      if (modal) modal.classList.add('hidden');
+      if (img) img.src = '';
+    }
+
     function showMemberDetail(branchId, type, memberName, memberId = null) {
       const branch = familyData.find(b => b.branchId === branchId);
       if (!branch) return;
@@ -2882,16 +2934,30 @@
       // Pasang Avatar Inisial & Foto Profil
       const avatarEl = document.getElementById('modal-avatar');
       const photoEl = document.getElementById('modal-photo');
+      const zoomIcon = document.getElementById('modal-photo-zoom-icon');
+      const avatarContainer = document.getElementById('modal-avatar-container');
+
       if (avatarEl) avatarEl.textContent = getInitials(name);
       if (photoEl) {
         if (photoUrl && photoUrl.trim() !== '') {
           photoEl.src = photoUrl.trim();
+          photoEl.alt = name;
           photoEl.classList.remove('hidden');
           if (avatarEl) avatarEl.classList.add('hidden');
+          if (zoomIcon) zoomIcon.classList.remove('hidden');
+          if (avatarContainer) {
+            avatarContainer.classList.add('cursor-pointer');
+            avatarContainer.title = `Klik untuk memperbesar foto ${name}`;
+          }
         } else {
           photoEl.src = '';
           photoEl.classList.add('hidden');
           if (avatarEl) avatarEl.classList.remove('hidden');
+          if (zoomIcon) zoomIcon.classList.add('hidden');
+          if (avatarContainer) {
+            avatarContainer.classList.remove('cursor-pointer');
+            avatarContainer.title = '';
+          }
         }
       }
 
@@ -3881,6 +3947,7 @@
       // Close Modal on Escape Key
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
+          closeImagePreview();
           closeAdminPasswordModal();
           closeAdminRestrictedAlert();
           closeAddChildModal();
