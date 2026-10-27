@@ -513,15 +513,15 @@
   <!-- MODAL 1: Detail Profil Anggota -->
   <div 
     id="modal-profile-backdrop" 
-    class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity duration-200 opacity-0"
+    class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-0 sm:p-4 transition-opacity duration-200 opacity-0"
     onclick="handleModalBackdropClick(event)"
   >
     <div 
       id="modal-profile-card" 
-      class="bg-white rounded-3xl shadow-2xl w-[92%] sm:w-full max-w-lg mx-auto overflow-hidden border border-slate-200 transform scale-95 transition-transform duration-200 max-h-[90vh] flex flex-col"
+      class="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] max-w-lg mx-auto rounded-none sm:rounded-3xl border-0 sm:border border-slate-200 shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-200"
     >
       <!-- 1. Header Hijau Terpusat (Foto Profil Besar di Atas) -->
-      <div class="flex flex-col items-center text-center p-6 bg-gradient-to-b from-emerald-800 to-emerald-900 text-white relative rounded-t-3xl shrink-0">
+      <div class="flex flex-col items-center text-center p-6 bg-gradient-to-b from-emerald-800 to-emerald-900 text-white relative rounded-none sm:rounded-t-3xl shrink-0">
         <!-- Tombol Tutup (X) -->
         <button 
           type="button" 
@@ -573,32 +573,32 @@
         </div>
       </div>
 
-      <!-- 2. Tombol Aksi Sama Lebar (50:50) -->
-      <div class="flex items-center gap-3 px-6 py-3 border-b border-slate-100 bg-slate-50/70 shrink-0">
+      <!-- 2. Tombol Aksi Sama Lebar (50:50) Tanpa Teks Terpotong -->
+      <div class="grid grid-cols-2 gap-3 px-4 sm:px-6 py-3 border-b border-slate-100 bg-slate-50/70 shrink-0">
         <button 
           type="button" 
           onclick="triggerEditData()" 
-          class="flex-1 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-emerald-700 bg-white hover:bg-emerald-50 border border-emerald-200 shadow-xs transition cursor-pointer"
+          class="w-full h-11 inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold text-emerald-700 bg-white hover:bg-emerald-50 border border-emerald-200 shadow-2xs hover:shadow-xs transition whitespace-nowrap cursor-pointer"
         >
-          <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
           </svg>
-          <span>Edit Data</span>
+          <span class="whitespace-nowrap">Edit Data</span>
         </button>
         <button 
           type="button" 
           onclick="triggerAddChild()" 
-          class="flex-1 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 shadow-xs transition cursor-pointer"
+          class="w-full h-11 inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs hover:shadow-xs transition whitespace-nowrap cursor-pointer"
         >
-          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
           </svg>
-          <span>Tambah Anak</span>
+          <span class="whitespace-nowrap">Tambah Anak</span>
         </button>
       </div>
 
       <!-- 3. Isi Informasi Full List (Menyatu tanpa Card Terpisah) -->
-      <div class="p-6 space-y-4 text-left overflow-y-auto flex-1">
+      <div class="p-5 sm:p-6 space-y-4 text-left overflow-y-auto flex-1">
         
         <!-- PASANGAN (SUAMI / ISTRI) -->
         <div id="detailSpouseContainer" class="pb-3 border-b border-slate-100">
@@ -624,20 +624,20 @@
             <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">KETURUNAN / ANAK</span>
             <span class="text-xs font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full" id="detailChildrenCount">0 Anggota</span>
           </div>
-          <div id="detailChildrenList" class="flex flex-wrap gap-2"></div>
+          <div id="detailChildrenList" class="flex flex-col divide-y divide-slate-100"></div>
         </div>
 
       </div>
 
       <!-- 4. Footer Modal -->
-      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+      <div class="px-5 sm:px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0 rounded-none sm:rounded-b-3xl">
         <span class="text-xs text-slate-500 font-medium">
           Arsip Silsilah Keluarga Besar
         </span>
         <button 
           type="button" 
           onclick="closeMemberModal()"
-          class="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-xs sm:text-sm transition cursor-pointer"
+          class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-xs sm:text-sm transition cursor-pointer"
         >
           Tutup
         </button>
@@ -2994,16 +2994,19 @@
 
       if (childrenListEl) {
         if (childrenList.length > 0) {
-          childrenListEl.innerHTML = childrenList.map(cName => {
+          childrenListEl.innerHTML = childrenList.map((cName, idx) => {
             return `
-              <span class="inline-flex items-center px-3 py-1.5 rounded-xl bg-slate-50 text-slate-800 text-xs sm:text-sm font-semibold border border-slate-200 shadow-2xs">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 shrink-0"></span>
-                ${escapeHtml(cName)}
-              </span>
+              <div class="py-2.5 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                  <span class="font-semibold text-slate-800 text-sm sm:text-base">${escapeHtml(cName)}</span>
+                </div>
+                <span class="text-xs text-slate-400 font-medium">Anak ke-${idx + 1}</span>
+              </div>
             `;
           }).join('');
         } else {
-          childrenListEl.innerHTML = `<span class="text-xs sm:text-sm text-slate-400 italic">Belum ada anak/keturunan tercatat</span>`;
+          childrenListEl.innerHTML = `<p class="text-xs sm:text-sm text-slate-400 italic py-2">Belum ada anak/keturunan tercatat</p>`;
         }
       }
 
