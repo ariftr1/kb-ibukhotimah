@@ -38,9 +38,9 @@ function openAddMemberModal() {
   // 1. Cek otorisasi admin
   if (!window.isAdminAuthenticated) {
     if (typeof showAdminRestrictedAlert === 'function') {
-      showAdminRestrictedAlert('Fitur tambah anggota keluarga hanya dapat diakses oleh admin keluarga.');
+      showAdminRestrictedAlert('Fitur tambah anggota hanya bisa diakses oleh admin, silakan menghubungi admin untuk menambahkan data anggota keluarga baru.');
     } else {
-      alert('Fitur tambah anggota keluarga hanya dapat diakses oleh admin keluarga.');
+      alert('Fitur tambah anggota hanya bisa diakses oleh admin, silakan menghubungi admin untuk menambahkan data anggota keluarga baru.');
     }
     return;
   }
