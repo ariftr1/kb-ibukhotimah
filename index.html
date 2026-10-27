@@ -1757,9 +1757,24 @@
 
             const ext = localExtras[r.id] || (r.name ? localExtras[r.name.trim().toLowerCase()] : null);
             if (ext) {
+              // Fill missing fields from localStorage cache (fallback only)
               if (!r.nickname && ext.nickname) r.nickname = ext.nickname;
               if (!r.birth_date && ext.birth_date) r.birth_date = ext.birth_date;
               if (!r.photo_url && ext.photo_url) r.photo_url = ext.photo_url;
+            }
+            // If Supabase now has authoritative values, update localStorage cache
+            // so other browsers / tabs don't resurrect stale cache values.
+            if (r.id && (r.photo_url || r.birth_date || r.nickname)) {
+              const cacheKey = r.id;
+              const existing = localExtras[cacheKey] || {};
+              let changed = false;
+              if (r.photo_url && existing.photo_url !== r.photo_url) { existing.photo_url = r.photo_url; changed = true; }
+              if (r.birth_date && existing.birth_date !== r.birth_date) { existing.birth_date = r.birth_date; changed = true; }
+              if (r.nickname && existing.nickname !== r.nickname) { existing.nickname = r.nickname; changed = true; }
+              if (changed) {
+                localExtras[cacheKey] = existing;
+                try { localStorage.setItem('family_member_extras', JSON.stringify(localExtras)); } catch(e) {}
+              }
             }
           });
         } catch (e) {
@@ -1967,19 +1982,67 @@
     }
 
     function findMemberData(memberId, memberName) {
-      if (!rawMembersList || rawMembersList.length === 0) return null;
-      // 1. Cek berdasarkan nama persis (agar jika mengklik pasangan/menantu tidak tertukar dengan id pasangannya)
-      if (memberName) {
-        const cleanName = memberName.trim().toLowerCase();
-        const byName = rawMembersList.find(r => r.name && r.name.trim().toLowerCase() === cleanName);
-        if (byName) return byName;
+      // 1. Search rawMembersList first (authoritative DB rows)
+      let found = null;
+      if (rawMembersList && rawMembersList.length > 0) {
+        if (memberName) {
+          const cleanName = memberName.trim().toLowerCase();
+          found = rawMembersList.find(r => r.name && r.name.trim().toLowerCase() === cleanName);
+        }
+        if (!found && memberId) {
+          found = rawMembersList.find(r => r.id === memberId);
+        }
       }
-      // 2. Cek berdasarkan memberId
-      if (memberId) {
-        const byId = rawMembersList.find(r => r.id === memberId);
-        if (byId) return byId;
+      // 2. If not found in rawMembersList, or found but lacks photo_url/birth_date,
+      //    also check the familyData hierarchy objects (heads / children / grandchildren)
+      //    which carry photoUrl / birthDate from the structured branch data.
+      if (!found || (!found.photo_url && !found.birth_date)) {
+        if (familyData && familyData.length > 0) {
+          const nameClean = memberName ? memberName.trim().toLowerCase() : null;
+          for (const branch of familyData) {
+            // Check heads (G2)
+            if (branch.heads) {
+              for (const h of branch.heads) {
+                const match = (memberId && h.id === memberId) || (nameClean && h.name && h.name.trim().toLowerCase() === nameClean);
+                if (match) {
+                  if (!found) found = {};
+                  if (!found.photo_url && h.photoUrl) found.photo_url = h.photoUrl;
+                  if (!found.birth_date && h.birthDate) found.birth_date = h.birthDate;
+                  if (!found.nickname && h.nickname) found.nickname = h.nickname;
+                  break;
+                }
+              }
+            }
+            // Check children (G3)
+            if (branch.children) {
+              for (const c of branch.children) {
+                const match = (memberId && c.id === memberId) || (nameClean && c.name && c.name.trim().toLowerCase() === nameClean);
+                if (match) {
+                  if (!found) found = {};
+                  if (!found.photo_url && c.photoUrl) found.photo_url = c.photoUrl;
+                  if (!found.birth_date && c.birthDate) found.birth_date = c.birthDate;
+                  if (!found.nickname && c.nickname) found.nickname = c.nickname;
+                  break;
+                }
+                // Check grandchildren (G4)
+                if (c.grandchildren) {
+                  for (const gc of c.grandchildren) {
+                    const matchGc = (memberId && gc.id === memberId) || (nameClean && gc.name && gc.name.trim().toLowerCase() === nameClean);
+                    if (matchGc) {
+                      if (!found) found = {};
+                      if (!found.photo_url && gc.photoUrl) found.photo_url = gc.photoUrl;
+                      if (!found.birth_date && gc.birthDate) found.birth_date = gc.birthDate;
+                      if (!found.nickname && gc.nickname) found.nickname = gc.nickname;
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
-      return null;
+      return found || null;
     }
 
     function calculateAge(birthDateString) {
@@ -3267,7 +3330,7 @@
       }, 200);
     }
 
-    function compressImageToBase64(file, maxWidth = 120, maxHeight = 120, quality = 0.7) {
+    function compressImageToBase64(file, maxWidth = 400, maxHeight = 400, quality = 0.75) {
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -3723,7 +3786,7 @@
             async (payload) => {
               console.log('Perubahan real-time terdeteksi di Supabase:', payload);
               await fetchFamilyDataFromSupabase();
-              showToast('Data silsilah diperbarui serentak dari database.', 'info');
+              // toast suppressed to avoid spam on every realtime event
             }
           )
           .subscribe((status) => {
