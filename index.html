@@ -549,14 +549,14 @@
           </svg>
         </button>
 
-        <!-- Foto Profil: w-36 h-36 sm:w-44 sm:h-44 (object-contain, tanpa crop) -->
+        <!-- Foto Profil: Ukuran Bingkai Otomatis Mengikuti Proporsi Gambar (Tanpa Ruang Kosong / Crop) -->
         <div 
           id="modal-avatar-container"
-          class="w-36 h-36 sm:w-44 sm:h-44 rounded-3xl overflow-hidden shadow-xl border-4 border-white/20 bg-emerald-950/40 flex items-center justify-center mb-3 shrink-0 relative"
+          class="inline-flex items-center justify-center max-w-[85vw] sm:max-w-xs max-h-60 sm:max-h-72 rounded-3xl overflow-hidden shadow-xl border-4 border-white/20 bg-emerald-950/40 mb-3 shrink-0 relative transition-all duration-200"
         >
           <div 
             id="modal-avatar" 
-            class="w-full h-full flex items-center justify-center text-4xl sm:text-5xl font-extrabold text-white/90 select-none"
+            class="w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center text-4xl sm:text-5xl font-extrabold text-white/90 select-none bg-emerald-700/60"
           >
             SU
           </div>
@@ -564,7 +564,7 @@
             id="modal-photo" 
             src="" 
             alt="Foto Profil" 
-            class="w-full h-full object-contain rounded-2xl hidden"
+            class="max-w-[85vw] sm:max-w-xs max-h-60 sm:max-h-72 w-auto h-auto object-contain block rounded-2xl hidden"
             onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden');"
           />
         </div>
