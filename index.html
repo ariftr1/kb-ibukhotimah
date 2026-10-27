@@ -526,68 +526,56 @@
       class="bg-white rounded-2xl shadow-2xl w-[92%] sm:w-full max-w-lg mx-auto overflow-hidden border border-slate-200 transform scale-95 transition-transform duration-200 max-h-[90vh] overflow-y-auto flex flex-col"
     >
       <!-- Modal Header Banner -->
-      <div class="relative bg-gradient-to-r from-emerald-800 to-emerald-900 text-white p-5 sm:p-6 pr-14 sm:pr-16">
+      <div class="relative bg-gradient-to-r from-emerald-800 to-emerald-900 flex items-start gap-3 p-4 sm:p-6 text-white">
+        <!-- Avatar Inisial / Foto Profil -->
+        <div class="w-14 h-14 rounded-2xl bg-emerald-400 text-emerald-950 flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden shadow-md relative">
+          <div 
+            id="modal-avatar" 
+            class="w-full h-full flex items-center justify-center font-bold text-lg text-emerald-950"
+          >
+            SU
+          </div>
+          <img 
+            id="modal-photo" 
+            src="" 
+            alt="Foto Profil" 
+            class="absolute inset-0 w-full h-full object-cover hidden"
+            onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden');"
+          />
+        </div>
+
+        <!-- Info Nama & Kategori -->
+        <div class="flex-1 min-w-0">
+          <span id="modal-branch-title" class="text-xs text-emerald-100 block">
+            Anak ke-1 dari Ibu Khotimah
+          </span>
+          <h3 id="modal-name" class="text-xl sm:text-2xl font-bold text-white truncate whitespace-normal leading-tight break-words mt-0.5">
+            Suciyati
+          </h3>
+          <div class="flex items-center gap-1.5 flex-wrap mt-2">
+            <span id="modal-role-badge" class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-700/60 text-emerald-100">
+              G2 • Anak
+            </span>
+            <span id="modal-deceased-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-200 text-slate-700">
+              (Almarhum)
+            </span>
+            <span id="modal-nickname" class="hidden px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/15 text-white/90 border border-white/20">
+              Panggilan: -
+            </span>
+          </div>
+        </div>
+
+        <!-- Tombol Tutup X -->
         <button 
           type="button" 
           onclick="closeMemberModal()"
-          class="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 rounded-full bg-white/10 hover:bg-emerald-700/50 text-white flex items-center justify-center transition"
+          class="text-white/80 hover:text-white p-1 rounded-lg shrink-0 ml-auto transition hover:bg-white/10"
           title="Tutup (Esc)"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
-
-        <div class="flex items-center gap-4">
-          <!-- Avatar Inisial / Foto Profil -->
-          <div class="relative w-16 h-16 rounded-2xl shrink-0 overflow-hidden shadow-lg border-2 border-white/40 bg-gradient-to-tr from-emerald-500 to-teal-300">
-            <div 
-              id="modal-avatar" 
-              class="w-full h-full text-slate-900 font-black text-2xl flex items-center justify-center"
-            >
-              AB
-            </div>
-            <img 
-              id="modal-photo" 
-              src="" 
-              alt="Foto Profil" 
-              class="absolute inset-0 w-full h-full object-cover hidden"
-              onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden');"
-            />
-          </div>
-
-          <!-- Informasi Anggota (Kiri: Nama & Panggilan, Kanan: Nasab & Badge Generasi) -->
-          <div class="flex-1 min-w-0 flex flex-col justify-center">
-            
-            <!-- Baris Atas: Kiri Nama Lengkap, Kanan Nasab -->
-            <div class="flex items-start justify-between gap-3">
-              <h2 id="modal-name" class="font-black text-white tracking-tight leading-tight flex-1 min-w-0 break-words text-xl sm:text-2xl">
-                Nama Lengkap
-              </h2>
-              <p id="modal-branch-title" class="text-[11px] sm:text-xs font-semibold text-emerald-200/90 shrink-0 text-right whitespace-nowrap mt-0.5">
-                Anak ke-1 dari Ibu Khotimah
-              </p>
-            </div>
-
-            <!-- Baris Bawah: Kiri Nama Panggilan, Kanan G2 • Anak -->
-            <div class="flex items-center justify-between gap-3 mt-2 min-h-[26px]">
-              <div class="flex items-center min-w-0">
-                <span id="modal-nickname" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/15 text-white/90 backdrop-blur-sm border border-white/20 shadow-xs hidden">
-                  Panggilan: -
-                </span>
-              </div>
-              <div class="flex items-center gap-1.5 shrink-0 justify-end ml-auto">
-                <span id="modal-role-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500 text-white shadow-xs">
-                  G2 • Anak
-                </span>
-                <span id="modal-deceased-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-200 text-slate-700">
-                  (Almarhum)
-                </span>
-              </div>
-            </div>
-
-          </div>
-        </div>
       </div>
 
       <!-- Quick Action Toolbar inside Modal -->
@@ -2770,11 +2758,11 @@
       // Perkecil ukuran font otomatis jika nama panjang agar nama lengkap terlihat utuh tanpa terpotong
       const nameLen = (name || '').trim().length;
       if (nameLen > 24) {
-        nameEl.className = "font-black text-white tracking-tight leading-tight flex-1 min-w-0 break-words text-sm sm:text-base";
+        nameEl.className = "text-base sm:text-lg font-bold text-white truncate whitespace-normal leading-tight break-words mt-0.5";
       } else if (nameLen > 16) {
-        nameEl.className = "font-black text-white tracking-tight leading-tight flex-1 min-w-0 break-words text-base sm:text-lg";
+        nameEl.className = "text-lg sm:text-xl font-bold text-white truncate whitespace-normal leading-tight break-words mt-0.5";
       } else {
-        nameEl.className = "font-black text-white tracking-tight leading-tight flex-1 min-w-0 break-words text-xl sm:text-2xl";
+        nameEl.className = "text-xl sm:text-2xl font-bold text-white truncate whitespace-normal leading-tight break-words mt-0.5";
       }
       const nicknameEl = document.getElementById('modal-nickname');
       if (nicknameEl) {
@@ -2791,7 +2779,7 @@
 
       const roleBadge = document.getElementById('modal-role-badge');
       roleBadge.textContent = roleText;
-      roleBadge.className = `px-2.5 py-0.5 rounded-full text-[11px] font-bold shadow-xs ${roleClass}`;
+      roleBadge.className = `inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${roleClass}`;
 
       const deceasedBadge = document.getElementById('modal-deceased-badge');
       if (isDeceased) {
