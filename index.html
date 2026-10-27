@@ -3267,6 +3267,70 @@
       }, 200);
     }
 
+    function compressImageToBase64(file, maxWidth = 120, maxHeight = 120, quality = 0.7) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width;
+            let h = img.height;
+            if (w > h) {
+              if (w > maxWidth) {
+                h = Math.round((h * maxWidth) / w);
+                w = maxWidth;
+              }
+            } else {
+              if (h > maxHeight) {
+                w = Math.round((w * maxHeight) / h);
+                h = maxHeight;
+              }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = () => resolve(e.target.result);
+          img.src = e.target.result;
+        };
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function updateMemberInSupabase(targetId, payload) {
+      let currentPayload = { ...payload };
+      Object.keys(currentPayload).forEach(k => currentPayload[k] === undefined && delete currentPayload[k]);
+
+      while (Object.keys(currentPayload).length > 0) {
+        const { error } = await supabase
+          .from('family_members')
+          .update(currentPayload)
+          .eq('id', targetId);
+
+        if (!error) {
+          return { success: true };
+        }
+
+        // Jika kolom tertentu belum ada di tabel Supabase, hapus kolom tersebut dari payload dan ulangi
+        if (error.message && (error.message.includes('column') || error.code === 'PGRST204')) {
+          const match = error.message.match(/Could not find the '([^']+)' column/);
+          if (match && match[1]) {
+            console.warn(`Kolom '${match[1]}' belum ada di tabel Supabase, mencoba update kolom lain...`);
+            delete currentPayload[match[1]];
+            continue;
+          }
+        }
+
+        return { success: false, error };
+      }
+
+      return { success: false, error: new Error('Gagal update database') };
+    }
+
     async function handleSaveEditMember(event) {
       event.preventDefault();
       if (!activeMemberContext) return;
@@ -3294,88 +3358,108 @@
         submitBtn.innerHTML = '<span>Menyimpan ke Database Supabase...</span>';
       }
 
-      // Upload foto ke Supabase Storage jika ada file baru dipilih
+      // Cari ID anggota di database
+      let targetId = memberId;
+      if (!targetId) {
+        if (type === 'head') {
+          const h = branch.heads.find(h => h.name === oldName);
+          if (h) targetId = h.id;
+        } else if (type === 'child') {
+          const c = branch.children.find(c => c.name === oldName);
+          if (c) targetId = c.id;
+        } else if (type === 'spouse') {
+          const c = branch.children.find(c => c.spouse === oldName);
+          if (c) targetId = c.id;
+        } else if (type === 'grandchild') {
+          for (const c of branch.children) {
+            const matched = c.grandchildren.find(gc => gc.name === oldName);
+            if (matched) { targetId = matched.id; break; }
+          }
+        }
+      }
+
+      if (!targetId && rawMembersList) {
+        const match = rawMembersList.find(r => r.name === oldName || (type === 'spouse' && r.spouse_name === oldName));
+        if (match) targetId = match.id;
+      }
+
+      // Upload foto (Opsi A: Supabase Storage, Opsi B: Base64 ringkas)
       let newPhotoUrl = undefined;
       if (photoFileSelected) {
-        if (submitBtn) submitBtn.innerHTML = '<span>Mengunggah foto...</span>';
-        try {
-          const fileExt = photoFileSelected.name.split('.').pop();
-          const safeId = (memberId || newName.replace(/[^a-zA-Z0-9]/g, '_'));
-          const fileName = `${safeId}_${Date.now()}.${fileExt}`;
-          const { error: uploadError } = await supabase.storage
-            .from('family-photos')
-            .upload(fileName, photoFileSelected, { cacheControl: '3600', upsert: true });
-          if (!uploadError) {
-            const { data: publicUrlData } = supabase.storage.from('family-photos').getPublicUrl(fileName);
-            newPhotoUrl = publicUrlData ? publicUrlData.publicUrl : null;
+        if (submitBtn) submitBtn.innerHTML = '<span>Memproses foto profil...</span>';
+        
+        let uploadedUrl = null;
+        const bucketNames = ['family-photos', 'avatars', 'photos'];
+        for (const bName of bucketNames) {
+          try {
+            const fileExt = photoFileSelected.name.split('.').pop() || 'jpg';
+            const safeId = (targetId || memberId || newName.replace(/[^a-zA-Z0-9]/g, '_'));
+            const fileName = `${safeId}_${Date.now()}.${fileExt}`;
+            const { error: upError } = await supabase.storage
+              .from(bName)
+              .upload(fileName, photoFileSelected, { cacheControl: '3600', upsert: true });
+            
+            if (!upError) {
+              const { data: pubData } = supabase.storage.from(bName).getPublicUrl(fileName);
+              if (pubData && pubData.publicUrl) {
+                uploadedUrl = pubData.publicUrl;
+                break;
+              }
+            }
+          } catch (e) {}
+        }
+
+        if (uploadedUrl) {
+          newPhotoUrl = uploadedUrl;
+        } else {
+          try {
+            newPhotoUrl = await compressImageToBase64(photoFileSelected);
+          } catch (e) {
+            console.warn('Gagal memproses base64 foto:', e);
           }
-        } catch (uploadErr) {
-          console.warn('Upload foto lewati (bucket belum aktif):', uploadErr);
         }
         if (submitBtn) submitBtn.innerHTML = '<span>Menyimpan ke Database Supabase...</span>';
       }
 
       try {
-        let targetId = memberId;
-
-        // Cari ID jika belum tercatat di context
-        if (!targetId) {
-          if (type === 'head') {
-            const h = branch.heads.find(h => h.name === oldName);
-            if (h) targetId = h.id;
-          } else if (type === 'child') {
-            const c = branch.children.find(c => c.name === oldName);
-            if (c) targetId = c.id;
-          } else if (type === 'spouse') {
-            const c = branch.children.find(c => c.spouse === oldName);
-            if (c) targetId = c.id;
-          } else if (type === 'grandchild') {
-            for (const c of branch.children) {
-              const matched = c.grandchildren.find(gc => gc.name === oldName);
-              if (matched) { targetId = matched.id; break; }
-            }
-          }
-        }
-
-        if (!targetId && rawMembersList) {
-          const match = rawMembersList.find(r => r.name === oldName || (type === 'spouse' && r.spouse_name === oldName));
-          if (match) targetId = match.id;
-        }
-
         const currentMemberForPhoto = findMemberData(memberId || null, oldName);
-        const oldPhotoUrl = currentMemberForPhoto ? currentMemberForPhoto.photo_url : null;
+        const oldPhotoUrl = currentMemberForPhoto ? (currentMemberForPhoto.photo_url || currentMemberForPhoto.foto_url) : null;
         const finalPhotoUrl = newPhotoUrl !== undefined ? (newPhotoUrl || null) : oldPhotoUrl;
 
-        // Format nama yang disimpan ke database terpusat Supabase
+        // Format nama tersimpan: sertakan nama panggilan agar tersinkronisasi ke seluruh perangkat
         const finalNameToSave = newNickname ? `${newName} (${newNickname})` : newName;
 
         if (targetId) {
+          // Siapkan payload dengan field tanggal_lahir, foto_url, nama_panggilan untuk database Supabase
           let updatePayload = {};
 
           if (type === 'spouse') {
-            // Update nama pasangan pada baris anggota
             updatePayload = {
               spouse_name: finalNameToSave
             };
           } else {
             updatePayload = {
               name: finalNameToSave,
-              is_deceased: Boolean(isDeceased)
+              nama: finalNameToSave,
+              is_deceased: Boolean(isDeceased),
+              tanggal_lahir: newBirthDate || null,
+              birth_date: newBirthDate || null,
+              foto_url: finalPhotoUrl || null,
+              photo_url: finalPhotoUrl || null,
+              nama_panggilan: newNickname || null,
+              nickname: newNickname || null
             };
             if (type === 'head' || type === 'child') {
               updatePayload.spouse_name = newSpouse || null;
             }
           }
 
-          // Perintah update ke tabel Supabase (family_members)
-          const { error: updateError } = await supabase
-            .from('family_members')
-            .update(updatePayload)
-            .eq('id', targetId);
+          // Kirim perintah update ke tabel Supabase (family_members)
+          const updateResult = await updateMemberInSupabase(targetId, updatePayload);
 
-          if (updateError) {
-            console.error('Gagal update database Supabase:', updateError);
-            showToast('Gagal menyimpan ke database Supabase: ' + updateError.message, 'error');
+          if (!updateResult.success) {
+            console.error('Gagal update database Supabase:', updateResult.error);
+            showToast('Gagal menyimpan ke database Supabase: ' + (updateResult.error ? updateResult.error.message : 'Error'), 'error');
             return;
           }
 
@@ -3383,10 +3467,7 @@
           if (type === 'head' && branch.heads && branch.heads.length > 1) {
             const otherHead = branch.heads.find(h => h.id !== targetId);
             if (otherHead && otherHead.id) {
-              await supabase
-                .from('family_members')
-                .update({ spouse_name: finalNameToSave })
-                .eq('id', otherHead.id);
+              await updateMemberInSupabase(otherHead.id, { spouse_name: finalNameToSave });
             }
           }
         } else {
@@ -3432,7 +3513,6 @@
         }
       }
     }
-
     /**
      * FITUR CETAK & SIMPAN PDF - DILINDUNGI KHUSUS ADMIN
      */
