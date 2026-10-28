@@ -526,14 +526,16 @@
   <!-- MODAL 1: Detail Profil Anggota -->
   <div 
     id="modal-profile-backdrop" 
-    class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-0 sm:p-4 transition-opacity duration-200 opacity-0"
+    class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-0 sm:p-4 transition-opacity duration-200 opacity-0 overscroll-contain"
     onclick="handleModalBackdropClick(event)"
   >
     <div 
       id="modal-profile-card" 
-      class="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] max-w-lg mx-auto rounded-none sm:rounded-3xl border-0 sm:border border-slate-200 shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-200"
+      class="bg-white w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] max-w-lg mx-auto rounded-none sm:rounded-3xl border-0 sm:border border-slate-200 shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-200"
     >
-      <!-- 1. Header Hijau Terpusat (Foto Profil Besar di Atas) -->
+      <!-- Scrollable Wrapper: Header, Tombol Aksi, & Informasi dapat discroll dari mana saja -->
+      <div class="flex-1 overflow-y-auto overscroll-contain min-h-0 flex flex-col">
+        <!-- 1. Header Hijau Terpusat (Foto Profil Besar di Atas) -->
       <div class="flex flex-col items-center text-center p-6 bg-gradient-to-b from-emerald-800 to-emerald-900 text-white relative rounded-none sm:rounded-t-3xl shrink-0">
         <!-- Foto Profil: Ukuran Bingkai Otomatis Mengikuti Proporsi Gambar (Tanpa Ruang Kosong / Crop) -->
         <div 
@@ -599,7 +601,7 @@
       </div>
 
       <!-- 3. Isi Informasi Full List (Menyatu tanpa Card Terpisah) -->
-      <div class="p-5 sm:p-6 space-y-4 text-left overflow-y-auto flex-1">
+      <div class="p-5 sm:p-6 space-y-4 text-left flex-1">
         
         <!-- PASANGAN (SUAMI / ISTRI) -->
         <div id="detailSpouseContainer" class="pb-3 border-b border-slate-100">
@@ -630,8 +632,9 @@
 
       </div>
 
+      </div>
       <!-- 4. Footer Modal -->
-      <div class="px-5 sm:px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0 rounded-none sm:rounded-b-3xl">
+      <div class="px-5 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0 rounded-none sm:rounded-b-3xl">
         <span class="text-xs text-slate-500 font-medium">
           Arsip Silsilah Keluarga Besar
         </span>
@@ -3200,6 +3203,9 @@
         }
       }
 
+      // Kunci scroll halaman latar belakang agar tidak bergerak saat modal dibuka
+      lockBodyScroll(true);
+
       // Animasi Buka Modal
       const backdrop = document.getElementById('modal-profile-backdrop');
       const card = document.getElementById('modal-profile-card');
@@ -3212,6 +3218,20 @@
       }, 10);
     }
 
+    function lockBodyScroll(lock) {
+      if (lock) {
+        document.body.classList.add('overflow-hidden');
+        document.documentElement.classList.add('overflow-hidden');
+      } else {
+        // Cek apakah masih ada modal lain yang terbuka sebelum melepas kunci scroll
+        const remainingModal = document.querySelector('#modal-profile-backdrop:not(.hidden), #modal-edit-member-backdrop:not(.hidden), #modal-add-child-backdrop:not(.hidden), #modal-add-member-backdrop:not(.hidden), #modal-admin-alert-backdrop:not(.hidden)');
+        if (!remainingModal) {
+          document.body.classList.remove('overflow-hidden');
+          document.documentElement.classList.remove('overflow-hidden');
+        }
+      }
+    }
+
     function closeMemberModal() {
       const backdrop = document.getElementById('modal-profile-backdrop');
       const card = document.getElementById('modal-profile-card');
@@ -3221,6 +3241,7 @@
       card.classList.add('scale-95');
       setTimeout(() => {
         backdrop.classList.add('hidden');
+        lockBodyScroll(false);
       }, 200);
     }
 
@@ -4021,6 +4042,11 @@
       });
 
       viewport.addEventListener('touchstart', (e) => {
+        const anyModalOpen = document.querySelector('#modal-profile-backdrop:not(.hidden), #modal-edit-member-backdrop:not(.hidden), #modal-add-child-backdrop:not(.hidden), #modal-add-member-backdrop:not(.hidden), #modal-admin-alert-backdrop:not(.hidden)');
+        if (anyModalOpen) {
+          isDraggingCanvas = false;
+          return;
+        }
         if (e.target.closest('#btn-zoom-in') || e.target.closest('#btn-zoom-out') || e.target.closest('#btn-reset-canvas') || e.target.closest('.tree-node')) return;
         if (e.touches.length === 1) {
           isDraggingCanvas = true;
@@ -4030,6 +4056,11 @@
       }, { passive: true });
 
       window.addEventListener('touchmove', (e) => {
+        const anyModalOpen = document.querySelector('#modal-profile-backdrop:not(.hidden), #modal-edit-member-backdrop:not(.hidden), #modal-add-child-backdrop:not(.hidden), #modal-add-member-backdrop:not(.hidden), #modal-admin-alert-backdrop:not(.hidden)');
+        if (anyModalOpen) {
+          isDraggingCanvas = false;
+          return;
+        }
         if (!isDraggingCanvas || e.touches.length !== 1) return;
         canvasPanX = e.touches[0].clientX - dragStartX;
         canvasPanY = e.touches[0].clientY - dragStartY;
