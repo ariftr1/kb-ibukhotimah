@@ -1749,7 +1749,7 @@
       const isSuccess = type === 'success';
       const bgColor = isSuccess 
         ? 'bg-emerald-800 border border-emerald-600/50' 
-        : (type === 'info' ? 'bg-blue-800 border border-blue-600/50' : 'bg-rose-800 border border-rose-600/50');
+        : (type === 'info' ? 'bg-blue-800 border border-blue-600/50' : type === 'warning' ? 'bg-amber-600 border border-amber-400/50' : 'bg-rose-800 border border-rose-600/50');
 
       toast.className = `px-6 py-3.5 ${bgColor} text-white rounded-2xl shadow-xl text-center flex flex-col items-center justify-center max-w-xs sm:max-w-sm w-full transform transition-all duration-300 translate-y-4 opacity-0 pointer-events-auto`;
       toast.innerHTML = `
@@ -3604,6 +3604,15 @@
         deceasedCheckbox.checked = foundGc ? Boolean(foundGc.isDeceased) : (currentMember ? Boolean(currentMember.is_deceased) : false);
       }
 
+      // Simpan nilai awal form untuk mendeteksi apakah ada perubahan data
+      activeMemberContext.initialFormValues = {
+        name: nameInput.value.trim(),
+        nickname: nicknameInput ? nicknameInput.value.trim() : '',
+        birthdate: birthdateInput ? birthdateInput.value : '',
+        spouse: spouseInput ? spouseInput.value.trim() : '',
+        deceased: deceasedCheckbox ? Boolean(deceasedCheckbox.checked) : false
+      };
+
       // Animasi Buka Modal Edit
       const backdrop = document.getElementById('modal-edit-member-backdrop');
       const card = document.getElementById('modal-edit-member-card');
@@ -3745,6 +3754,28 @@
 
       if (!newName) {
         showToast('Nama tidak boleh kosong.', 'error');
+        return;
+      }
+
+      // Validasi: Cek apakah ada perubahan data sama sekali
+      const initVals = activeMemberContext.initialFormValues;
+      const currentMemberData = findMemberData(memberId, oldName);
+      
+      const prevName = initVals ? initVals.name : oldName;
+      const prevNickname = initVals ? initVals.nickname : (currentMemberData && currentMemberData.nickname ? currentMemberData.nickname : '');
+      const prevBirthDate = initVals ? initVals.birthdate : (currentMemberData && currentMemberData.birth_date ? currentMemberData.birth_date : '');
+      const prevSpouse = initVals ? initVals.spouse : (currentMemberData && currentMemberData.spouse_name ? currentMemberData.spouse_name : '');
+      const prevDeceased = initVals ? initVals.deceased : (currentMemberData ? Boolean(currentMemberData.is_deceased) : false);
+
+      const hasPhotoChange = Boolean(photoFileSelected);
+      const hasNameChange = newName !== prevName;
+      const hasNicknameChange = newNickname !== prevNickname;
+      const hasBirthDateChange = newBirthDate !== prevBirthDate;
+      const hasSpouseChange = newSpouse !== prevSpouse;
+      const hasDeceasedChange = isDeceased !== prevDeceased;
+
+      if (!hasPhotoChange && !hasNameChange && !hasNicknameChange && !hasBirthDateChange && !hasSpouseChange && !hasDeceasedChange) {
+        showToast('Belum ada data perubahan', 'warning');
         return;
       }
 
