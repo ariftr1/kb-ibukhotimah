@@ -2109,7 +2109,14 @@
       // 1. Search rawMembersList first (authoritative DB rows)
       if (rawMembersList && rawMembersList.length > 0) {
         if (cleanName) {
-          found = rawMembersList.find(r => r.name && r.name.trim().toLowerCase() === cleanName);
+          const qNorm = cleanName.replace(/\s*\(.*?\)\s*/g, '').trim();
+          found = rawMembersList.find(r => {
+            if (!r.name) return false;
+            const rClean = r.name.trim().toLowerCase();
+            if (rClean === cleanName) return true;
+            const rNorm = rClean.replace(/\s*\(.*?\)\s*/g, '').trim();
+            return rNorm === qNorm;
+          });
         }
         if (!found && memberId && !memberName) {
           found = rawMembersList.find(r => r.id === memberId);
@@ -2123,7 +2130,14 @@
 
       // If this member is a spouse (stored in spouse_name of a child)
       if (cleanName && !found && rawMembersList && rawMembersList.length > 0) {
-        const spouseRow = rawMembersList.find(r => r.spouse_name && r.spouse_name.trim().toLowerCase() === cleanName);
+        const qNorm = cleanName.replace(/\s*\(.*?\)\s*/g, '').trim();
+        const spouseRow = rawMembersList.find(r => {
+          if (!r.spouse_name) return false;
+          const sClean = r.spouse_name.trim().toLowerCase();
+          if (sClean === cleanName) return true;
+          const sNorm = sClean.replace(/\s*\(.*?\)\s*/g, '').trim();
+          return sNorm === qNorm;
+        });
         if (spouseRow) {
           found = {
             id: spouseRow.id,
@@ -3758,7 +3772,13 @@
             // Simpan / sinkronkan profil pasangan ke Supabase agar foto & tanggal lahir dapat diakses di semua perangkat (iPhone, Laptop, dll.)
             try {
               const cleanSpouseName = (oldName || finalNameToSave).trim().toLowerCase();
-              const existingSpouseRow = rawMembersList ? rawMembersList.find(r => r.role === 'spouse' && (r.name.trim().toLowerCase() === cleanSpouseName || r.name.trim().toLowerCase() === finalNameToSave.trim().toLowerCase())) : null;
+              const cleanNorm = cleanSpouseName.replace(/\s*\(.*?\)\s*/g, '').trim();
+              const finalNorm = finalNameToSave.replace(/\s*\(.*?\)\s*/g, '').trim().toLowerCase();
+              const existingSpouseRow = rawMembersList ? rawMembersList.find(r => r.role === 'spouse' && (
+                r.name.trim().toLowerCase() === cleanSpouseName ||
+                r.name.replace(/\s*\(.*?\)\s*/g, '').trim().toLowerCase() === cleanNorm ||
+                r.name.replace(/\s*\(.*?\)\s*/g, '').trim().toLowerCase() === finalNorm
+              )) : null;
               
               if (existingSpouseRow) {
                 await supabase.from('family_members').update({
