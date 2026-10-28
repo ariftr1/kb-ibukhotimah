@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Keluarga Besar Ibu Khotimah - Pohon Silsilah Keluarga Interaktif</title>
 
   <!-- Open Graph / WhatsApp Preview -->
@@ -403,7 +406,7 @@
         <!-- Live Search & Status Indicator -->
         <div id="search-status-container" class="text-slate-500 font-medium flex items-center gap-2">
           <span id="sync-status-dot" class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span id="active-count-text">Memuat data dari Supabase...</span>
+          <span id="active-count-text">Memuat data silsilah keluarga...</span>
         </div>
 
       </div>
@@ -418,7 +421,7 @@
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
       </div>
-      <h3 class="text-base font-bold text-slate-700">Menghubungkan ke Database Supabase</h3>
+      <h3 class="text-base font-bold text-slate-700">Memuat Silsilah Keluarga</h3>
       <p class="text-xs text-slate-500 mt-1">Mengambil silsilah 10 cabang keluarga besar secara terpusat...</p>
     </div>
 
@@ -1768,7 +1771,7 @@
      * MIGRASI / SEEDING OTOMATIS JIKA TABEL KOSONG
      */
     async function seedDefaultDataIfEmpty() {
-      showToast('Menyiapkan migrasi 10 cabang ke Supabase...', 'info');
+      showToast('Menyiapkan pemuatan data silsilah...', 'info');
 
       for (const b of defaultBranchSeeds) {
         let primaryHeadId = null;
@@ -1827,7 +1830,7 @@
         }
       }
 
-      showToast('Migrasi 10 cabang ke Supabase sukses!', 'success');
+      showToast('Pemuatan 10 cabang silsilah berhasil!', 'success');
     }
 
     /**
@@ -1865,7 +1868,7 @@
 
         if (error) {
           console.error('Error fetching Supabase data:', error);
-          showToast('Gagal memuat data dari Supabase: ' + error.message, 'error');
+          showToast('Gagal memuat data silsilah: ' + error.message, 'error');
           return;
         }
 
@@ -2011,7 +2014,7 @@
 
       } catch (err) {
         console.error('Koneksi Supabase gagal:', err);
-        showToast('Koneksi Supabase bermasalah', 'error');
+        showToast('Koneksi silsilah terganggu', 'error');
       }
     }
 
@@ -3443,7 +3446,7 @@
 
         if (error) {
           console.error('Gagal insert ke Supabase:', error);
-          alert('Gagal menyimpan ke Supabase: ' + error.message);
+          alert('Gagal menyimpan data: ' + error.message);
           return;
         }
 
@@ -3451,14 +3454,14 @@
         await fetchFamilyDataFromSupabase();
 
         closeAddChildModal();
-        showToast(`Berhasil menambahkan "${childName}" ke database Supabase!`, 'success');
+        showToast(`Berhasil menambahkan "${childName}"!`, 'success');
 
         // Buka kembali modal profil
         showMemberDetail(branchId, type, memberName, memberId);
 
       } catch (err) {
         console.error('Error saat simpan anak:', err);
-        alert('Terjadi kesalahan koneksi Supabase.');
+        alert('Terjadi kesalahan koneksi saat menyimpan.');
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -3619,6 +3622,11 @@
     }
 
     function closeEditMemberModal() {
+      const submitBtn = document.getElementById('btn-submit-edit');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Perbarui Data';
+      }
       const backdrop = document.getElementById('modal-edit-member-backdrop');
       const card = document.getElementById('modal-edit-member-card');
       const editPhotoFile = document.getElementById('editPhotoFile');
@@ -3883,7 +3891,7 @@
 
           if (!updateResult.success) {
             console.error('Gagal update database Supabase:', updateResult.error);
-            showToast('Gagal menyimpan ke database Supabase: ' + (updateResult.error ? updateResult.error.message : 'Error'), 'error');
+            showToast('Gagal menyimpan data: ' + (updateResult.error ? updateResult.error.message : 'Error'), 'error');
             return;
           }
 
@@ -3899,11 +3907,7 @@
             if (birthDropped) missingCols.push('birth_date TEXT');
             const sqlHint = missingCols.map(c => `ALTER TABLE family_members ADD COLUMN IF NOT EXISTS ${c};`).join('\n');
             console.warn('Kolom belum ada di Supabase:', missingCols, '\nSQL untuk menambah kolom:\n' + sqlHint);
-            showToast(
-              `⚠️ ${photoDropped && birthDropped ? 'Foto profil dan tanggal lahir' : photoDropped ? 'Foto profil' : 'Tanggal lahir'} hanya tersimpan di perangkat ini! ` +
-              `Kolom database belum ada. Buka Supabase Dashboard → SQL Editor → jalankan: ${sqlHint.replace(/\n/g, ' | ')}`,
-              'error'
-            );
+            showToast(`⚠️ Foto profil atau tanggal lahir hanya tersimpan di perangkat ini.`, 'info');
             // Tetap lanjut simpan ke localStorage sebagai fallback offline
           } else if (type !== 'spouse') {
             // Verifikasi cepat hanya untuk anggota utama (bukan pasangan/menantu yang menumpang di baris partner)
@@ -3912,10 +3916,10 @@
                 .from('family_members').select('photo_url, birth_date, nickname').eq('id', targetId).single();
               if (verifyRow) {
                 if (finalPhotoUrl && !verifyRow.photo_url) {
-                  showToast('⚠️ Foto profil gagal tersimpan ke database Supabase. Coba lagi atau hubungi admin.', 'error');
+                  showToast('⚠️ Foto profil gagal tersimpan ke server. Silakan coba lagi.', 'error');
                 }
                 if (newBirthDate && !verifyRow.birth_date) {
-                  showToast('⚠️ Tanggal lahir gagal tersimpan ke database Supabase. Coba lagi atau hubungi admin.', 'error');
+                  showToast('⚠️ Tanggal lahir gagal tersimpan ke server. Silakan coba lagi.', 'error');
                 }
               }
             } catch(e) { /* verifikasi opsional, tidak blokir */ }

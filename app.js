@@ -211,7 +211,7 @@ async function handleSaveNewMember(event) {
 
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span>Menyimpan ke Database...</span>';
+    submitBtn.innerHTML = '<span>Menyimpan...</span>';
   }
 
   try {
