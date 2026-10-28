@@ -62,9 +62,12 @@
     }
     .branch-card {
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid #34d399 !important; /* Garis hijau cerah (emerald-400) */
     }
     .branch-card:hover {
       transform: translateY(-2px);
+      border-color: #10b981 !important; /* emerald-500 */
+      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.15), 0 8px 10px -6px rgba(16, 185, 129, 0.1) !important;
     }
     .scrollbar-none::-webkit-scrollbar,
     .no-scrollbar::-webkit-scrollbar {
@@ -2693,7 +2696,7 @@
         }
 
         return `
-          <div class="branch-card bg-white rounded-2xl border border-slate-200/80 shadow-md hover:shadow-lg transition-shadow duration-200 p-4 sm:p-6 mb-6 w-full h-fit flex flex-col self-start">
+          <div class="branch-card bg-white rounded-2xl border-2 border-emerald-400 hover:border-emerald-500 shadow-sm hover:shadow-md transition-all duration-200 p-4 sm:p-6 mb-6 w-full h-fit flex flex-col self-start">
             <!-- Bahagian Atas Kad: Header Anak & Pasangan -->
             <div>
               <div class="flex items-center justify-between mb-3">
