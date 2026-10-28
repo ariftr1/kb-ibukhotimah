@@ -2497,12 +2497,15 @@
         const headsHtml = branch.heads.map((head, hIdx) => {
           const isMatched = query !== '' && textMatches(head.name, query);
           const nameHtml = highlightText(head.name, query);
-          const isMainHead = hIdx === 0;
+          const isMainHead = hIdx === 0;
+          const headBorderClass = isMainHead 
+            ? 'border-2 border-emerald-600 hover:border-emerald-700 bg-white hover:bg-emerald-50/50' 
+            : 'border-2 border-teal-400 hover:border-teal-500 bg-white hover:bg-teal-50/50';
 
           return `
             <div 
               onclick="showMemberDetail(${branch.branchId}, 'head', '${escapeHtml(head.name)}', ${head.id || null})"
-              class="bg-white hover:bg-emerald-50/80 border border-slate-200/90 hover:border-emerald-400 rounded-xl px-2.5 py-1.5 cursor-pointer transition-all shadow-2xs group inline-flex items-center gap-2 shrink-0 ${
+              class="${headBorderClass} rounded-xl px-2.5 py-1.5 cursor-pointer transition-all shadow-2xs group inline-flex items-center gap-2 shrink-0 ${
                 isMatched ? 'bg-amber-100/70 ring-2 ring-amber-300 border-amber-300' : ''
               }"
               title="Klik untuk melihat / edit profil ${escapeHtml(head.name)}"
