@@ -2551,7 +2551,7 @@
                   <!-- Kotak Penuh Baris Cucu (G3) -->
                   <div 
                     onclick="openDetailModal(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
-                    class="flex items-center justify-between gap-3 p-3 rounded-xl bg-blue-50/50 border border-blue-100 hover:bg-blue-100/50 transition-colors cursor-pointer group shadow-2xs ${
+                    class="flex items-center justify-between gap-3 p-3 rounded-xl bg-blue-50/60 border-2 border-blue-400 hover:border-blue-500 hover:bg-blue-100/50 transition-all cursor-pointer group shadow-2xs ${
                       childMatched ? 'ring-2 ring-blue-400 bg-blue-100/90 font-bold' : ''
                     }"
                     title="Klik untuk melihat profil Cucu: ${escapeHtml(child.name)}"
@@ -2594,7 +2594,7 @@
                   ${child.spouse ? `
                     <div 
                       onclick="openDetailModal(${branch.branchId}, 'spouse', '${escapeHtml(child.spouse)}', ${child.id || null})"
-                      class="flex items-center justify-between gap-3 p-3 rounded-xl bg-sky-50/50 border border-sky-100 hover:bg-sky-100/50 transition-colors mt-2 cursor-pointer group shadow-2xs ${
+                      class="flex items-center justify-between gap-3 p-3 rounded-xl bg-sky-50/60 border-2 border-sky-400 hover:border-sky-500 hover:bg-sky-100/50 transition-all mt-2 cursor-pointer group shadow-2xs ${
                         spouseMatched ? 'ring-2 ring-sky-400 bg-sky-100/90 font-bold' : ''
                       }"
                       title="Klik untuk melihat profil Menantu: ${escapeHtml(child.spouse)}"
@@ -2648,7 +2648,7 @@
                           return `
                             <div 
                               onclick="openDetailModal(${branch.branchId}, 'grandchild', '${escapeHtml(gc.name)}', ${gc.id || null})"
-                              class="flex items-center justify-between gap-3 p-3 rounded-xl bg-purple-50/60 border border-purple-100 hover:bg-purple-100/60 transition-colors cursor-pointer group shadow-2xs ${
+                              class="flex items-center justify-between gap-3 p-3 rounded-xl bg-purple-50/70 border-2 border-purple-400 hover:border-purple-500 hover:bg-purple-100/60 transition-all cursor-pointer group shadow-2xs ${
                                 gcMatched ? 'ring-2 ring-purple-400 bg-purple-100/90 font-bold' : ''
                               }"
                               title="Klik untuk melihat / edit profil Cicit: ${escapeHtml(gc.name)}"
@@ -2819,7 +2819,7 @@
                     <div class="tree-node bg-white p-3.5 rounded-2xl border ${
                       (childMatched || spouseMatched)
                         ? 'border-amber-400 ring-4 ring-amber-300 shadow-md bg-amber-50/60'
-                        : 'border-slate-200/90 shadow-sm hover:border-emerald-300'
+                        : 'border-2 border-blue-400 shadow-sm hover:border-blue-500'
                     } w-[220px] max-w-[220px] text-center shrink-0">
                       <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 mb-1.5">
                         G3 • Cucu ke-${idx + 1}
@@ -2879,7 +2879,7 @@
                                 class="tree-node bg-white p-2.5 rounded-xl border cursor-pointer ${
                                   gcMatched
                                     ? 'border-purple-400 ring-4 ring-purple-300 shadow-md bg-purple-50 font-bold'
-                                    : 'border-purple-200 shadow-2xs hover:border-purple-400 bg-purple-50/30'
+                                    : 'border-2 border-purple-400 shadow-2xs hover:border-purple-500 bg-purple-50/30'
                                 } w-[145px] max-w-[145px] text-center shrink-0"
                                 title="Klik untuk melihat / edit profil Cicit: ${escapeHtml(gc.name)}"
                               >
