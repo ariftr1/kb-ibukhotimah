@@ -3397,7 +3397,7 @@
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span>Menyimpan ke Supabase...</span>';
+        submitBtn.innerHTML = '<span>Menyimpan...</span>';
       }
 
       try {
@@ -3483,6 +3483,13 @@
       const { branchId, type, memberName, memberId } = activeMemberContext;
       const branch = familyData.find(b => b.branchId === branchId);
       if (!branch) return;
+
+      // Pastikan teks tombol selalu 'Perbarui Data' saat modal dibuka
+      const submitBtn = document.getElementById('btn-submit-edit');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Perbarui Data';
+      }
 
       const branchInfo = document.getElementById('form-edit-branch-info');
       const genBadge = document.getElementById('form-edit-gen-badge');
@@ -3735,7 +3742,7 @@
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span>Menyimpan ke Database Supabase...</span>';
+        submitBtn.innerHTML = '<span>Menyimpan...</span>';
       }
 
       // Cari ID anggota di database
@@ -3766,7 +3773,7 @@
       // Upload foto (Opsi A: Supabase Storage, Opsi B: Base64 ringkas)
       let newPhotoUrl = undefined;
       if (photoFileSelected) {
-        if (submitBtn) submitBtn.innerHTML = '<span>Memproses foto profil...</span>';
+        if (submitBtn) submitBtn.innerHTML = '<span>Memproses...</span>';
         
         let uploadedUrl = null;
         const bucketNames = ['family-photos', 'avatars', 'photos'];
@@ -3798,7 +3805,7 @@
             console.warn('Gagal memproses base64 foto:', e);
           }
         }
-        if (submitBtn) submitBtn.innerHTML = '<span>Menyimpan ke Database Supabase...</span>';
+        if (submitBtn) submitBtn.innerHTML = '<span>Menyimpan...</span>';
       }
 
       try {
@@ -3960,7 +3967,7 @@
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = '<span>Perbarui Data</span>';
+          submitBtn.innerHTML = 'Perbarui Data';
         }
       }
     }
