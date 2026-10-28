@@ -1908,11 +1908,11 @@
           // G2: Anak Kandung (Kepala Cabang) & Menantu
           const heads = branchRows.filter(r => r.generation === 2 || r.generation === 1 || r.role === 'head' || r.role === 'anak');
           // G3: Cucu & Cucu Menantu
-          const childrenRows = branchRows.filter(r => (r.generation === 3 || r.role === 'cucu' || (r.generation === 2 && r.role === 'child')) && r.parent_id !== null && heads.some(h => h.id === r.parent_id));
+          const childrenRows = branchRows.filter(r => r.role !== 'spouse' && (r.generation === 3 || r.role === 'cucu' || (r.generation === 2 && r.role === 'child')) && r.parent_id !== null && heads.some(h => h.id === r.parent_id));
 
           const children = childrenRows.map(c => {
             // G4: Buyut / Cicit (Urutkan konsisten berdasarkan birth_order / tanggal lahir / id)
-            const gcRows = branchRows.filter(r => r.parent_id === c.id || ((r.generation === 4 || r.role === 'Buyut' || r.generation === 3 || r.role === 'grandchild') && r.parent_id === c.id));
+            const gcRows = branchRows.filter(r => r.role !== 'spouse' && (r.parent_id === c.id || ((r.generation === 4 || r.role === 'Buyut' || r.generation === 3 || r.role === 'grandchild') && r.parent_id === c.id)));
             gcRows.sort((a, b) => {
               if (a.birth_order != null && b.birth_order != null && a.birth_order !== b.birth_order) {
                 return Number(a.birth_order) - Number(b.birth_order);
@@ -3754,6 +3754,38 @@
               spouse_birth_date: newBirthDate || null,
               spouse_nickname: newNickname || null
             };
+
+            // Simpan / sinkronkan profil pasangan ke Supabase agar foto & tanggal lahir dapat diakses di semua perangkat (iPhone, Laptop, dll.)
+            try {
+              const cleanSpouseName = (oldName || finalNameToSave).trim().toLowerCase();
+              const existingSpouseRow = rawMembersList ? rawMembersList.find(r => r.role === 'spouse' && (r.name.trim().toLowerCase() === cleanSpouseName || r.name.trim().toLowerCase() === finalNameToSave.trim().toLowerCase())) : null;
+              
+              if (existingSpouseRow) {
+                await supabase.from('family_members').update({
+                  name: finalNameToSave,
+                  photo_url: finalPhotoUrl || null,
+                  birth_date: newBirthDate || null,
+                  nickname: newNickname || null,
+                  is_deceased: Boolean(isDeceased)
+                }).eq('id', existingSpouseRow.id);
+              } else if (finalPhotoUrl || newBirthDate || newNickname) {
+                const partnerName = branch.children ? (branch.children.find(c => c.id === targetId)?.name || null) : null;
+                await supabase.from('family_members').insert([{
+                  branch_id: branchId,
+                  name: finalNameToSave,
+                  spouse_name: partnerName,
+                  parent_id: null,
+                  generation: 3,
+                  role: 'spouse',
+                  is_deceased: Boolean(isDeceased),
+                  photo_url: finalPhotoUrl || null,
+                  birth_date: newBirthDate || null,
+                  nickname: newNickname || null
+                }]);
+              }
+            } catch(e) {
+              console.warn('Gagal sinkronisasi baris spouse ke Supabase:', e);
+            }
           } else {
             updatePayload = {
               name: finalNameToSave,
