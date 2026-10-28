@@ -1493,6 +1493,7 @@
       if (currentPassLabel) currentPassLabel.textContent = getActiveFamilyPass();
 
       modal.classList.remove('hidden');
+      pushModalToHistory('admin-pass');
       requestAnimationFrame(() => {
         modal.classList.remove('opacity-0');
         modal.classList.add('opacity-100');
@@ -1506,7 +1507,8 @@
       });
     }
 
-    function closeAdminPasswordModal() {
+    function closeAdminPasswordModal(fromPopstate = false) {
+      if (!fromPopstate) popModalFromHistory('admin-pass');
       const modal = document.getElementById('adminPasswordModal');
       const card = document.getElementById('admin-password-card');
       if (!modal) return;
@@ -2979,6 +2981,98 @@
       openAddChildModalFromActive();
     }
 
+    
+    // ==========================================
+    // SISTEM NAVIGASI TOMBOL BACK HP (ANDROID)
+    // ==========================================
+    let modalStack = [];
+    let isHandlingPopstate = false;
+
+    function pushModalToHistory(modalName) {
+      modalStack.push(modalName);
+      try {
+        window.history.pushState({ modalOpen: true, modalName: modalName, depth: modalStack.length }, '');
+      } catch (e) {}
+    }
+
+    function popModalFromHistory(modalName) {
+      if (isHandlingPopstate) return;
+      const idx = modalStack.lastIndexOf(modalName);
+      if (idx !== -1) {
+        modalStack.splice(idx, 1);
+        try {
+          if (window.history.state && window.history.state.modalOpen) {
+            window.history.back();
+          }
+        } catch (e) {}
+      }
+    }
+
+    function getTopmostActiveModal() {
+      // 1. Modal Edit Member
+      const editModal = document.getElementById('modal-edit-member-backdrop');
+      if (editModal && !editModal.classList.contains('hidden')) return 'edit-member';
+
+      // 2. Modal Tambah Anak
+      const addChildModal = document.getElementById('modal-add-child-backdrop');
+      if (addChildModal && !addChildModal.classList.contains('hidden')) return 'add-child';
+
+      // 3. Modal Tambah Anggota
+      const addMemberModal = document.getElementById('modal-add-member-backdrop');
+      if (addMemberModal && !addMemberModal.classList.contains('hidden')) return 'add-member';
+
+      // 4. Modal Alert Admin
+      const alertModal = document.getElementById('modal-admin-alert-backdrop');
+      if (alertModal && !alertModal.classList.contains('hidden')) return 'admin-alert';
+
+      // 5. Modal Password Admin
+      const passModal = document.getElementById('adminPasswordModal');
+      if (passModal && !passModal.classList.contains('hidden')) return 'admin-pass';
+
+      // 6. Modal Detail Profil
+      const profileModal = document.getElementById('modal-profile-backdrop');
+      if (profileModal && !profileModal.classList.contains('hidden')) return 'profile';
+
+      return null;
+    }
+
+    function closeTopmostModal() {
+      const top = getTopmostActiveModal();
+      if (!top) return false;
+
+      if (top === 'edit-member') {
+        closeEditMemberModal(true);
+      } else if (top === 'add-child') {
+        closeAddChildModal(true);
+      } else if (top === 'add-member') {
+        if (typeof closeAddMemberModal === 'function') closeAddMemberModal(true);
+      } else if (top === 'admin-alert') {
+        closeAdminRestrictedAlert(true);
+      } else if (top === 'admin-pass') {
+        closeAdminPasswordModal(true);
+      } else if (top === 'profile') {
+        closeMemberModal(true);
+      }
+
+      return true;
+    }
+
+    // Tangani saat pengguna menekan tombol Back fisik / gestur bawaan HP Android
+    window.addEventListener('popstate', (e) => {
+      isHandlingPopstate = true;
+      const closed = closeTopmostModal();
+      if (closed) {
+        if (modalStack.length > 0) modalStack.pop();
+      }
+      setTimeout(() => {
+        isHandlingPopstate = false;
+      }, 60);
+    });
+
+    try {
+      window.history.replaceState({ appRoot: true }, '', window.location.href);
+    } catch(e) {}
+
     function showMemberDetail(branchId, type, memberName, memberId = null) {
       if (typeof branchId === 'object' && branchId !== null) {
         const obj = branchId;
@@ -3213,6 +3307,7 @@
       const backdrop = document.getElementById('modal-profile-backdrop');
       const card = document.getElementById('modal-profile-card');
       backdrop.classList.remove('hidden');
+      pushModalToHistory('profile');
       setTimeout(() => {
         backdrop.classList.remove('opacity-0');
         backdrop.classList.add('opacity-100');
@@ -3235,7 +3330,8 @@
       }
     }
 
-    function closeMemberModal() {
+    function closeMemberModal(fromPopstate = false) {
+      if (!fromPopstate) popModalFromHistory('profile');
       const backdrop = document.getElementById('modal-profile-backdrop');
       const card = document.getElementById('modal-profile-card');
       backdrop.classList.remove('opacity-100');
@@ -3274,6 +3370,7 @@
       }
 
       backdrop.classList.remove('hidden');
+      pushModalToHistory('admin-alert');
       setTimeout(() => {
         backdrop.classList.remove('opacity-0');
         backdrop.classList.add('opacity-100');
@@ -3282,7 +3379,8 @@
       }, 10);
     }
 
-    function closeAdminRestrictedAlert() {
+    function closeAdminRestrictedAlert(fromPopstate = false) {
+      if (!fromPopstate) popModalFromHistory('admin-alert');
       const backdrop = document.getElementById('modal-admin-alert-backdrop');
       const card = document.getElementById('modal-admin-alert-card');
       if (!backdrop || !card) return;
@@ -3353,6 +3451,7 @@
       const backdrop = document.getElementById('modal-add-child-backdrop');
       const card = document.getElementById('modal-add-child-card');
       backdrop.classList.remove('hidden');
+      pushModalToHistory('add-child');
       setTimeout(() => {
         backdrop.classList.remove('opacity-0');
         backdrop.classList.add('opacity-100');
@@ -3362,7 +3461,8 @@
       }, 10);
     }
 
-    function closeAddChildModal() {
+    function closeAddChildModal(fromPopstate = false) {
+      if (!fromPopstate) popModalFromHistory('add-child');
       const backdrop = document.getElementById('modal-add-child-backdrop');
       const card = document.getElementById('modal-add-child-card');
       backdrop.classList.remove('opacity-100');
@@ -3617,6 +3717,7 @@
       const backdrop = document.getElementById('modal-edit-member-backdrop');
       const card = document.getElementById('modal-edit-member-card');
       backdrop.classList.remove('hidden');
+      pushModalToHistory('edit-member');
       setTimeout(() => {
         backdrop.classList.remove('opacity-0');
         backdrop.classList.add('opacity-100');
@@ -3630,7 +3731,8 @@
       closeEditMemberModal();
     }
 
-    function closeEditMemberModal() {
+    function closeEditMemberModal(fromPopstate = false) {
+      if (!fromPopstate) popModalFromHistory('edit-member');
       const submitBtn = document.getElementById('btn-submit-edit');
       if (submitBtn) {
         submitBtn.disabled = false;

@@ -144,7 +144,8 @@ function openAddMemberModal() {
   }, 10);
 }
 
-function closeAddMemberModal() {
+function closeAddMemberModal(fromPopstate = false) {
+  if (!fromPopstate && typeof popModalFromHistory === 'function') popModalFromHistory('add-member');
   const backdrop = document.getElementById('modal-add-member-backdrop');
   const card = document.getElementById('modal-add-member-card');
   if (!backdrop || !card) return;
