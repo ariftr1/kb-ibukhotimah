@@ -3749,7 +3749,10 @@
 
           if (type === 'spouse') {
             updatePayload = {
-              spouse_name: finalNameToSave
+              spouse_name: finalNameToSave,
+              spouse_photo_url: finalPhotoUrl || null,
+              spouse_birth_date: newBirthDate || null,
+              spouse_nickname: newNickname || null
             };
           } else {
             updatePayload = {
@@ -3776,8 +3779,8 @@
           // Cek apakah kolom foto/tanggal lahir BENAR-BENAR tersimpan di Supabase
           // (bukan hanya di localStorage) agar semua anggota keluarga bisa melihat
           const dropped = updateResult.droppedColumns || [];
-          const photoDropped = dropped.includes('photo_url');
-          const birthDropped = dropped.includes('birth_date');
+          const photoDropped = type !== 'spouse' && dropped.includes('photo_url');
+          const birthDropped = type !== 'spouse' && dropped.includes('birth_date');
 
           if (photoDropped || birthDropped) {
             const missingCols = [];
@@ -3791,8 +3794,8 @@
               'error'
             );
             // Tetap lanjut simpan ke localStorage sebagai fallback offline
-          } else {
-            // Verifikasi cepat: re-fetch baris untuk konfirmasi data tersimpan
+          } else if (type !== 'spouse') {
+            // Verifikasi cepat hanya untuk anggota utama (bukan pasangan/menantu yang menumpang di baris partner)
             try {
               const { data: verifyRow } = await supabase
                 .from('family_members').select('photo_url, birth_date, nickname').eq('id', targetId).single();
