@@ -1831,6 +1831,25 @@
      * MENGAMBIL DATA LANGSUNG DARI SUPABASE
      */
     async function fetchFamilyDataFromSupabase() {
+      // Pembersihan cache foto profil lama (hanya mempertahankan Rizki Jihan Afiatun & Arif Tri Prawito)
+      try {
+        const cleanupKey = 'family_photos_reset_v3';
+        if (!localStorage.getItem(cleanupKey)) {
+          const rawExt = JSON.parse(localStorage.getItem('family_member_extras') || '{}');
+          const preserved = ['rizki jihan afiatun', 'arif tri prawito', '29', '30', 'jihan', 'arif'];
+          Object.keys(rawExt).forEach(k => {
+            const kNorm = k.toLowerCase().replace(/\s*\(.*?\)\s*/g, '').trim();
+            if (!preserved.includes(kNorm) && !preserved.includes(k.toLowerCase())) {
+              if (rawExt[k] && rawExt[k].photo_url) {
+                delete rawExt[k].photo_url;
+              }
+            }
+          });
+          localStorage.setItem('family_member_extras', JSON.stringify(rawExt));
+          localStorage.setItem(cleanupKey, '1');
+        }
+      } catch(e) {}
+
       const loadingState = document.getElementById('loading-state');
       const cardsContainer = document.getElementById('family-tree-container');
 
@@ -1878,7 +1897,19 @@
               // Fill missing fields from localStorage cache (fallback only)
               if (!r.nickname && ext.nickname) r.nickname = ext.nickname;
               if (!r.birth_date && ext.birth_date) r.birth_date = ext.birth_date;
-              if (!r.photo_url && ext.photo_url) r.photo_url = ext.photo_url;
+              if (!r.photo_url && ext.photo_url) {
+                // Otoritas Supabase: jika foto null di database pusat, bersihkan dari cache agar tidak membangkitkan foto lama
+                const normName = r.name ? r.name.toLowerCase().replace(/\s*\(.*?\)\s*/g, '').trim() : '';
+                const isPreserved = r.id === 29 || r.id === 30 || normName === 'rizki jihan afiatun' || normName === 'arif tri prawito';
+                if (isPreserved) {
+                  r.photo_url = ext.photo_url;
+                } else {
+                  delete ext.photo_url;
+                  if (localExtras[r.id]) delete localExtras[r.id].photo_url;
+                  if (r.name && localExtras[r.name.trim().toLowerCase()]) delete localExtras[r.name.trim().toLowerCase()].photo_url;
+                  try { localStorage.setItem('family_member_extras', JSON.stringify(localExtras)); } catch(e) {}
+                }
+              }
             }
             // If Supabase now has authoritative values, update localStorage cache
             // so other browsers / tabs don't resurrect stale cache values.
