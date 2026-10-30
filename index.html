@@ -2531,12 +2531,12 @@
       const hasPhoto = Boolean(photoUrl && String(photoUrl).trim() !== '');
 
       return `
-        <div class="relative shrink-0 aspect-square ${dimensionClass} overflow-hidden shadow-xs ${borderRing} bg-white flex items-center justify-center">
+        <div class="relative shrink-0 aspect-square ${dimensionClass} overflow-hidden shadow-xs ${borderRing}">
           ${hasPhoto ? `
             <img 
               src="${escapeHtml(photoUrl)}" 
               alt="${escapeHtml(name)}" 
-              class="w-full h-full aspect-square object-cover block rounded-[inherit]"
+              class="w-full h-full aspect-square object-cover block"
               loading="lazy"
               onerror="this.classList.add('hidden'); if(this.nextElementSibling) this.nextElementSibling.classList.remove('hidden');"
             />
