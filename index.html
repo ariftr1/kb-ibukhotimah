@@ -2624,14 +2624,14 @@
                     }"
                     title="Klik untuk melihat profil Cucu: ${escapeHtml(child.name)}"
                   >
-                    <!-- Sisi Kiri: Foto 1:1 + Info (Nama & Badge) -->
+                    <!-- Foto 1:1 + Info (Nama & Badge) -->
                     <div class="flex items-center gap-3 flex-1 min-w-0">
                       ${renderMemberAvatarHtml(child.photoUrl || getMemberPhotoUrl(child.id, child.name), child.name, 'child', 'md')}
                       <div class="flex-1 min-w-0">
-                        <div class="font-bold text-slate-800 text-base leading-snug break-words">${childNameHighlighted}</div>
+                        <div class="font-bold text-slate-800 text-base leading-snug break-normal">${childNameHighlighted}</div>
                         <div class="flex items-center gap-2 mt-1">
                           <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 whitespace-nowrap">
-                            G3 • Cucu
+                            G3 • Cucu ke-${cucuIndex}
                           </span>
                           ${child.isDeceased ? `
                             <span class="text-[10px] text-slate-500 font-medium shrink-0 whitespace-nowrap">(Almarhum)</span>
@@ -2649,11 +2649,6 @@
                         </div>
                       </div>
                     </div>
-
-                    <!-- Sisi Kanan: Badge Urutan Cucu -->
-                    <span class="inline-flex items-center justify-center w-20 sm:w-24 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 shadow-sm shrink-0 whitespace-nowrap text-center ml-auto">
-                      Cucu ke-${cucuIndex}
-                    </span>
                   </div>
 
                   <!-- Kotak Penuh Baris Menantu (G3 • Menantu) -->
@@ -2665,11 +2660,11 @@
                       }"
                       title="Klik untuk melihat profil Menantu: ${escapeHtml(child.spouse)}"
                     >
-                      <!-- Sisi Kiri: Foto 1:1 + Info (Nama & Badge) -->
+                      <!-- Foto 1:1 + Info (Nama & Badge) -->
                       <div class="flex items-center gap-3 flex-1 min-w-0">
                         ${renderMemberAvatarHtml(getMemberPhotoUrl(null, child.spouse), child.spouse, 'spouse', 'md')}
                         <div class="flex-1 min-w-0">
-                          <div class="font-bold text-slate-800 text-base leading-snug break-words">${spouseNameHighlighted}</div>
+                          <div class="font-bold text-slate-800 text-base leading-snug break-normal">${spouseNameHighlighted}</div>
                           <div class="flex items-center gap-2 mt-1">
                             <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-700 whitespace-nowrap">
                               G3 • Menantu
@@ -2687,11 +2682,6 @@
                           </div>
                         </div>
                       </div>
-
-                      <!-- Sisi Kanan: Badge Peran Menantu -->
-                      <span class="inline-flex items-center justify-center w-20 sm:w-24 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 shadow-sm shrink-0 whitespace-nowrap text-center ml-auto">
-                        Menantu
-                      </span>
                     </div>
                   ` : ''}
 
@@ -2717,14 +2707,14 @@
                               }"
                               title="Klik untuk melihat / edit profil Cicit: ${escapeHtml(gc.name)}"
                             >
-                              <!-- Sisi Kiri: Foto 1:1 + Info (Nama & Badge) -->
+                              <!-- Foto 1:1 + Info (Nama & Badge) -->
                               <div class="flex items-center gap-3 flex-1 min-w-0">
                                 ${renderMemberAvatarHtml(gc.photoUrl || getMemberPhotoUrl(gc.id, gc.name), gc.name, 'grandchild', 'md')}
                                 <div class="flex-1 min-w-0">
-                                  <div class="font-bold text-slate-800 text-base leading-snug break-words">${gcNameHighlighted}</div>
+                                  <div class="font-bold text-slate-800 text-base leading-snug break-normal">${gcNameHighlighted}</div>
                                   <div class="flex items-center gap-2 mt-1">
                                     <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 whitespace-nowrap">
-                                      G4 • Cicit
+                                      G4 • Cicit ke-${cicitIndex}
                                     </span>
                                     ${gc.isDeceased ? `<span class="text-[10px] text-slate-500 font-medium shrink-0 whitespace-nowrap">(Almarhum)</span>` : ''}
                                     <button 
@@ -2740,11 +2730,6 @@
                                   </div>
                                 </div>
                               </div>
-
-                              <!-- Sisi Kanan: Badge Urutan Cicit -->
-                              <span class="inline-flex items-center justify-center w-20 sm:w-24 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 shadow-sm shrink-0 whitespace-nowrap text-center ml-auto">
-                                Cicit ke-${cicitIndex}
-                              </span>
                             </div>
                           `;
                         }).join('')}
