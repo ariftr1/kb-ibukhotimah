@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+<!DOC
+                                <div class="flex justify-center my-1">
+                                  ${renderMemberAvatarHtml(gc.photoUrl || getMemberPhotoUrl(gc.id, gc.name), gc.name, 'grandchild', 'md')}
+                                </div>TYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -2489,6 +2492,66 @@
     /**
      * Render Mode Kartu
      */
+    
+    // Helper untuk mengambil foto profil anggota keluarga
+    function getMemberPhotoUrl(memberId, memberName) {
+      if (!memberName && !memberId) return null;
+      if (typeof findMemberData === 'function') {
+        const m = findMemberData(memberId, memberName);
+        if (m && (m.photo_url || m.foto_url)) return m.photo_url || m.foto_url;
+      }
+      return null;
+    }
+
+    // Helper render foto profil atau avatar placeholder berukuran 1:1
+    function renderMemberAvatarHtml(photoUrl, name, roleType = 'child', size = 'md') {
+      const initials = typeof getInitials === 'function' ? getInitials(name) : 'KB';
+      
+      let themeBg = 'bg-blue-100 text-blue-800 border-blue-300';
+      let borderRing = 'border-2 border-blue-400';
+      if (roleType === 'head-main') {
+        themeBg = 'bg-emerald-100 text-emerald-800 border-emerald-300';
+        borderRing = 'border border-emerald-500';
+      } else if (roleType === 'head-spouse') {
+        themeBg = 'bg-teal-100 text-teal-800 border-teal-300';
+        borderRing = 'border border-teal-400';
+      } else if (roleType === 'spouse') {
+        themeBg = 'bg-sky-100 text-sky-800 border-sky-300';
+        borderRing = 'border-2 border-sky-400';
+      } else if (roleType === 'grandchild') {
+        themeBg = 'bg-purple-100 text-purple-800 border-purple-300';
+        borderRing = 'border-2 border-purple-400';
+      }
+
+      const isSm = size === 'sm';
+      const dimensionClass = isSm 
+        ? 'w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs' 
+        : 'w-12 h-12 sm:w-14 sm:h-14 rounded-xl text-sm sm:text-base';
+      
+      const hasPhoto = Boolean(photoUrl && String(photoUrl).trim() !== '');
+
+      return `
+        <div class="relative shrink-0 aspect-square ${dimensionClass} overflow-hidden shadow-xs ${borderRing} bg-white flex items-center justify-center">
+          ${hasPhoto ? `
+            <img 
+              src="${escapeHtml(photoUrl)}" 
+              alt="${escapeHtml(name)}" 
+              class="w-full h-full aspect-square object-cover block rounded-[inherit]"
+              loading="lazy"
+              onerror="this.classList.add('hidden'); if(this.nextElementSibling) this.nextElementSibling.classList.remove('hidden');"
+            />
+            <div class="w-full h-full aspect-square flex items-center justify-center font-bold select-none ${themeBg} hidden">
+              ${escapeHtml(initials)}
+            </div>
+          ` : `
+            <div class="w-full h-full aspect-square flex items-center justify-center font-bold select-none ${themeBg}">
+              ${escapeHtml(initials)}
+            </div>
+          `}
+        </div>
+      `;
+    }
+
     function renderCardsView(matchedBranches, query) {
       const container = document.getElementById('family-tree-container');
       if (!container) return;
@@ -2497,10 +2560,11 @@
         const headsHtml = branch.heads.map((head, hIdx) => {
           const isMatched = query !== '' && textMatches(head.name, query);
           const nameHtml = highlightText(head.name, query);
-          const isMainHead = hIdx === 0;
-          const headBorderClass = isMainHead 
-            ? 'border-2 border-emerald-600 hover:border-emerald-700 bg-emerald-50/70 hover:bg-emerald-100/60' 
+          const isMainHead = hIdx === 0;
+          const headBorderClass = isMainHead 
+            ? 'border-2 border-emerald-600 hover:border-emerald-700 bg-emerald-50/70 hover:bg-emerald-100/60' 
             : 'border-2 border-teal-400 hover:border-teal-500 bg-teal-50/70 hover:bg-teal-100/60';
+          const headPhoto = head.photoUrl || getMemberPhotoUrl(head.id, head.name);
 
           return `
             <div 
@@ -2510,6 +2574,7 @@
               }"
               title="Klik untuk melihat / edit profil ${escapeHtml(head.name)}"
             >
+              ${renderMemberAvatarHtml(headPhoto, head.name, isMainHead ? 'head-main' : 'head-spouse', 'sm')}
               <span class="font-bold text-slate-900 text-sm group-hover:text-emerald-800 transition whitespace-nowrap">${nameHtml}</span>
               <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${
                 isMainHead 
@@ -2559,31 +2624,29 @@
                     }"
                     title="Klik untuk melihat profil Cucu: ${escapeHtml(child.name)}"
                   >
-                    <!-- Sisi Kiri: 2 Baris Vertikal (Baris 1: Dot & Nama, Baris 2: Badge & Tombol Edit) -->
-                    <div class="flex-1 min-w-0">
-                      <!-- Baris 1: Titik warna sejajar horizontal di sebelah kiri teks nama -->
-                      <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-blue-500"></span>
-                        <span class="font-bold text-slate-800 text-base leading-snug break-words">${childNameHighlighted}</span>
-                      </div>
-                      <!-- Baris 2: Badge generasi dan ikon pensil edit tepat di bawah nama -->
-                      <div class="flex items-center gap-2 mt-1.5 pl-[18px]">
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 whitespace-nowrap">
-                          G3 • Cucu
-                        </span>
-                        ${child.isDeceased ? `
-                          <span class="text-[10px] text-slate-500 font-medium shrink-0 whitespace-nowrap">(Almarhum)</span>
-                        ` : ''}
-                        <button 
-                          type="button"
-                          class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
-                          onclick="event.stopPropagation(); openDetailModal(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
-                          title="Lihat profil / detail Cucu: ${escapeHtml(child.name)}"
-                        >
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                          </svg>
-                        </button>
+                    <!-- Sisi Kiri: Foto 1:1 + Info (Nama & Badge) -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                      ${renderMemberAvatarHtml(child.photoUrl || getMemberPhotoUrl(child.id, child.name), child.name, 'child', 'md')}
+                      <div class="flex-1 min-w-0">
+                        <div class="font-bold text-slate-800 text-base leading-snug break-words">${childNameHighlighted}</div>
+                        <div class="flex items-center gap-2 mt-1">
+                          <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 whitespace-nowrap">
+                            G3 • Cucu
+                          </span>
+                          ${child.isDeceased ? `
+                            <span class="text-[10px] text-slate-500 font-medium shrink-0 whitespace-nowrap">(Almarhum)</span>
+                          ` : ''}
+                          <button 
+                            type="button"
+                            class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
+                            onclick="event.stopPropagation(); openDetailModal(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
+                            title="Lihat profil / detail Cucu: ${escapeHtml(child.name)}"
+                          >
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                            </svg>
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -2602,28 +2665,26 @@
                       }"
                       title="Klik untuk melihat profil Menantu: ${escapeHtml(child.spouse)}"
                     >
-                      <!-- Sisi Kiri: 2 Baris Vertikal (Baris 1: Dot & Nama, Baris 2: Badge & Tombol Edit) -->
-                      <div class="flex-1 min-w-0">
-                        <!-- Baris 1: Titik warna sejajar horizontal di sebelah kiri teks nama -->
-                        <div class="flex items-center gap-2">
-                          <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-sky-500"></span>
-                          <span class="font-bold text-slate-800 text-base leading-snug break-words">${spouseNameHighlighted}</span>
-                        </div>
-                        <!-- Baris 2: Badge generasi dan ikon pensil edit tepat di bawah nama -->
-                        <div class="flex items-center gap-2 mt-1.5 pl-[18px]">
-                          <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-700 whitespace-nowrap">
-                            G3 • Menantu
-                          </span>
-                          <button 
-                            type="button"
-                            class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
-                            onclick="event.stopPropagation(); openDetailModal(${branch.branchId}, 'spouse', '${escapeHtml(child.spouse)}', ${child.id || null})"
-                            title="Lihat profil / detail Menantu: ${escapeHtml(child.spouse)}"
-                          >
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                            </svg>
-                          </button>
+                      <!-- Sisi Kiri: Foto 1:1 + Info (Nama & Badge) -->
+                      <div class="flex items-center gap-3 flex-1 min-w-0">
+                        ${renderMemberAvatarHtml(getMemberPhotoUrl(null, child.spouse), child.spouse, 'spouse', 'md')}
+                        <div class="flex-1 min-w-0">
+                          <div class="font-bold text-slate-800 text-base leading-snug break-words">${spouseNameHighlighted}</div>
+                          <div class="flex items-center gap-2 mt-1">
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-700 whitespace-nowrap">
+                              G3 • Menantu
+                            </span>
+                            <button 
+                              type="button"
+                              class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
+                              onclick="event.stopPropagation(); openDetailModal(${branch.branchId}, 'spouse', '${escapeHtml(child.spouse)}', ${child.id || null})"
+                              title="Lihat profil / detail Menantu: ${escapeHtml(child.spouse)}"
+                            >
+                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
 
@@ -2656,29 +2717,27 @@
                               }"
                               title="Klik untuk melihat / edit profil Cicit: ${escapeHtml(gc.name)}"
                             >
-                              <!-- Sisi Kiri: 2 Baris Vertikal (Baris 1: Dot & Nama, Baris 2: Badge & Tombol Edit) -->
-                              <div class="flex-1 min-w-0">
-                                <!-- Baris 1: Titik warna sejajar horizontal di sebelah kiri teks nama -->
-                                <div class="flex items-center gap-2">
-                                  <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-purple-500"></span>
-                                  <span class="font-bold text-slate-800 text-base leading-snug break-words">${gcNameHighlighted}</span>
-                                </div>
-                                <!-- Baris 2: Badge generasi dan ikon pensil edit tepat di bawah nama -->
-                                <div class="flex items-center gap-2 mt-1.5 pl-[18px]">
-                                  <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 whitespace-nowrap">
-                                    G4 • Cicit
-                                  </span>
-                                  ${gc.isDeceased ? `<span class="text-[10px] text-slate-500 font-medium shrink-0 whitespace-nowrap">(Almarhum)</span>` : ''}
-                                  <button 
-                                    type="button"
-                                    class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
-                                    onclick="event.stopPropagation(); openDetailModal(${branch.branchId}, 'grandchild', '${escapeHtml(gc.name)}', ${gc.id || null})"
-                                    title="Lihat profil / detail Cicit: ${escapeHtml(gc.name)}"
-                                  >
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                                    </svg>
-                                  </button>
+                              <!-- Sisi Kiri: Foto 1:1 + Info (Nama & Badge) -->
+                              <div class="flex items-center gap-3 flex-1 min-w-0">
+                                ${renderMemberAvatarHtml(gc.photoUrl || getMemberPhotoUrl(gc.id, gc.name), gc.name, 'grandchild', 'md')}
+                                <div class="flex-1 min-w-0">
+                                  <div class="font-bold text-slate-800 text-base leading-snug break-words">${gcNameHighlighted}</div>
+                                  <div class="flex items-center gap-2 mt-1">
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 whitespace-nowrap">
+                                      G4 • Cicit
+                                    </span>
+                                    ${gc.isDeceased ? `<span class="text-[10px] text-slate-500 font-medium shrink-0 whitespace-nowrap">(Almarhum)</span>` : ''}
+                                    <button 
+                                      type="button"
+                                      class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
+                                      onclick="event.stopPropagation(); openDetailModal(${branch.branchId}, 'grandchild', '${escapeHtml(gc.name)}', ${gc.id || null})"
+                                      title="Lihat profil / detail Cicit: ${escapeHtml(gc.name)}"
+                                    >
+                                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                      </svg>
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
 
@@ -2826,6 +2885,9 @@
                     } w-[220px] max-w-[220px] text-center shrink-0">
                       <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 mb-1.5">
                         G3 • Cucu ke-${idx + 1}
+                      </div>
+                      <div class="flex justify-center my-1.5">
+                        ${renderMemberAvatarHtml(child.photoUrl || getMemberPhotoUrl(child.id, child.name), child.name, 'child', 'md')}
                       </div>
 
                       <div 
