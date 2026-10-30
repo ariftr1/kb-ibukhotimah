@@ -2627,67 +2627,80 @@
         if (cucuCount > 0) {
           childrenHtml = branch.children.map((child, index) => {
             const cucuIndex = index + 1;
-            const hasGrandchildren = child.grandchildren && child.grandchildren.length > 0;
+            const hasSpouse = Boolean(child.spouse && child.spouse.trim() !== '');
+            const hasGrandchildren = Boolean(child.grandchildren && child.grandchildren.length > 0);
+            const hasFamilyGroup = hasSpouse || hasGrandchildren;
+
             const childMatched = query !== '' && textMatches(child.name, query);
-            const spouseMatched = query !== '' && child.spouse && textMatches(child.spouse, query);
+            const spouseMatched = query !== '' && hasSpouse && textMatches(child.spouse, query);
 
             const childNameHighlighted = highlightText(child.name, query);
-            const spouseNameHighlighted = child.spouse ? highlightText(child.spouse, query) : null;
+            const spouseNameHighlighted = hasSpouse ? highlightText(child.spouse, query) : null;
+
+            const cucuCardHtml = `
+              <div 
+                onclick="openDetailModal(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
+                class="flex items-center justify-between gap-3 p-3 rounded-xl ${
+                  child.isDeceased
+                    ? 'bg-slate-200/70 border-2 border-slate-400 hover:border-slate-500 hover:bg-slate-200/90'
+                    : 'bg-blue-50/60 border-2 border-blue-600 hover:border-blue-700 hover:bg-blue-100/50'
+                } transition-all cursor-pointer group shadow-2xs ${
+                  childMatched ? 'ring-2 ring-blue-400 bg-blue-100/90 font-bold' : ''
+                }"
+                title="Klik untuk melihat profil Cucu: ${escapeHtml(child.name)}"
+              >
+                <!-- Foto 1:1 + Info (Nama & Badge) -->
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                  ${renderMemberAvatarHtml(child.photoUrl || getMemberPhotoUrl(child.id, child.name), child.name, child.isDeceased ? 'deceased' : 'child', 'md')}
+                  <div class="flex-1 min-w-0">
+                    <div class="font-bold text-slate-800 text-base leading-snug break-normal">${childNameHighlighted}</div>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        child.isDeceased 
+                          ? 'bg-slate-200 text-slate-700 border border-slate-300' 
+                          : 'bg-blue-100 text-blue-700'
+                      } whitespace-nowrap">
+                        G3 • Cucu ke-${cucuIndex}
+                      </span>
+                      ${child.isDeceased ? `
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-300 text-slate-700 border border-slate-400 whitespace-nowrap" title="Almarhum">
+                          <svg class="w-2 h-2 text-slate-500" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/></svg>
+                          (Almarhum)
+                        </span>
+                      ` : ''}
+                      <button 
+                        type="button"
+                        class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
+                        onclick="event.stopPropagation(); openDetailModal(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
+                        title="Lihat profil / detail Cucu: ${escapeHtml(child.name)}"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            if (!hasFamilyGroup) {
+              return `
+                <li class="w-full">
+                  ${cucuCardHtml}
+                </li>
+              `;
+            }
 
             return `
               <li class="w-full">
-                
                 <div class="bg-blue-50/20 hover:bg-blue-50/30 p-3 rounded-2xl border-2 border-blue-600 transition-colors ${
                   (childMatched || spouseMatched) ? 'ring-2 ring-amber-400 bg-amber-50/70 border-amber-300' : ''
                 }">
-                  <!-- Kotak Penuh Baris Cucu (G3) -->
-                  <div 
-                    onclick="openDetailModal(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
-                    class="flex items-center justify-between gap-3 p-3 rounded-xl ${
-                      child.isDeceased
-                        ? 'bg-slate-200/70 border-2 border-slate-400 hover:border-slate-500 hover:bg-slate-200/90'
-                        : 'bg-blue-50/60 border-2 border-blue-600 hover:border-blue-700 hover:bg-blue-100/50'
-                    } transition-all cursor-pointer group shadow-2xs ${
-                      childMatched ? 'ring-2 ring-blue-400 bg-blue-100/90 font-bold' : ''
-                    }"
-                    title="Klik untuk melihat profil Cucu: ${escapeHtml(child.name)}"
-                  >
-                    <!-- Foto 1:1 + Info (Nama & Badge) -->
-                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                      ${renderMemberAvatarHtml(child.photoUrl || getMemberPhotoUrl(child.id, child.name), child.name, child.isDeceased ? 'deceased' : 'child', 'md')}
-                      <div class="flex-1 min-w-0">
-                        <div class="font-bold text-slate-800 text-base leading-snug break-normal">${childNameHighlighted}</div>
-                        <div class="flex items-center gap-2 mt-1">
-                          <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                            child.isDeceased 
-                              ? 'bg-slate-200 text-slate-700 border border-slate-300' 
-                              : 'bg-blue-100 text-blue-700'
-                          } whitespace-nowrap">
-                            G3 • Cucu ke-${cucuIndex}
-                          </span>
-                          ${child.isDeceased ? `
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-300 text-slate-700 border border-slate-400 whitespace-nowrap" title="Almarhum">
-                              <svg class="w-2 h-2 text-slate-500" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/></svg>
-                              (Almarhum)
-                            </span>
-                          ` : ''}
-                          <button 
-                            type="button"
-                            class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
-                            onclick="event.stopPropagation(); openDetailModal(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
-                            title="Lihat profil / detail Cucu: ${escapeHtml(child.name)}"
-                          >
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  ${cucuCardHtml}
 
                   <!-- Kotak Penuh Baris Menantu (G3 • Menantu) -->
-                  ${child.spouse ? `
+                  ${hasSpouse ? `
                     <div 
                       onclick="openDetailModal(${branch.branchId}, 'spouse', '${escapeHtml(child.spouse)}', ${child.id || null})"
                       class="flex items-center justify-between gap-3 p-3 rounded-xl bg-sky-50/60 border-2 border-sky-400 hover:border-sky-500 hover:bg-sky-100/50 transition-all mt-2 cursor-pointer group shadow-2xs ${
