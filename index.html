@@ -2564,18 +2564,13 @@
           const isMatched = query !== '' && textMatches(head.name, query);
           const nameHtml = highlightText(head.name, query);
           const isMainHead = hIdx === 0;
-          const isDeceased = Boolean(head.isDeceased);
 
-          let headBorderClass = '';
-          if (isDeceased) {
-            headBorderClass = 'border-2 border-slate-400 hover:border-slate-500 bg-slate-200/70 hover:bg-slate-200/90';
-          } else if (isMainHead) {
-            headBorderClass = 'border-2 border-emerald-600 hover:border-emerald-700 bg-emerald-50/70 hover:bg-emerald-100/60';
-          } else {
-            headBorderClass = 'border-2 border-teal-400 hover:border-teal-500 bg-teal-50/70 hover:bg-teal-100/60';
-          }
+          // Warna hijau tua untuk Anak (G2), hijau cerah/teal untuk Menantu (G2) kaya Solikhatun
+          const headBorderClass = isMainHead 
+            ? 'border-2 border-emerald-600 hover:border-emerald-700 bg-emerald-50/70 hover:bg-emerald-100/60' 
+            : 'border-2 border-teal-400 hover:border-teal-500 bg-teal-50/70 hover:bg-teal-100/60';
           const headPhoto = head.photoUrl || getMemberPhotoUrl(head.id, head.name);
-          const avatarRole = isDeceased ? 'deceased' : (isMainHead ? 'head-main' : 'head-spouse');
+          const avatarRole = isMainHead ? 'head-main' : 'head-spouse';
 
           return `
             <div 
@@ -2592,15 +2587,13 @@
                   <div class="font-bold text-slate-800 text-base leading-snug break-normal">${nameHtml}</div>
                   <div class="flex items-center gap-2 mt-1">
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                      isDeceased
-                        ? 'bg-slate-200 text-slate-700 border border-slate-300'
-                        : (isMainHead ? 'bg-emerald-100 text-emerald-700' : 'bg-teal-100 text-teal-700')
+                      isMainHead ? 'bg-emerald-100 text-emerald-700' : 'bg-teal-100 text-teal-700'
                     } whitespace-nowrap">
                       ${isMainHead ? ('G2 • ' + branch.branchName) : 'G2 • Menantu'}
                     </span>
                     ${head.isDeceased ? `
-                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-300 text-slate-700 border border-slate-400 whitespace-nowrap" title="Almarhum">
-                        <svg class="w-2 h-2 text-slate-500" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/></svg>
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-200 text-slate-600 border border-slate-300 whitespace-nowrap" title="Almarhum">
+                        <svg class="w-2 h-2 text-slate-400" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/></svg>
                         (Almarhum)
                       </span>
                     ` : ''}
@@ -2640,31 +2633,23 @@
             const cucuCardHtml = `
               <div 
                 onclick="openDetailModal(${branch.branchId}, 'child', '${escapeHtml(child.name)}', ${child.id || null})"
-                class="flex items-center justify-between gap-3 p-3 rounded-xl ${
-                  child.isDeceased
-                    ? 'bg-slate-200/70 border-2 border-slate-400 hover:border-slate-500 hover:bg-slate-200/90'
-                    : 'bg-blue-50/60 border-2 border-blue-600 hover:border-blue-700 hover:bg-blue-100/50'
-                } transition-all cursor-pointer group shadow-2xs ${
+                class="flex items-center justify-between gap-3 p-3 rounded-xl bg-blue-50/60 border-2 border-blue-600 hover:border-blue-700 hover:bg-blue-100/50 transition-all cursor-pointer group shadow-2xs ${
                   childMatched ? 'ring-2 ring-blue-400 bg-blue-100/90 font-bold' : ''
                 }"
                 title="Klik untuk melihat profil Cucu: ${escapeHtml(child.name)}"
               >
                 <!-- Foto 1:1 + Info (Nama & Badge) -->
                 <div class="flex items-center gap-3 flex-1 min-w-0">
-                  ${renderMemberAvatarHtml(child.photoUrl || getMemberPhotoUrl(child.id, child.name), child.name, child.isDeceased ? 'deceased' : 'child', 'md')}
+                  ${renderMemberAvatarHtml(child.photoUrl || getMemberPhotoUrl(child.id, child.name), child.name, 'child', 'md')}
                   <div class="flex-1 min-w-0">
                     <div class="font-bold text-slate-800 text-base leading-snug break-normal">${childNameHighlighted}</div>
                     <div class="flex items-center gap-2 mt-1">
-                      <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                        child.isDeceased 
-                          ? 'bg-slate-200 text-slate-700 border border-slate-300' 
-                          : 'bg-blue-100 text-blue-700'
-                      } whitespace-nowrap">
+                      <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 whitespace-nowrap">
                         G3 • Cucu ke-${cucuIndex}
                       </span>
                       ${child.isDeceased ? `
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-300 text-slate-700 border border-slate-400 whitespace-nowrap" title="Almarhum">
-                          <svg class="w-2 h-2 text-slate-500" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/></svg>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-200 text-slate-600 border border-slate-300 whitespace-nowrap" title="Almarhum">
+                          <svg class="w-2 h-2 text-slate-400" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/></svg>
                           (Almarhum)
                         </span>
                       ` : ''}
@@ -2750,31 +2735,23 @@
                           return `
                             <div 
                               onclick="openDetailModal(${branch.branchId}, 'grandchild', '${escapeHtml(gc.name)}', ${gc.id || null})"
-                              class="flex items-center justify-between gap-3 p-3 rounded-xl ${
-                                gc.isDeceased
-                                  ? 'bg-slate-200/70 border-2 border-slate-400 hover:border-slate-500 hover:bg-slate-200/90'
-                                  : 'bg-purple-50/70 border-2 border-purple-400 hover:border-purple-500 hover:bg-purple-100/60'
-                              } transition-all cursor-pointer group shadow-2xs ${
+                              class="flex items-center justify-between gap-3 p-3 rounded-xl bg-purple-50/70 border-2 border-purple-400 hover:border-purple-500 hover:bg-purple-100/60 transition-all cursor-pointer group shadow-2xs ${
                                 gcMatched ? 'ring-2 ring-purple-400 bg-purple-100/90 font-bold' : ''
                               }"
                               title="Klik untuk melihat / edit profil Cicit: ${escapeHtml(gc.name)}"
                             >
                               <!-- Foto 1:1 + Info (Nama & Badge) -->
                               <div class="flex items-center gap-3 flex-1 min-w-0">
-                                ${renderMemberAvatarHtml(gc.photoUrl || getMemberPhotoUrl(gc.id, gc.name), gc.name, gc.isDeceased ? 'deceased' : 'grandchild', 'md')}
+                                ${renderMemberAvatarHtml(gc.photoUrl || getMemberPhotoUrl(gc.id, gc.name), gc.name, 'grandchild', 'md')}
                                 <div class="flex-1 min-w-0">
                                   <div class="font-bold text-slate-800 text-base leading-snug break-normal">${gcNameHighlighted}</div>
                                   <div class="flex items-center gap-2 mt-1">
-                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                                      gc.isDeceased 
-                                        ? 'bg-slate-200 text-slate-700 border border-slate-300' 
-                                        : 'bg-purple-100 text-purple-700'
-                                    } whitespace-nowrap">
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 whitespace-nowrap">
                                       G4 • Cicit ke-${cicitIndex}
                                     </span>
                                     ${gc.isDeceased ? `
-                                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-300 text-slate-700 border border-slate-400 whitespace-nowrap" title="Almarhum">
-                                        <svg class="w-2 h-2 text-slate-500" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/></svg>
+                                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-200 text-slate-600 border border-slate-300 whitespace-nowrap" title="Almarhum">
+                                        <svg class="w-2 h-2 text-slate-400" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/></svg>
                                         (Almarhum)
                                       </span>
                                     ` : ''}
