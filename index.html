@@ -2511,10 +2511,10 @@
       let borderRing = 'border-2 border-blue-400';
       if (roleType === 'head-main') {
         themeBg = 'bg-emerald-100 text-emerald-800 border-emerald-300';
-        borderRing = 'border border-emerald-500';
+        borderRing = 'border-2 border-emerald-500';
       } else if (roleType === 'head-spouse') {
         themeBg = 'bg-teal-100 text-teal-800 border-teal-300';
-        borderRing = 'border border-teal-400';
+        borderRing = 'border-2 border-teal-400';
       } else if (roleType === 'spouse') {
         themeBg = 'bg-sky-100 text-sky-800 border-sky-300';
         borderRing = 'border-2 border-sky-400';
@@ -2569,31 +2569,40 @@
           return `
             <div 
               onclick="showMemberDetail(${branch.branchId}, 'head', '${escapeHtml(head.name)}', ${head.id || null})"
-              class="${headBorderClass} rounded-xl p-2.5 sm:px-3 sm:py-2 cursor-pointer transition-all shadow-2xs group flex items-center justify-between gap-2.5 w-full ${
-                isMatched ? 'bg-amber-100/70 ring-2 ring-amber-300 border-amber-300' : ''
+              class="flex items-center justify-between gap-3 p-3 rounded-xl ${headBorderClass} transition-all cursor-pointer group shadow-2xs w-full ${
+                isMatched ? 'ring-2 ring-emerald-400 bg-emerald-100/90 font-bold' : ''
               }"
               title="Klik untuk melihat / edit profil ${escapeHtml(head.name)}"
             >
-              <div class="flex items-center gap-2.5 flex-1 min-w-0">
-                ${renderMemberAvatarHtml(headPhoto, head.name, isMainHead ? 'head-main' : 'head-spouse', 'sm')}
-                <span class="font-bold text-slate-900 text-sm group-hover:text-emerald-800 transition truncate">${nameHtml}</span>
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${
-                  isMainHead 
-                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
-                    : 'bg-teal-50 text-teal-800 border border-teal-200'
-                } whitespace-nowrap">
-                  ${isMainHead ? 'G2 • Anak' : 'G2 • Menantu'}
-                </span>
-                ${head.isDeceased ? `
-                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-200 text-slate-600 border border-slate-300 whitespace-nowrap" title="Almarhum">
-                    <svg class="w-2 h-2 text-slate-500" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/></svg>
-                    (Almarhum)
-                  </span>
-                ` : ''}
+              <!-- Foto 1:1 + Info (Nama & Badge) -->
+              <div class="flex items-center gap-3 flex-1 min-w-0">
+                ${renderMemberAvatarHtml(headPhoto, head.name, isMainHead ? 'head-main' : 'head-spouse', 'md')}
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-slate-800 text-base leading-snug break-normal">${nameHtml}</div>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                      isMainHead 
+                        ? 'bg-emerald-100 text-emerald-700' 
+                        : 'bg-teal-100 text-teal-700'
+                    } whitespace-nowrap">
+                      ${isMainHead ? ('G2 • ' + branch.branchName) : 'G2 • Menantu'}
+                    </span>
+                    ${head.isDeceased ? `
+                      <span class="text-[10px] text-slate-500 font-medium shrink-0 whitespace-nowrap">(Almarhum)</span>
+                    ` : ''}
+                    <button 
+                      type="button"
+                      class="edit-btn p-1 text-slate-400 hover:text-emerald-600 transition"
+                      onclick="event.stopPropagation(); showMemberDetail(${branch.branchId}, 'head', '${escapeHtml(head.name)}', ${head.id || null})"
+                      title="Lihat profil / detail: ${escapeHtml(head.name)}"
+                    >
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
               </div>
-              <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-600 opacity-50 group-hover:opacity-100 transition shrink-0 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-              </svg>
             </div>
           `;
         }).join('');
@@ -2757,7 +2766,7 @@
                   </span>
                 ` : ''}
               </div>
-              <div class="mt-2.5 flex flex-col gap-2 w-full text-sm sm:text-base font-semibold">
+              <div class="mt-2.5 flex flex-col gap-2.5 w-full">
                 ${headsHtml}
               </div>
             </div>
