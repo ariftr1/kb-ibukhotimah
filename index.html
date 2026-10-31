@@ -1016,7 +1016,7 @@
             </label>
             <span id="editPhotoFileName" class="text-xs text-slate-600 ml-3 truncate font-medium"></span>
           </div>
-          <p class="text-xs text-slate-500">Maksimal ukuran foto <strong>1 MB</strong> (Format: JPG, PNG, WEBP).</p>
+          <p class="text-xs text-slate-500">Maksimal ukuran foto <strong>5 MB</strong> (Format: JPG, PNG, WEBP).</p>
 
           <!-- Preview foto baru yang dipilih -->
           <div id="photoPreviewContainer" class="hidden items-center gap-3 pt-1">
@@ -3800,7 +3800,7 @@
         }
       }
 
-      // Pasang validasi 1 MB & preview saat file dipilih
+      // Pasang validasi 5 MB & preview saat file dipilih
       if (editPhotoFile) {
         editPhotoFile.onchange = function() {
           const file = editPhotoFile.files[0];
@@ -3808,11 +3808,11 @@
             if (editPhotoFileName) editPhotoFileName.textContent = '';
             return;
           }
-          if (file.size > 1024 * 1024) {
+          if (file.size > 5 * 1024 * 1024) {
             editPhotoFile.value = '';
             if (editPhotoFileName) editPhotoFileName.textContent = '';
             if (photoPreviewContainer) { photoPreviewContainer.classList.add('hidden'); photoPreviewContainer.classList.remove('flex'); }
-            alert('Ukuran foto terlalu besar! Maksimal ukuran file adalah 1 MB. Silakan pilih foto lain atau kompres terlebih dahulu.');
+            alert('Ukuran foto terlalu besar! Maksimal ukuran file adalah 5 MB. Silakan pilih foto lain.');
             return;
           }
           if (editPhotoFileName) editPhotoFileName.textContent = file.name;
@@ -3910,6 +3910,51 @@
       setTimeout(() => {
         backdrop.classList.add('hidden');
       }, 200);
+    }
+
+    function compressImageToBlob(file, maxWidth = 1200, maxHeight = 1200, quality = 0.85) {
+      return new Promise((resolve) => {
+        if (!file || !file.type || !file.type.startsWith('image/')) return resolve(file);
+        const reader = new FileReader();
+        reader.onerror = () => resolve(file);
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onerror = () => resolve(file);
+          img.onload = () => {
+            try {
+              const canvas = document.createElement('canvas');
+              let w = img.width;
+              let h = img.height;
+              if (w > h) {
+                if (w > maxWidth) {
+                  h = Math.round((h * maxWidth) / w);
+                  w = maxWidth;
+                }
+              } else {
+                if (h > maxHeight) {
+                  w = Math.round((h * maxHeight) / h);
+                  h = maxHeight;
+                }
+              }
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, w, h);
+              canvas.toBlob((blob) => {
+                if (blob && blob.size < file.size) {
+                  resolve(blob);
+                } else {
+                  resolve(file);
+                }
+              }, 'image/jpeg', quality);
+            } catch (err) {
+              resolve(file);
+            }
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
     }
 
     function compressImageToBase64(file, maxWidth = 400, maxHeight = 400, quality = 0.75) {
@@ -4071,18 +4116,29 @@
       // Upload foto (Opsi A: Supabase Storage, Opsi B: Base64 ringkas)
       let newPhotoUrl = undefined;
       if (photoFileSelected) {
-        if (submitBtn) submitBtn.innerHTML = '<span>Memproses...</span>';
+        if (photoFileSelected.size > 5 * 1024 * 1024) {
+          showToast('Ukuran foto terlalu besar! Maksimal 5 MB.', 'error');
+          return;
+        }
+        if (submitBtn) submitBtn.innerHTML = '<span>Mengunggah foto...</span>';
         
         let uploadedUrl = null;
+        // Optimasi foto besar otomatis menjadi JPEG berkualitas tinggi sebelum upload
+        const uploadPayload = await compressImageToBlob(photoFileSelected, 1200, 1200, 0.85);
+        const isCompressed = (uploadPayload !== photoFileSelected);
         const bucketNames = ['family-photos', 'avatars', 'photos'];
         for (const bName of bucketNames) {
           try {
-            const fileExt = photoFileSelected.name.split('.').pop() || 'jpg';
+            const fileExt = isCompressed ? 'jpg' : (photoFileSelected.name.split('.').pop() || 'jpg');
             const safeId = (targetId || memberId || newName.replace(/[^a-zA-Z0-9]/g, '_'));
             const fileName = `${safeId}_${Date.now()}.${fileExt}`;
             const { error: upError } = await supabase.storage
               .from(bName)
-              .upload(fileName, photoFileSelected, { cacheControl: '3600', upsert: true });
+              .upload(fileName, uploadPayload, {
+                cacheControl: '3600',
+                upsert: true,
+                contentType: isCompressed ? 'image/jpeg' : (photoFileSelected.type || 'image/jpeg')
+              });
             
             if (!upError) {
               const { data: pubData } = supabase.storage.from(bName).getPublicUrl(fileName);
@@ -4093,7 +4149,6 @@
             }
           } catch (e) {}
         }
-
         if (uploadedUrl) {
           newPhotoUrl = uploadedUrl;
         } else {
