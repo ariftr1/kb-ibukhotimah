@@ -95,6 +95,9 @@
       0% { transform: translate3d(0%, 0, 0); }
       100% { transform: translate3d(-50%, 0, 0); }
     }
+    :root {
+      --marquee-blur: 5px;
+    }
     .marquee-track-ltr {
       display: flex;
       width: max-content;
@@ -107,7 +110,50 @@
       animation: marqueeRTL 36s linear infinite;
       will-change: transform;
     }
+    /* Efek Blur pada Banner Foto Bergerak di Layar Depan */
+    .marquee-track-ltr img,
+    .marquee-track-rtl img {
+      filter: blur(var(--marquee-blur, 5px));
+      transition: filter 0.2s ease-out;
+    }
     /* Animasi terus berjalan tanpa berhenti saat diklik/disentuh */
+    /* Styling Slider Pengatur Blur di Modal Admin */
+    input[type=range].blur-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      outline: none;
+      transition: background 0.2s;
+    }
+    input[type=range].blur-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #059669;
+      cursor: pointer;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+    input[type=range].blur-slider::-webkit-slider-thumb:hover,
+    input[type=range].blur-slider::-webkit-slider-thumb:active {
+      transform: scale(1.15);
+      background: #047857;
+    }
+    input[type=range].blur-slider::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #059669;
+      cursor: pointer;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    }
 
     @keyframes lockShake {
       0%, 100% { transform: translateX(0); }
@@ -1335,6 +1381,43 @@
           </p>
         </div>
 
+        <!-- Fitur Pengatur Tingkat Blur Banner Foto (Slide) -->
+        <div class="pt-3 border-t border-slate-100">
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="adminBlurSlider" class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              <span>Tingkat Blur Gambar Berjalan</span>
+            </label>
+            <span id="adminBlurValueBadge" class="font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 text-xs">
+              5 px (Sedang)
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 mb-2 leading-relaxed">
+            Geser slide untuk mengatur efek buram pada foto yang bergerak di layar depan.
+          </p>
+          <div class="space-y-1.5">
+            <input 
+              type="range" 
+              id="adminBlurSlider" 
+              min="0" 
+              max="20" 
+              step="1" 
+              value="5" 
+              oninput="handleBlurSliderInput(this.value)" 
+              class="blur-slider w-full cursor-pointer"
+            />
+            <div class="flex justify-between items-center text-[10px] text-slate-400 font-medium px-0.5">
+              <span>0 (Jernih)</span>
+              <span>5 (Sedang)</span>
+              <span>10 (Buram)</span>
+              <span>20 (Maksimal)</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Pesan Peringatan Error Admin -->
         <div id="admin-modal-error-msg" class="hidden text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 p-2.5 rounded-xl">
           Kata sandi baru keluarga tidak boleh kosong.
@@ -1353,7 +1436,7 @@
             type="submit" 
             class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-sm transition hover:shadow flex items-center gap-1.5"
           >
-            <span>Simpan Sandi Baru</span>
+            <span>Simpan Pengaturan</span>
           </button>
         </div>
       </form>
@@ -1403,6 +1486,47 @@
     const VALID_PASSWORD = "1111"; // Ganti dengan sandi pilihan Anda (hanya satu nilai)
     let isFamilyUnlocked = false;
 
+    /** 
+     * KONFIGURASI TINGKAT BLUR GAMBAR BERJALAN LAYAR DEPAN
+     */
+    const DEFAULT_BANNER_BLUR = 5;
+
+    function getFamilyBannerBlur() {
+      const saved = localStorage.getItem('family_banner_blur');
+      if (saved !== null && saved !== '' && !isNaN(Number(saved))) {
+        return parseInt(saved, 10);
+      }
+      return DEFAULT_BANNER_BLUR;
+    }
+
+    function applyLockScreenBlur(blurPx) {
+      const px = (blurPx !== undefined && blurPx !== null && !isNaN(Number(blurPx))) ? Math.max(0, Math.min(30, Number(blurPx))) : DEFAULT_BANNER_BLUR;
+      document.documentElement.style.setProperty('--marquee-blur', px + 'px');
+    }
+
+    function saveFamilyBannerBlur(blurPx) {
+      const px = Math.max(0, Math.min(30, Number(blurPx) || 0));
+      localStorage.setItem('family_banner_blur', px.toString());
+      applyLockScreenBlur(px);
+    }
+
+    function getBlurDescription(num) {
+      if (num === 0) return 'Jernih';
+      if (num <= 3) return 'Halus';
+      if (num <= 7) return 'Sedang';
+      if (num <= 14) return 'Buram';
+      return 'Maksimal';
+    }
+
+    function handleBlurSliderInput(val) {
+      const num = Math.max(0, Math.min(30, Number(val) || 0));
+      applyLockScreenBlur(num);
+      const badge = document.getElementById('adminBlurValueBadge');
+      if (badge) {
+        badge.textContent = `${num} px (${getBlurDescription(num)})`;
+      }
+    }
+
     function getFamilyPass() {
       const savedPass = localStorage.getItem('family_active_pass');
       // Pastikan hanya menggunakan sandi kustom jika valid dan bukan sandi lama 'khotimah2026'
@@ -1444,7 +1568,8 @@
       const lockScreen = document.getElementById('familyLockScreen') || document.getElementById('family-lock-screen');
       if (!lockScreen) return;
 
-      // 2. Kunci Default Setiap Halaman Dimuat / Di-refresh
+      // 2. Kunci Default Setiap Halaman Dimuat / Di-refresh & Terapkan Efek Blur Banner
+      applyLockScreenBlur(getFamilyBannerBlur());
       lockScreen.classList.remove('hidden', 'opacity-0');
       lockScreen.classList.add('opacity-100');
       lockScreen.style.display = 'flex';
@@ -1552,17 +1677,28 @@
       }
     }
 
+    let adminModalOriginalBlur = DEFAULT_BANNER_BLUR;
+
     function openAdminPasswordModal() {
       const modal = document.getElementById('adminPasswordModal');
       const card = document.getElementById('admin-password-card');
       const newPassInput = document.getElementById('adminNewPassInput') || document.getElementById('admin-new-family-pass');
       const errorMsg = document.getElementById('admin-modal-error-msg');
       const currentPassLabel = document.getElementById('admin-current-pass-label');
+      const blurSlider = document.getElementById('adminBlurSlider');
 
       if (!modal) return;
       if (errorMsg) errorMsg.classList.add('hidden');
-      if (newPassInput) newPassInput.value = '';
-      if (currentPassLabel) currentPassLabel.textContent = getActiveFamilyPass();
+
+      const currentPass = getActiveFamilyPass();
+      if (newPassInput) newPassInput.value = currentPass;
+      if (currentPassLabel) currentPassLabel.textContent = currentPass;
+
+      adminModalOriginalBlur = getFamilyBannerBlur();
+      if (blurSlider) {
+        blurSlider.value = adminModalOriginalBlur;
+        handleBlurSliderInput(adminModalOriginalBlur);
+      }
 
       modal.classList.remove('hidden');
       pushModalToHistory('admin-pass');
@@ -1584,6 +1720,9 @@
       const modal = document.getElementById('adminPasswordModal');
       const card = document.getElementById('admin-password-card');
       if (!modal) return;
+
+      // Kembalikan efek blur ke nilai tersimpan jika batal
+      applyLockScreenBlur(getFamilyBannerBlur());
 
       modal.classList.remove('opacity-100');
       modal.classList.add('opacity-0');
@@ -1612,6 +1751,7 @@
       if (event) event.preventDefault();
       const newPassInput = document.getElementById('adminNewPassInput') || document.getElementById('admin-new-family-pass');
       const errorMsg = document.getElementById('admin-modal-error-msg');
+      const blurSlider = document.getElementById('adminBlurSlider');
 
       const newPass = (newPassInput ? newPassInput.value : '').trim();
 
@@ -1625,9 +1765,14 @@
       }
 
       setFamilyPass(newPass);
+
+      if (blurSlider) {
+        saveFamilyBannerBlur(blurSlider.value);
+      }
+
       if (errorMsg) errorMsg.classList.add('hidden');
       closeAdminPasswordModal();
-      showToast("Kata sandi keluarga berhasil diganti!", "success");
+      showToast("Pengaturan sandi & tingkat blur berhasil disimpan!", "success");
     }
 
     /**
