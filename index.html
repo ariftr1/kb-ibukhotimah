@@ -69,15 +69,33 @@
     }
     body {
       background-color: #f8fafc;
+      background-image: 
+        radial-gradient(circle at 12% 12%, rgba(167, 243, 208, 0.35) 0%, transparent 45%),
+        radial-gradient(circle at 88% 22%, rgba(199, 210, 254, 0.3) 0%, transparent 45%),
+        radial-gradient(circle at 50% 60%, rgba(186, 230, 253, 0.35) 0%, transparent 50%),
+        radial-gradient(circle at 20% 88%, rgba(209, 250, 229, 0.35) 0%, transparent 45%);
+      background-attachment: fixed;
     }
     .branch-card {
+      background: rgba(255, 255, 255, 0.8) !important;
+      backdrop-filter: blur(20px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+      border: 1.5px solid rgba(52, 211, 153, 0.6) !important;
+      box-shadow: 
+        0 20px 40px -15px rgba(16, 185, 129, 0.1),
+        0 10px 25px -5px rgba(15, 23, 42, 0.05),
+        inset 0 1.5px 1.5px rgba(255, 255, 255, 0.95) !important;
+      border-radius: 1.5rem !important;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 2px solid #34d399 !important; /* Garis hijau cerah (emerald-400) */
+      overflow: hidden;
     }
     .branch-card:hover {
-      transform: translateY(-2px);
-      border-color: #10b981 !important; /* emerald-500 */
-      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.15), 0 8px 10px -6px rgba(16, 185, 129, 0.1) !important;
+      transform: translateY(-3px);
+      border-color: #10b981 !important;
+      box-shadow: 
+        0 25px 50px -12px rgba(16, 185, 129, 0.2),
+        0 15px 30px -8px rgba(15, 23, 42, 0.08),
+        inset 0 2px 2px rgba(255, 255, 255, 1) !important;
     }
     .scrollbar-none::-webkit-scrollbar,
     .no-scrollbar::-webkit-scrollbar {
@@ -127,6 +145,70 @@
       transition: filter 0.2s ease-out;
     }
     /* Animasi terus berjalan tanpa berhenti saat diklik/disentuh */
+    /* Header Liquid Glass Luxury */
+    .liquid-glass-header {
+      background: linear-gradient(145deg, rgba(6, 78, 59, 0.94) 0%, rgba(6, 95, 70, 0.96) 50%, rgba(4, 47, 46, 0.98) 100%) !important;
+      backdrop-filter: blur(24px) saturate(190%) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.18) !important;
+      box-shadow: 
+        0 20px 40px -15px rgba(6, 78, 59, 0.4),
+        inset 0 1px 1.5px rgba(255, 255, 255, 0.25) !important;
+      position: relative;
+    }
+
+    /* Dark Liquid Glass untuk Kartu Statistik & Tombol Header */
+    .liquid-glass-dark {
+      background: rgba(255, 255, 255, 0.08) !important;
+      backdrop-filter: blur(18px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.18) !important;
+      box-shadow: 
+        0 10px 25px -5px rgba(0, 0, 0, 0.2),
+        inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.22),
+        inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.25) !important;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .liquid-glass-dark::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 45%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, transparent 100%);
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    .liquid-glass-dark:hover {
+      background: rgba(255, 255, 255, 0.14) !important;
+      border-color: rgba(255, 255, 255, 0.32) !important;
+      transform: translateY(-2px);
+      box-shadow: 
+        0 14px 30px -4px rgba(0, 0, 0, 0.25),
+        inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.35) !important;
+    }
+
+    /* Input Pencarian Liquid Glass */
+    .liquid-glass-search {
+      background: rgba(255, 255, 255, 0.9) !important;
+      backdrop-filter: blur(18px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+      box-shadow: 
+        0 10px 25px -5px rgba(0, 0, 0, 0.15),
+        inset 0 1.5px 2px rgba(255, 255, 255, 0.9) !important;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .liquid-glass-search:focus {
+      background: #ffffff !important;
+      border-color: #34d399 !important;
+      box-shadow: 
+        0 0 0 4px rgba(52, 211, 153, 0.35),
+        0 14px 30px -5px rgba(0, 0, 0, 0.2) !important;
+    }
     /* ============================================================ */
     /* LIQUID GLASS / FROSTED GLASSMORPHISM LUXURY DESIGN          */
     /* ============================================================ */
@@ -366,8 +448,10 @@
   </div>
 
   <!-- Header & Hero Section -->
-    <header class="bg-gradient-to-b from-emerald-800 via-emerald-850 to-emerald-900 text-white shadow-lg relative overflow-hidden">
+    <header class="liquid-glass-header text-white relative overflow-hidden">
     <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
+    <div class="absolute -top-24 -left-24 w-96 h-96 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/2 -right-24 w-96 h-96 bg-teal-300/15 rounded-full blur-3xl pointer-events-none"></div>
     <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10 space-y-6">
       
       <!-- Baris 1: Header Atas (Judul & Statistik) -->
@@ -385,19 +469,19 @@
 
         <!-- Kotak Statistik: Ditarik mentok ke kanan -->
         <div class="grid grid-cols-4 gap-2 sm:gap-3 w-full lg:w-auto lg:ml-auto">
-          <div class="flex flex-col items-center justify-center text-center p-2 sm:p-3 rounded-xl bg-emerald-900/40 border border-emerald-500/20">
+          <div class="flex flex-col items-center justify-center text-center p-2 sm:p-3 rounded-xl liquid-glass-dark shadow-md">
             <span class="text-xl sm:text-2xl font-bold text-white mb-0.5" id="stat-g1">1</span>
             <span class="text-[11px] sm:text-xs text-emerald-100/90 whitespace-nowrap font-medium text-center" title="Ibu Khotimah">Leluhur<span class="hidden sm:inline"> Utama</span></span>
           </div>
-          <div class="flex flex-col items-center justify-center text-center p-2 sm:p-3 rounded-xl bg-emerald-900/40 border border-emerald-500/20">
+          <div class="flex flex-col items-center justify-center text-center p-2 sm:p-3 rounded-xl liquid-glass-dark shadow-md">
             <span class="text-xl sm:text-2xl font-bold text-white mb-0.5" id="stat-g2">10</span>
             <span class="text-[11px] sm:text-xs text-emerald-100/90 whitespace-nowrap font-medium text-center">Anak<span class="hidden sm:inline"> Kandung</span></span>
           </div>
-          <div class="flex flex-col items-center justify-center text-center p-2 sm:p-3 rounded-xl bg-emerald-900/40 border border-emerald-500/20">
+          <div class="flex flex-col items-center justify-center text-center p-2 sm:p-3 rounded-xl liquid-glass-dark shadow-md">
             <span class="text-xl sm:text-2xl font-bold text-white mb-0.5" id="stat-g3">0</span>
             <span class="text-[11px] sm:text-xs text-emerald-100/90 whitespace-nowrap font-medium text-center">Cucu</span>
           </div>
-          <div class="flex flex-col items-center justify-center text-center p-2 sm:p-3 rounded-xl bg-emerald-900/40 border border-emerald-500/20">
+          <div class="flex flex-col items-center justify-center text-center p-2 sm:p-3 rounded-xl liquid-glass-dark shadow-md">
             <span class="text-xl sm:text-2xl font-bold text-white mb-0.5" id="stat-g4">0</span>
             <span class="text-[11px] sm:text-xs text-emerald-100/90 whitespace-nowrap font-medium text-center">Cicit</span>
           </div>
@@ -421,7 +505,7 @@
               type="text" 
               id="search-input" 
               placeholder="Cari nama anggota keluarga..." 
-              class="w-full text-sm py-2 sm:py-2.5 pl-9 pr-4 bg-white/95 text-slate-800 placeholder-slate-400 rounded-xl shadow-inner font-medium focus:outline-none focus:ring-4 focus:ring-emerald-400/40 focus:bg-white transition"
+              class="liquid-glass-search w-full text-sm py-2.5 sm:py-3 pl-10 pr-4 text-slate-800 placeholder-slate-500 rounded-2xl font-semibold focus:outline-none transition"
               autocomplete="off"
             />
 
@@ -441,7 +525,7 @@
         <!-- Tombol Aksi & Kontrol Navigasi: 2 Baris Seimbang -->
         <div class="flex flex-col gap-2.5 w-full md:w-auto md:min-w-[320px] shrink-0 md:ml-auto">
           <!-- Baris 1: Switcher Tampilan (Kartu & Tree View) -->
-          <div class="inline-flex p-1 bg-emerald-950/70 border border-emerald-800/60 rounded-2xl w-full">
+          <div class="inline-flex p-1.5 liquid-glass-dark rounded-2xl w-full shadow-inner">
             <button 
               type="button" 
               id="view-btn-cards" 
@@ -472,7 +556,7 @@
               type="button" 
               id="btnPrintPdf" 
               onclick="triggerPrintDocument()" 
-              class="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-800/60 text-emerald-100 font-medium text-xs sm:text-sm shadow-xs transition cursor-pointer"
+              class="liquid-glass-dark w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl text-emerald-100 hover:text-white font-semibold text-xs sm:text-sm shadow-md transition cursor-pointer"
               title="Cetak silsilah atau simpan sebagai file PDF"
             >
               <svg class="w-4 h-4 shrink-0 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -485,7 +569,7 @@
               type="button" 
               id="btnAddMember" 
               onclick="openAddMemberModal()" 
-              class="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-800/60 text-emerald-100 font-medium text-xs sm:text-sm shadow-xs transition cursor-pointer"
+              class="liquid-glass-dark w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl text-emerald-100 hover:text-white font-semibold text-xs sm:text-sm shadow-md transition cursor-pointer"
               title="Tambah anggota keluarga baru"
             >
               <svg class="w-4 h-4 shrink-0 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -508,7 +592,7 @@
     <div id="branch-filter-box" class="mb-6 space-y-4">
       
       <!-- Branch Navigation Chips -->
-      <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-200">
+      <div class="liquid-glass p-4 sm:p-5 rounded-3xl shadow-xl">
         <div class="flex items-center justify-between gap-2 mb-2.5 w-full">
           <span class="text-xs font-bold uppercase tracking-wider text-slate-400 leading-tight">
             PILIH KELUARGA<span class="hidden sm:inline"> </span><br class="block sm:hidden"/>ANAK:
@@ -541,7 +625,7 @@
       </div>
 
       <!-- Legend & Info Bar -->
-      <div id="legend-bar" class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+      <div id="legend-bar" class="liquid-glass p-4 sm:p-5 rounded-3xl shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
         
         <!-- Legend Badges -->
         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs py-2 text-slate-600">
@@ -2468,8 +2552,8 @@
       const cardsContainer = document.getElementById('family-tree-container');
       const treeWrapper = document.getElementById('tree-view-wrapper');
 
-      const activePill = "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white text-emerald-950 font-semibold text-xs sm:text-sm shadow-xs transition cursor-pointer";
-      const inactivePill = "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-emerald-200 hover:text-white font-medium text-xs sm:text-sm transition cursor-pointer";
+      const activePill = "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white text-emerald-950 font-bold text-xs sm:text-sm shadow-md transition cursor-pointer";
+      const inactivePill = "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-emerald-100 hover:text-white hover:bg-white/10 font-medium text-xs sm:text-sm transition cursor-pointer";
 
       if (mode === 'cards') {
         if (btnCards) btnCards.className = activePill;
@@ -2706,8 +2790,8 @@
           onclick="setBranchFilter('all')"
           class="whitespace-nowrap flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition ${
             isAllActive 
-              ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/20' 
-              : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+              ? 'liquid-glass-btn text-white shadow-md ring-2 ring-emerald-400/30' 
+              : 'bg-white/70 hover:bg-white text-slate-700 border border-slate-200/80 shadow-2xs backdrop-blur-xs'
           }"
         >
           Semua Anak
@@ -2737,8 +2821,8 @@
             onclick="setBranchFilter(${branch.branchId})"
             class="whitespace-nowrap flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition ${
               isActive 
-                ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/20' 
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+              ? 'liquid-glass-btn text-white shadow-md ring-2 ring-emerald-400/30' 
+              : 'bg-white/70 hover:bg-white text-slate-700 border border-slate-200/80 shadow-2xs backdrop-blur-xs'
             }"
           >
             ${escapeHtml(displayText)}
