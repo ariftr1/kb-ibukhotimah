@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -57,6 +57,16 @@
     }
   </script>
   <style>
+    html, body {
+      touch-action: pan-x pan-y;
+      -webkit-text-size-adjust: 100%;
+    }
+    /* Cegah auto-zoom saat fokus kolom input di layar mobile (iOS Safari / Chrome) */
+    @media screen and (max-width: 768px) {
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+    }
     body {
       background-color: #f8fafc;
     }
@@ -4653,6 +4663,63 @@
     /**
      * Pasang Event Listeners Form & Keyboard
      */
+    /**
+     * SISTEM PENCEGAHAN BROWSER ZOOM PADA WEB
+     * - Mencegah gesture pinch-to-zoom (dua jari) di HP / tablet
+     * - Mencegah double tap to zoom di mobile
+     * - Mencegah keyboard shortcut zoom (Ctrl/Cmd +, -, =, 0)
+     * - Mencegah Ctrl + Mouse Wheel zoom halaman (kecuali canvas silsilah)
+     */
+    function setupPreventBrowserZoom() {
+      // 1. Cegah gesture pinch zoom (Safari iOS)
+      document.addEventListener('gesturestart', (e) => e.preventDefault());
+      document.addEventListener('gesturechange', (e) => e.preventDefault());
+      document.addEventListener('gestureend', (e) => e.preventDefault());
+
+      // 2. Cegah pinch zoom (2 jari atau lebih) pada touch move
+      document.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches.length > 1) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      // 3. Cegah double-tap to zoom di HP
+      let lastTouchTime = 0;
+      document.addEventListener('touchend', (e) => {
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) {
+          return;
+        }
+        const now = Date.now();
+        if (now - lastTouchTime <= 300) {
+          e.preventDefault();
+        }
+        lastTouchTime = now;
+      }, { passive: false });
+
+      // 4. Cegah shortcut keyboard browser zoom (Ctrl/Cmd +, -, =, 0)
+      window.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          if (
+            e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0' ||
+            e.keyCode === 187 || e.keyCode === 189 || e.keyCode === 48 ||
+            e.keyCode === 96 || e.keyCode === 107 || e.keyCode === 109
+          ) {
+            e.preventDefault();
+          }
+        }
+      }, { passive: false });
+
+      // 5. Cegah Ctrl + Scroll Wheel zoom browser di seluruh halaman (kecuali canvas pohon silsilah)
+      window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          const inCanvas = e.target && e.target.closest && e.target.closest('#canvas-viewport');
+          if (!inCanvas) {
+            e.preventDefault();
+          }
+        }
+      }, { passive: false });
+    }
+
     function setupEventListeners() {
       const searchInput = document.getElementById('search-input');
       const clearBtn = document.getElementById('btn-clear-search');
@@ -4814,6 +4881,7 @@
     };
     // Inisialisasi Aplikasi ketika DOM siap
     document.addEventListener('DOMContentLoaded', () => {
+      setupPreventBrowserZoom();
       checkFamilyLockStatus();
       setupPrintDate();
       setupEventListeners();
