@@ -145,28 +145,24 @@
       transition: filter 0.2s ease-out;
     }
     /* Animasi terus berjalan tanpa berhenti saat diklik/disentuh */
-    /* Header Liquid Glass Luxury */
+    /* Header Liquid Glass - Warna Hijau Emerald Asli */
     .liquid-glass-header {
-      background: linear-gradient(145deg, rgba(6, 78, 59, 0.94) 0%, rgba(6, 95, 70, 0.96) 50%, rgba(4, 47, 46, 0.98) 100%) !important;
-      backdrop-filter: blur(24px) saturate(190%) !important;
-      -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
-      border-bottom: 1.5px solid rgba(255, 255, 255, 0.18) !important;
-      box-shadow: 
-        0 20px 40px -15px rgba(6, 78, 59, 0.4),
-        inset 0 1px 1.5px rgba(255, 255, 255, 0.25) !important;
+      background: linear-gradient(180deg, #065f46 0%, #064e3b 50%, #022c22 100%) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 10px 30px -10px rgba(2, 44, 34, 0.5) !important;
       position: relative;
     }
 
-    /* Dark Liquid Glass untuk Kartu Statistik & Tombol Header */
+    /* Dark Liquid Glass - Warna Gelap Asli Emerald 950 Berkilau */
     .liquid-glass-dark {
-      background: rgba(255, 255, 255, 0.08) !important;
-      backdrop-filter: blur(18px) saturate(180%) !important;
-      -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
-      border: 1px solid rgba(255, 255, 255, 0.18) !important;
+      background: rgba(2, 44, 34, 0.75) !important;
+      backdrop-filter: blur(16px) saturate(160%) !important;
+      -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+      border: 1px solid rgba(16, 185, 129, 0.22) !important;
       box-shadow: 
-        0 10px 25px -5px rgba(0, 0, 0, 0.2),
-        inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.22),
-        inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.25) !important;
+        0 8px 20px -4px rgba(0, 0, 0, 0.35),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1px 2px 0 rgba(0, 0, 0, 0.3) !important;
       position: relative;
       overflow: hidden;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -178,36 +174,34 @@
       left: 0;
       right: 0;
       height: 45%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, transparent 100%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
       pointer-events: none;
       border-radius: inherit;
     }
     .liquid-glass-dark:hover {
-      background: rgba(255, 255, 255, 0.14) !important;
-      border-color: rgba(255, 255, 255, 0.32) !important;
-      transform: translateY(-2px);
+      background: rgba(2, 44, 34, 0.9) !important;
+      border-color: rgba(52, 211, 153, 0.4) !important;
+      transform: translateY(-1.5px);
       box-shadow: 
-        0 14px 30px -4px rgba(0, 0, 0, 0.25),
-        inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.35) !important;
+        0 12px 24px -4px rgba(0, 0, 0, 0.45),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.2) !important;
     }
 
-    /* Input Pencarian Liquid Glass */
+    /* Input Pencarian Liquid Glass Bersih & Terang */
     .liquid-glass-search {
-      background: rgba(255, 255, 255, 0.9) !important;
-      backdrop-filter: blur(18px) saturate(180%) !important;
-      -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+      background: #ffffff !important;
       border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
       box-shadow: 
-        0 10px 25px -5px rgba(0, 0, 0, 0.15),
-        inset 0 1.5px 2px rgba(255, 255, 255, 0.9) !important;
+        0 8px 20px -4px rgba(0, 0, 0, 0.12),
+        inset 0 1px 2px rgba(15, 23, 42, 0.05) !important;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     .liquid-glass-search:focus {
       background: #ffffff !important;
-      border-color: #34d399 !important;
+      border-color: #10b981 !important;
       box-shadow: 
-        0 0 0 4px rgba(52, 211, 153, 0.35),
-        0 14px 30px -5px rgba(0, 0, 0, 0.2) !important;
+        0 0 0 4px rgba(16, 185, 129, 0.3),
+        0 10px 25px -4px rgba(0, 0, 0, 0.15) !important;
     }
     /* ============================================================ */
     /* LIQUID GLASS / FROSTED GLASSMORPHISM LUXURY DESIGN          */
@@ -450,8 +444,6 @@
   <!-- Header & Hero Section -->
     <header class="liquid-glass-header text-white relative overflow-hidden">
     <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
-    <div class="absolute -top-24 -left-24 w-96 h-96 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute top-1/2 -right-24 w-96 h-96 bg-teal-300/15 rounded-full blur-3xl pointer-events-none"></div>
     <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative z-10 space-y-6">
       
       <!-- Baris 1: Header Atas (Judul & Statistik) -->
@@ -495,7 +487,7 @@
         <div class="relative flex-1 max-w-md">
           <label for="search-input" class="sr-only">Cari nama anggota keluarga</label>
           <div class="relative flex items-center">
-            <div class="absolute left-3.5 z-10 pointer-events-none text-emerald-600 flex items-center">
+            <div class="absolute left-3.5 z-10 pointer-events-none text-emerald-500 flex items-center">
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
               </svg>
@@ -505,7 +497,7 @@
               type="text" 
               id="search-input" 
               placeholder="Cari nama anggota keluarga..." 
-              class="liquid-glass-search w-full text-sm py-2.5 sm:py-3 pl-11 pr-4 text-slate-800 placeholder-slate-500 rounded-2xl font-semibold focus:outline-none transition"
+              class="liquid-glass-search w-full text-sm py-2.5 sm:py-3 pl-11 pr-10 text-slate-800 placeholder-slate-400 rounded-xl sm:rounded-2xl font-medium focus:outline-none transition"
               autocomplete="off"
             />
 
