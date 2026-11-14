@@ -1230,8 +1230,13 @@
 
           <!-- Preview foto aktif saat ini -->
           <div id="editCurrentPhotoContainer" class="hidden items-center gap-3 pb-1">
-            <img id="editCurrentPhotoImg" class="w-12 h-12 rounded-xl object-contain bg-slate-100 border border-slate-200 shadow-xs" alt="Foto Saat Ini">
-            <span class="text-xs text-slate-500">Foto profil saat ini</span>
+            <div class="inline-flex items-center justify-center max-w-[120px] max-h-28 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-xs p-0.5">
+              <img id="editCurrentPhotoImg" class="max-w-[110px] max-h-24 w-auto h-auto object-contain block rounded-lg" alt="Foto Saat Ini">
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs font-semibold text-slate-700">Foto profil aktif saat ini</span>
+              <span id="currentPhotoRatioLabel" class="text-[11px] text-slate-400"></span>
+            </div>
           </div>
 
           <!-- Input File Kustom: Tombol "Pilih Gambar" -->
@@ -1253,12 +1258,18 @@
             </label>
             <span id="editPhotoFileName" class="text-xs text-slate-600 ml-3 truncate font-medium"></span>
           </div>
-          <p class="text-xs text-slate-500">Maksimal ukuran foto <strong>5 MB</strong> (Format: JPG, PNG, WEBP).</p>
+          <p class="text-xs text-slate-500">Maksimal ukuran foto <strong>5 MB</strong> (Format: JPG, PNG, WEBP). Foto diunggah dalam ukuran & rasio asli (9:16, 3:4, 1:1, dll.).</p>
 
-          <!-- Preview foto baru yang dipilih -->
-          <div id="photoPreviewContainer" class="hidden items-center gap-3 pt-1">
-            <img id="photoPreviewImg" class="w-14 h-14 rounded-xl object-contain bg-emerald-50 border border-emerald-300 shadow-xs" alt="Preview">
-            <span class="text-xs text-emerald-700 font-semibold">Pratinjau foto terpilih</span>
+          <!-- Preview foto baru yang dipilih (Mengikuti Ukuran & Proporsi Asli Gambar: 9:16, 3:4, dll.) -->
+          <div id="photoPreviewContainer" class="hidden flex-col items-start gap-2 pt-1">
+            <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+              <span>Pratinjau Foto Baru (Sesuai Ukuran Asli Gambar):</span>
+            </div>
+            <div class="inline-flex items-center justify-center max-w-[180px] max-h-60 rounded-2xl overflow-hidden border-2 border-emerald-500 bg-emerald-950/10 shadow-md p-1">
+              <img id="photoPreviewImg" class="max-w-[170px] max-h-56 w-auto h-auto object-contain block rounded-xl" alt="Preview">
+            </div>
+            <span id="photoPreviewRatioLabel" class="text-[11px] text-emerald-800 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200"></span>
           </div>
         </div>
 
@@ -3813,7 +3824,7 @@
       const birthDate = memberData ? memberData.birth_date : null;
       const photoUrl = memberData ? memberData.photo_url : null;
 
-      // Pasang Avatar Inisial & Foto Profil Besar Otomatis Mengikuti Aspek Rasio (9:16, 3:4, 1:1, dll.)
+      // Pasang Avatar Inisial & Foto Profil Besar Otomatis Mengikuti Aspek Rasio Asli (9:16, 3:4, 1:1, dll.)
       const avatarEl = document.getElementById('modal-avatar');
       const photoEl = document.getElementById('modal-photo');
       const avatarContainer = document.getElementById('modal-avatar-container');
@@ -3822,16 +3833,20 @@
       if (photoEl) {
         if (photoUrl && String(photoUrl).trim() !== '') {
           const cleanUrl = String(photoUrl).trim();
-          photoEl.onload = function() {
-            if (this.naturalWidth && this.naturalHeight) {
-              const ratio = this.naturalWidth + ' / ' + this.naturalHeight;
-              this.style.aspectRatio = ratio;
+          function applyPhotoRatio() {
+            if (photoEl.naturalWidth && photoEl.naturalHeight) {
+              const ratio = photoEl.naturalWidth + ' / ' + photoEl.naturalHeight;
+              photoEl.style.aspectRatio = ratio;
               if (avatarContainer) {
                 avatarContainer.style.aspectRatio = ratio;
               }
             }
-          };
+          }
+          photoEl.onload = applyPhotoRatio;
           photoEl.src = cleanUrl;
+          if (photoEl.complete) {
+            applyPhotoRatio();
+          }
           photoEl.alt = name;
           photoEl.classList.remove('hidden');
           if (avatarEl) avatarEl.classList.add('hidden');
@@ -4293,25 +4308,44 @@
       }
 
       // Pasang validasi 5 MB & preview saat file dipilih
+      // Pasang validasi 5 MB & preview saat file dipilih (menampilkan resolusi & rasio asli)
       if (editPhotoFile) {
         editPhotoFile.onchange = function() {
           const file = editPhotoFile.files[0];
           if (!file) {
-            if (editPhotoFileName) editPhotoFileName.textContent = '';
+            if (editPhotoFileName) editPhotoFileName.textContent = "";
             return;
           }
           if (file.size > 5 * 1024 * 1024) {
-            editPhotoFile.value = '';
-            if (editPhotoFileName) editPhotoFileName.textContent = '';
-            if (photoPreviewContainer) { photoPreviewContainer.classList.add('hidden'); photoPreviewContainer.classList.remove('flex'); }
-            alert('Ukuran foto terlalu besar! Maksimal ukuran file adalah 5 MB. Silakan pilih foto lain.');
+            editPhotoFile.value = "";
+            if (editPhotoFileName) editPhotoFileName.textContent = "";
+            if (photoPreviewContainer) { photoPreviewContainer.classList.add("hidden"); photoPreviewContainer.classList.remove("flex"); }
+            alert("Ukuran foto terlalu besar! Maksimal ukuran file adalah 5 MB. Silakan pilih foto lain.");
             return;
           }
           if (editPhotoFileName) editPhotoFileName.textContent = file.name;
           const reader = new FileReader();
           reader.onload = function(e) {
-            if (photoPreviewImg) photoPreviewImg.src = e.target.result;
-            if (photoPreviewContainer) { photoPreviewContainer.classList.remove('hidden'); photoPreviewContainer.classList.add('flex'); }
+            if (photoPreviewImg) {
+              photoPreviewImg.onload = function() {
+                if (this.naturalWidth && this.naturalHeight) {
+                  const w = this.naturalWidth;
+                  const h = this.naturalHeight;
+                  const ratio = w + " / " + h;
+                  this.style.aspectRatio = ratio;
+                  const ratioLabel = document.getElementById("photoPreviewRatioLabel");
+                  if (ratioLabel) {
+                    const ratioText = (h / w > 1.6) ? "9:16 (Portrait)" : ((h / w > 1.25) ? "3:4 (Portrait)" : ((w / h > 1.5) ? "16:9 (Landscape)" : ((w === h) ? "1:1 (Persegi)" : `${w}:${h}`)));
+                    ratioLabel.textContent = `Ukuran asli: ${w} × ${h} px (${ratioText})`;
+                  }
+                }
+              };
+              photoPreviewImg.src = e.target.result;
+            }
+            if (photoPreviewContainer) {
+              photoPreviewContainer.classList.remove("hidden");
+              photoPreviewContainer.classList.add("flex");
+            }
           };
           reader.readAsDataURL(file);
         };
@@ -4615,9 +4649,9 @@
         if (submitBtn) submitBtn.innerHTML = '<span>Mengunggah foto...</span>';
         
         let uploadedUrl = null;
-        // Optimasi foto besar otomatis menjadi JPEG berkualitas tinggi sebelum upload
-        const uploadPayload = await compressImageToBlob(photoFileSelected, 1200, 1200, 0.85);
-        const isCompressed = (uploadPayload !== photoFileSelected);
+        // Unggah file foto ASLI secara utuh tanpa pemotongan atau kompresi paksa agar ukuran & rasio (9:16, 3:4, dll.) 100% terjaga
+        const uploadPayload = photoFileSelected;
+        const isCompressed = false;
         const bucketNames = ['family-photos', 'avatars', 'photos'];
         for (const bName of bucketNames) {
           try {
