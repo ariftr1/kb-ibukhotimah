@@ -1518,6 +1518,9 @@
       const px = Math.max(0, Math.min(30, Number(blurPx) || 0));
       localStorage.setItem('family_banner_blur', px.toString());
       applyLockScreenBlur(px);
+      if (typeof syncSystemConfigToSupabase === 'function') {
+        syncSystemConfigToSupabase(px, getActiveFamilyPass());
+      }
     }
 
     function getBlurDescription(num) {
@@ -1776,13 +1779,15 @@
 
       setFamilyPass(newPass);
 
-      if (blurSlider) {
-        saveFamilyBannerBlur(blurSlider.value);
+      const finalBlur = blurSlider ? parseInt(blurSlider.value, 10) : getFamilyBannerBlur();
+      saveFamilyBannerBlur(finalBlur);
+      if (typeof syncSystemConfigToSupabase === 'function') {
+        syncSystemConfigToSupabase(finalBlur, newPass);
       }
 
       if (errorMsg) errorMsg.classList.add('hidden');
       closeAdminPasswordModal();
-      showToast("Pengaturan sandi & tingkat blur berhasil disimpan!", "success");
+      showToast("Pengaturan sandi & blur berhasil disimpan dan disinkronkan ke semua perangkat!", "success");
     }
 
     /**
@@ -1791,6 +1796,88 @@
     const SUPABASE_URL = "https://rcjjqhcvaydqwxepeqtm.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjampxaGN2YXlkcXd4ZXBlcXRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMwMzAzODUsImV4cCI6MjEwODYwNjM4NX0.rIJskYt5WcUmTzt_uF9Hva8wTOID629faX04kGrDlf8";
     var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /**
+     * SINKRONISASI PENGATURAN TERPUSAT (BLUR & SANDI) ANTAR SEMUA PERANGKAT (SUPABASE)
+     */
+    async function fetchSystemConfigFromSupabase() {
+      try {
+        if (!supabase) return;
+        const { data, error } = await supabase
+          .from('family_members')
+          .select('nickname, spouse_name')
+          .eq('name', '__SYSTEM_CONFIG__')
+          .maybeSingle();
+
+        if (error) {
+          console.warn('Gagal memuat konfigurasi terpusat dari Supabase:', error);
+          return;
+        }
+
+        if (data) {
+          // 1. Terapkan tingkat blur terpusat ke semua perangkat
+          if (data.nickname !== null && data.nickname !== undefined && !isNaN(Number(data.nickname))) {
+            const remoteBlur = parseInt(data.nickname, 10);
+            localStorage.setItem('family_banner_blur', remoteBlur.toString());
+            applyLockScreenBlur(remoteBlur);
+            const slider = document.getElementById('adminBlurSlider');
+            if (slider) {
+              slider.value = remoteBlur;
+              handleBlurSliderInput(remoteBlur);
+            }
+          }
+          // 2. Terapkan kata sandi keluarga terpusat ke semua perangkat
+          if (data.spouse_name && data.spouse_name.trim() !== '') {
+            localStorage.setItem('family_active_pass', data.spouse_name.trim());
+            const currentPassLabel = document.getElementById('admin-current-pass-label');
+            if (currentPassLabel) currentPassLabel.textContent = data.spouse_name.trim();
+          }
+        }
+      } catch (err) {
+        console.warn('Error mengambil pengaturan dari Supabase:', err);
+      }
+    }
+
+    async function syncSystemConfigToSupabase(blurPx, password) {
+      try {
+        if (!supabase) return;
+        const blurStr = String(blurPx !== undefined ? blurPx : getFamilyBannerBlur());
+        const passStr = String(password || getActiveFamilyPass() || '1111');
+
+        const { data: existing } = await supabase
+          .from('family_members')
+          .select('id')
+          .eq('name', '__SYSTEM_CONFIG__')
+          .maybeSingle();
+
+        if (existing && existing.id) {
+          await supabase
+            .from('family_members')
+            .update({
+              nickname: blurStr,
+              spouse_name: passStr
+            })
+            .eq('id', existing.id);
+        } else {
+          await supabase
+            .from('family_members')
+            .insert([{
+              name: '__SYSTEM_CONFIG__',
+              role: 'archived',
+              branch_id: 0,
+              generation: 0,
+              nickname: blurStr,
+              spouse_name: passStr
+            }]);
+        }
+        console.log('Konfigurasi blur & sandi sukses disinkronkan ke Supabase:', { blur: blurStr, pass: passStr });
+      } catch (err) {
+        console.warn('Gagal menyimpan konfigurasi ke Supabase:', err);
+      }
+    }
+
+    // Segera tarik konfigurasi terpusat dari cloud saat script pertama kali aktif
+    fetchSystemConfigFromSupabase();
 
     /**
      * DATA BAWAAN AWAL UNTUK SEEDING / MIGRASI PERTAMA KALI KE SUPABASE
@@ -4821,6 +4908,25 @@
             { event: '*', schema: 'public', table: 'family_members' },
             async (payload) => {
               console.log('Perubahan real-time terdeteksi di Supabase:', payload);
+              // Jika perubahan adalah konfigurasi blur atau sandi terpusat
+              if (payload && payload.new && payload.new.name === '__SYSTEM_CONFIG__') {
+                if (payload.new.nickname !== null && payload.new.nickname !== undefined && !isNaN(Number(payload.new.nickname))) {
+                  const remoteBlur = parseInt(payload.new.nickname, 10);
+                  localStorage.setItem('family_banner_blur', remoteBlur.toString());
+                  applyLockScreenBlur(remoteBlur);
+                  const slider = document.getElementById('adminBlurSlider');
+                  if (slider) {
+                    slider.value = remoteBlur;
+                    handleBlurSliderInput(remoteBlur);
+                  }
+                }
+                if (payload.new.spouse_name && payload.new.spouse_name.trim() !== '') {
+                  localStorage.setItem('family_active_pass', payload.new.spouse_name.trim());
+                  const currentPassLabel = document.getElementById('admin-current-pass-label');
+                  if (currentPassLabel) currentPassLabel.textContent = payload.new.spouse_name.trim();
+                }
+                return;
+              }
               await fetchFamilyDataFromSupabase();
               // toast suppressed to avoid spam on every realtime event
             }
