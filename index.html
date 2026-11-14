@@ -781,13 +781,14 @@
         <!-- 1. Header Hijau Terpusat (Foto Profil Besar di Atas) -->
       <div class="flex flex-col items-center text-center p-6 bg-gradient-to-b from-emerald-800 to-emerald-900 text-white relative rounded-none sm:rounded-t-3xl shrink-0">
         <!-- Foto Profil: Ukuran Bingkai Otomatis Mengikuti Proporsi Gambar (Tanpa Ruang Kosong / Crop) -->
+        <!-- Foto Profil: Ukuran Bingkai Otomatis Mengikuti Proporsi Gambar Asli (9:16, 3:4, 1:1, dll.) -->
         <div 
           id="modal-avatar-container"
-          class="inline-flex items-center justify-center max-w-[85vw] sm:max-w-xs max-h-60 sm:max-h-72 rounded-3xl overflow-hidden shadow-xl border-4 border-white/20 bg-emerald-950/40 mb-3 shrink-0 relative transition-all duration-200"
+          class="inline-flex items-center justify-center max-w-[85vw] sm:max-w-xs max-h-[65vh] sm:max-h-[500px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/30 bg-emerald-950/20 mb-3 shrink-0 relative transition-all duration-200"
         >
           <div 
             id="modal-avatar" 
-            class="w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center text-4xl sm:text-5xl font-extrabold text-white/90 select-none bg-emerald-700/60"
+            class="w-32 h-32 sm:w-40 sm:h-40 aspect-square flex items-center justify-center text-4xl sm:text-5xl font-extrabold text-white/90 select-none bg-emerald-700/60 rounded-2xl"
           >
             SU
           </div>
@@ -795,12 +796,11 @@
             id="modal-photo" 
             src="" 
             alt="Foto Profil" 
-            class="max-w-[85vw] sm:max-w-xs max-h-60 sm:max-h-72 w-auto h-auto object-contain block rounded-2xl hidden"
-            onerror="this.classList.add('hidden'); document.getElementById('modal-avatar').classList.remove('hidden');"
+            class="max-w-[85vw] sm:max-w-xs max-h-[65vh] sm:max-h-[500px] w-auto h-auto object-contain block hidden"
+            onerror="this.classList.add('hidden'); const a = document.getElementById('modal-avatar'); if(a) a.classList.remove('hidden'); const c = document.getElementById('modal-avatar-container'); if(c) c.style.aspectRatio = '1 / 1';"
           />
         </div>
 
-        <!-- Keterangan di Bawah Foto (Tersusun Rapi ke Bawah) -->
         <!-- 1. Hubungan/Status -->
         <span class="text-xs sm:text-sm font-medium text-emerald-200 block" id="detailRelation">Anak ke-1 dari Ibu Khotimah</span>
         
@@ -3813,20 +3813,33 @@
       const birthDate = memberData ? memberData.birth_date : null;
       const photoUrl = memberData ? memberData.photo_url : null;
 
-      // Pasang Avatar Inisial & Foto Profil Besar
+      // Pasang Avatar Inisial & Foto Profil Besar Otomatis Mengikuti Aspek Rasio (9:16, 3:4, 1:1, dll.)
       const avatarEl = document.getElementById('modal-avatar');
       const photoEl = document.getElementById('modal-photo');
+      const avatarContainer = document.getElementById('modal-avatar-container');
 
       if (avatarEl) avatarEl.textContent = getInitials(name);
       if (photoEl) {
-        if (photoUrl && photoUrl.trim() !== '') {
-          photoEl.src = photoUrl.trim();
+        if (photoUrl && String(photoUrl).trim() !== '') {
+          const cleanUrl = String(photoUrl).trim();
+          photoEl.onload = function() {
+            if (this.naturalWidth && this.naturalHeight) {
+              const ratio = this.naturalWidth + ' / ' + this.naturalHeight;
+              this.style.aspectRatio = ratio;
+              if (avatarContainer) {
+                avatarContainer.style.aspectRatio = ratio;
+              }
+            }
+          };
+          photoEl.src = cleanUrl;
           photoEl.alt = name;
           photoEl.classList.remove('hidden');
           if (avatarEl) avatarEl.classList.add('hidden');
         } else {
           photoEl.src = '';
+          photoEl.style.aspectRatio = '';
           photoEl.classList.add('hidden');
+          if (avatarContainer) avatarContainer.style.aspectRatio = '1 / 1';
           if (avatarEl) avatarEl.classList.remove('hidden');
         }
       }
@@ -4391,7 +4404,7 @@
       }, 200);
     }
 
-    function compressImageToBlob(file, maxWidth = 1200, maxHeight = 1200, quality = 0.85) {
+    function compressImageToBlob(file, maxWidth = 1600, maxHeight = 2400, quality = 0.88) {
       return new Promise((resolve) => {
         if (!file || !file.type || !file.type.startsWith('image/')) return resolve(file);
         const reader = new FileReader();
@@ -4436,7 +4449,7 @@
       });
     }
 
-    function compressImageToBase64(file, maxWidth = 400, maxHeight = 400, quality = 0.75) {
+    function compressImageToBase64(file, maxWidth = 800, maxHeight = 1200, quality = 0.80) {
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => {
