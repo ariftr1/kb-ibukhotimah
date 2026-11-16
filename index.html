@@ -1193,7 +1193,7 @@
         <!-- Nama Lengkap -->
         <div>
           <label for="form-edit-name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-            Nama Lengkap <span class="text-rose-500">*</span>
+            Nama Lengkap
           </label>
           <input 
             type="text" 
@@ -1211,6 +1211,7 @@
           <input 
             type="text" 
             id="form-edit-nickname" 
+            required
             placeholder="Masukkan nama panggilan..."
             class="w-full px-3.5 py-2.5 bg-white text-slate-900 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" 
           />
@@ -1219,7 +1220,7 @@
         <!-- Tanggal Lahir -->
         <div>
           <label for="form-edit-birthdate" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-            Tanggal Lahir <span class="text-rose-500">*</span>
+            Tanggal Lahir
           </label>
           <input 
             type="date" 
@@ -1232,7 +1233,7 @@
         <!-- Foto Profil -->
         <div class="space-y-2">
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-            Foto Profil <span class="text-rose-500">*</span>
+            Foto Profil
           </label>
           <!-- Preview foto aktif saat ini -->
           <div id="editCurrentPhotoContainer" class="hidden items-center gap-3 pb-1">
@@ -4824,6 +4825,15 @@
         };
       }
 
+      if (nicknameInput) {
+        nicknameInput.classList.remove("ring-2", "ring-rose-500", "border-rose-500");
+        nicknameInput.oninput = function() {
+          if (this.value.trim() !== "") {
+            this.classList.remove("ring-2", "ring-rose-500", "border-rose-500");
+          }
+        };
+      }
+
       // Pasang validasi 5 MB & preview saat file dipilih (menampilkan resolusi & rasio asli)
       if (editPhotoFile) {
         editPhotoFile.onchange = function() {
@@ -5123,6 +5133,16 @@
 
       if (!newName) {
         showToast('Nama tidak boleh kosong.', 'error');
+        return;
+      }
+
+      if (!newNickname) {
+        showToast('Nama panggilan tidak boleh kosong.', 'error');
+        const nickInput = document.getElementById('form-edit-nickname');
+        if (nickInput) {
+          nickInput.classList.add('ring-2', 'ring-rose-500', 'border-rose-500');
+          nickInput.focus();
+        }
         return;
       }
       // ============================================================
