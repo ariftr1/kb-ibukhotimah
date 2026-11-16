@@ -865,15 +865,9 @@
         </div>
 
         <!-- ALAMAT RUMAH -->
-        <div id="detailAddressContainer" class="pb-3 border-b border-slate-100 hidden">
+        <div id="detailAddressContainer" class="pb-3 border-b border-slate-100">
           <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase block mb-1">ALAMAT RUMAH</span>
-          <div class="flex items-start gap-2">
-            <svg class="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            <p class="text-sm sm:text-base font-semibold text-slate-800 leading-snug break-words" id="detailAddress">-</p>
-          </div>
+          <p class="text-sm sm:text-base font-semibold text-slate-800 leading-snug break-words" id="detailAddress">-</p>
         </div>
 
         <!-- KETURUNAN / ANAK -->
@@ -1303,12 +1297,8 @@
         <!-- ALAMAT RUMAH (KABUPATEN/KOTA, KECAMATAN, DESA/KELURAHAN BERJENJANG OTOMATIS) -->
         <div class="space-y-3 pt-3 pb-1 border-t border-slate-100">
           <div class="flex items-center justify-between">
-            <span class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
-              <span>Alamat Rumah</span>
+            <span class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Alamat Rumah
             </span>
             <span class="text-[11px] text-slate-400 font-medium">(Opsional)</span>
           </div>
@@ -1801,21 +1791,9 @@
       const bottomTrack = document.getElementById('lockBannerBottom');
       if (!topTrack || !bottomTrack) return;
 
-      const pool = [...BASE_BANNER_PHOTOS];
-      try {
-        const extras = JSON.parse(localStorage.getItem('family_member_extras') || '{}');
-        Object.keys(extras).forEach(k => {
-          const p = extras[k] && extras[k].photo_url;
-          if (p && typeof p === 'string' && (p.startsWith('http') || p.startsWith('data:image'))) {
-            if (!pool.some(item => item.src === p)) {
-              pool.push({ src: p, alt: 'Foto Anggota Keluarga' });
-            }
-          }
-        });
-      } catch(e) {}
-
-      const topList = shuffleArray(pool);
-      let bottomList = shuffleArray(pool);
+      // Hanya mengacak foto bersama / foto keluarga besar (bukan profil anggota)
+      const topList = shuffleArray([...BASE_BANNER_PHOTOS]);
+      let bottomList = shuffleArray([...BASE_BANNER_PHOTOS]);
       if (bottomList.length > 1 && topList.length > 1 && bottomList[0].src === topList[0].src) {
         bottomList.reverse();
       }
@@ -4474,12 +4452,9 @@
       const addressVal = document.getElementById('detailAddress');
       const memberAddress = getMemberAddress(memberId, name);
       const formattedAddr = formatFullAddress(memberAddress);
-      if (formattedAddr && formattedAddr.trim() !== '') {
-        if (addressContainer) addressContainer.classList.remove('hidden');
-        if (addressVal) addressVal.textContent = formattedAddr;
-      } else {
-        if (addressContainer) addressContainer.classList.add('hidden');
-        if (addressVal) addressVal.textContent = '-';
+      if (addressContainer) addressContainer.classList.remove('hidden');
+      if (addressVal) {
+        addressVal.textContent = (formattedAddr && formattedAddr.trim() !== '') ? formattedAddr : '-';
       }
 
       // KETURUNAN / ANAK
