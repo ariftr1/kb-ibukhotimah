@@ -1475,7 +1475,7 @@
     <div class="w-full overflow-hidden select-none py-1 relative shrink-0">
       <div class="pointer-events-none absolute inset-y-0 left-0 w-12 sm:w-24 bg-gradient-to-r from-slate-50 via-slate-50/80 to-transparent z-10"></div>
       <div class="pointer-events-none absolute inset-y-0 right-0 w-12 sm:w-24 bg-gradient-to-l from-slate-50 via-slate-50/80 to-transparent z-10"></div>
-      <div class="marquee-track-ltr flex gap-3 sm:gap-4 items-center pointer-events-none">
+      <div id="lockBannerTop" class="marquee-track-ltr flex gap-3 sm:gap-4 items-center pointer-events-none">
         <!-- Bagian 1 (6 Foto Keluarga Rasio 16:9) -->
         <div class="flex gap-3 sm:gap-4 shrink-0 items-center">
           <img src="images/family-group-1.jpg" alt="Foto Keluarga 1" class="aspect-video h-32 lg:h-36 rounded-2xl object-cover shadow-md border-2 border-slate-200/80 shrink-0" loading="eager" />
@@ -1588,7 +1588,7 @@
     <div class="w-full overflow-hidden select-none py-1 mb-2.5 sm:mb-4 relative shrink-0">
       <div class="pointer-events-none absolute inset-y-0 left-0 w-12 sm:w-24 bg-gradient-to-r from-slate-50 via-slate-50/80 to-transparent z-10"></div>
       <div class="pointer-events-none absolute inset-y-0 right-0 w-12 sm:w-24 bg-gradient-to-l from-slate-50 via-slate-50/80 to-transparent z-10"></div>
-      <div class="marquee-track-rtl flex gap-3 sm:gap-4 items-center pointer-events-none">
+      <div id="lockBannerBottom" class="marquee-track-rtl flex gap-3 sm:gap-4 items-center pointer-events-none">
         <!-- Bagian 1 (6 Foto Keluarga Urutan Terbalik) -->
         <div class="flex gap-3 sm:gap-4 shrink-0 items-center">
           <img src="images/family-group-4.jpg" alt="Foto Keluarga 4" class="aspect-video h-32 lg:h-36 rounded-2xl object-cover object-bottom shadow-md border-2 border-slate-200/80 shrink-0" loading="eager" />
@@ -1776,6 +1776,76 @@
     let isFamilyUnlocked = false;
 
     /** 
+     * RANDOMISASI FOTO BANNER LAYAR KUNCI AWAL (ACAK SETIAP KALI HALAMAN DIBUKA)
+     */
+    const BASE_BANNER_PHOTOS = [
+      { src: "images/family-group-1.jpg", alt: "Foto Keluarga 1" },
+      { src: "images/family-group-2.jpg", alt: "Foto Keluarga 2" },
+      { src: "images/family-group-3.jpg", alt: "Foto Keluarga 3" },
+      { src: "images/family-group-4.jpg", alt: "Foto Keluarga 4", extraClass: "object-bottom" },
+      { src: "images/family-group-5.png", alt: "Foto Keluarga Ibu Khotimah" },
+      { src: "images/family-group-6.jpg", alt: "Foto Keluarga Besar" }
+    ];
+
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function randomizeLockScreenBanners() {
+      const topTrack = document.getElementById('lockBannerTop');
+      const bottomTrack = document.getElementById('lockBannerBottom');
+      if (!topTrack || !bottomTrack) return;
+
+      const pool = [...BASE_BANNER_PHOTOS];
+      try {
+        const extras = JSON.parse(localStorage.getItem('family_member_extras') || '{}');
+        Object.keys(extras).forEach(k => {
+          const p = extras[k] && extras[k].photo_url;
+          if (p && typeof p === 'string' && (p.startsWith('http') || p.startsWith('data:image'))) {
+            if (!pool.some(item => item.src === p)) {
+              pool.push({ src: p, alt: 'Foto Anggota Keluarga' });
+            }
+          }
+        });
+      } catch(e) {}
+
+      const topList = shuffleArray(pool);
+      let bottomList = shuffleArray(pool);
+      if (bottomList.length > 1 && topList.length > 1 && bottomList[0].src === topList[0].src) {
+        bottomList.reverse();
+      }
+
+      function renderTrackHTML(items) {
+        const imgs = items.map(img => `
+          <img src="${img.src}" alt="${img.alt || 'Foto Keluarga'}" class="aspect-video h-32 lg:h-36 rounded-2xl object-cover ${img.extraClass || ''} shadow-md border-2 border-slate-200/80 shrink-0" loading="eager" />
+        `).join('');
+
+        return `
+          <div class="flex gap-3 sm:gap-4 shrink-0 items-center">
+            ${imgs}
+          </div>
+          <div class="flex gap-3 sm:gap-4 shrink-0 items-center" aria-hidden="true">
+            ${imgs}
+          </div>
+        `;
+      }
+
+      topTrack.innerHTML = renderTrackHTML(topList);
+      bottomTrack.innerHTML = renderTrackHTML(bottomList);
+
+      // Acak posisi awal animasi (0 hingga 36 detik) agar foto yang tampil di tengah tidak pernah sama
+      const topOffset = -(Math.random() * 36).toFixed(2);
+      const bottomOffset = -(Math.random() * 36).toFixed(2);
+      topTrack.style.animationDelay = `${topOffset}s`;
+      bottomTrack.style.animationDelay = `${bottomOffset}s`;
+    }
+
+    /** 
      * KONFIGURASI TINGKAT BLUR GAMBAR BERJALAN LAYAR DEPAN
      */
     const DEFAULT_BANNER_BLUR = 5;
@@ -1861,6 +1931,7 @@
       if (!lockScreen) return;
 
       // 2. Kunci Default Setiap Halaman Dimuat / Di-refresh & Terapkan Efek Blur Banner
+      randomizeLockScreenBanners();
       applyLockScreenBlur(getFamilyBannerBlur());
       lockScreen.classList.remove('hidden', 'opacity-0');
       lockScreen.classList.add('opacity-100');
