@@ -1210,24 +1210,26 @@
           />
         </div>
 
-        <!-- Tanggal Lahir -->
+        <!-- Tanggal Lahir (Wajib diisi sebelum edit/ubah foto) -->
         <div>
-          <label for="form-edit-birthdate" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-            Tanggal Lahir
+          <label for="form-edit-birthdate" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+            <span>Tanggal Lahir <span class="text-rose-500">*</span></span>
+            <span class="text-[10px] text-emerald-600 font-semibold normal-case">Wajib diisi sebelum edit foto</span>
           </label>
           <input 
             type="date" 
             id="form-edit-birthdate" 
+            required
             class="w-full px-3.5 py-2.5 bg-white text-slate-900 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" 
           />
         </div>
 
-        <!-- Foto Profil -->
+        <!-- Foto Profil (Wajib diisi / ada foto) -->
         <div class="space-y-2">
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-            Foto Profil
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
+            <span>Foto Profil <span class="text-rose-500">*</span></span>
+            <span class="text-[10px] text-slate-400 font-normal normal-case">Wajib ada foto</span>
           </label>
-
           <!-- Preview foto aktif saat ini -->
           <div id="editCurrentPhotoContainer" class="hidden items-center gap-3 pb-1">
             <div class="inline-flex items-center justify-center max-w-[120px] max-h-28 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-xs p-0.5">
@@ -4308,9 +4310,49 @@
       }
 
       // Pasang validasi 5 MB & preview saat file dipilih
+      // Pasang validasi: Cegah memilih foto jika tanggal lahir masih kosong
+      const editPhotoFileLabel = document.querySelector('label[for="editPhotoFile"]');
+      if (editPhotoFileLabel) {
+        editPhotoFileLabel.onclick = function(e) {
+          const bDate = birthdateInput ? birthdateInput.value.trim() : "";
+          if (!bDate) {
+            e.preventDefault();
+            showToast("Harap isi tanggal lahir terlebih dahulu sebelum memilih foto profil.", "warning");
+            if (birthdateInput) {
+              birthdateInput.classList.add("ring-2", "ring-rose-500", "border-rose-500");
+              birthdateInput.focus();
+            }
+            return false;
+          } else if (birthdateInput) {
+            birthdateInput.classList.remove("ring-2", "ring-rose-500", "border-rose-500");
+          }
+        };
+      }
+
+      if (birthdateInput) {
+        birthdateInput.oninput = function() {
+          if (this.value.trim() !== "") {
+            this.classList.remove("ring-2", "ring-rose-500", "border-rose-500");
+          }
+        };
+      }
+
       // Pasang validasi 5 MB & preview saat file dipilih (menampilkan resolusi & rasio asli)
       if (editPhotoFile) {
         editPhotoFile.onchange = function() {
+          const bDate = birthdateInput ? birthdateInput.value.trim() : "";
+          if (!bDate) {
+            showToast("Harap isi tanggal lahir terlebih dahulu sebelum memilih foto profil.", "warning");
+            if (birthdateInput) {
+              birthdateInput.classList.add("ring-2", "ring-rose-500", "border-rose-500");
+              birthdateInput.focus();
+            }
+            editPhotoFile.value = "";
+            if (editPhotoFileName) editPhotoFileName.textContent = "";
+            if (photoPreviewContainer) { photoPreviewContainer.classList.add("hidden"); photoPreviewContainer.classList.remove("flex"); }
+            return;
+          }
+
           const file = editPhotoFile.files[0];
           if (!file) {
             if (editPhotoFileName) editPhotoFileName.textContent = "";
@@ -4586,6 +4628,54 @@
         showToast('Nama tidak boleh kosong.', 'error');
         return;
       }
+      // ============================================================
+      // VALIDASI TANGGAL LAHIR & FOTO PROFIL
+      // 1. Saat edit foto, harus isi tanggal lahir dulu.
+      // 2. Kalau sudah ada tanggal lahir, tetap bisa ubah foto profil.
+      // 3. Kalau profil tidak ada tapi tanggal lahir ada, harus isi foto profil.
+      // 4. Jika profil dan tanggal lahir kosong, harus diisi semua.
+      // ============================================================
+      const currentMemberDataForVal = findMemberData(memberId, oldName);
+      const existingPhotoVal = currentMemberDataForVal ? (currentMemberDataForVal.photo_url || currentMemberDataForVal.foto_url) : null;
+      const hasExistingPhotoVal = Boolean(existingPhotoVal && String(existingPhotoVal).trim() !== "");
+      const hasNewPhotoVal = Boolean(photoFileSelected);
+      const hasPhotoVal = hasExistingPhotoVal || hasNewPhotoVal;
+      const hasBirthDateVal = Boolean(newBirthDate && String(newBirthDate).trim() !== "");
+      const birthdateInputEl = document.getElementById("form-edit-birthdate");
+
+      // Aturan 4: Jika profil dan tanggal lahir kosong, harus diisi semua
+      if (!hasPhotoVal && !hasBirthDateVal) {
+        showToast("Tanggal lahir dan foto profil wajib diisi semua.", "error");
+        if (birthdateInputEl) {
+          birthdateInputEl.classList.add("ring-2", "ring-rose-500", "border-rose-500");
+          birthdateInputEl.focus();
+        }
+        return;
+      }
+
+      // Aturan 1 & 2: Saat edit foto, harus isi tanggal lahir dulu (kalau sudah ada tanggal lahir, tetap bisa ubah foto profil)
+      if (hasPhotoVal && !hasBirthDateVal) {
+        showToast("Harap isi tanggal lahir terlebih dahulu sebelum mengubah atau menyimpan foto profil.", "error");
+        if (birthdateInputEl) {
+          birthdateInputEl.classList.add("ring-2", "ring-rose-500", "border-rose-500");
+          birthdateInputEl.focus();
+        }
+        return;
+      }
+
+      // Aturan 3: Kalau profil tidak ada tapi tanggal lahir ada, harus isi profil
+      if (hasBirthDateVal && !hasPhotoVal) {
+        showToast("Foto profil belum ada. Harap pilih dan unggah foto profil terlebih dahulu.", "error");
+        if (birthdateInputEl) {
+          birthdateInputEl.classList.remove("ring-2", "ring-rose-500", "border-rose-500");
+        }
+        return;
+      }
+
+      if (birthdateInputEl) {
+        birthdateInputEl.classList.remove("ring-2", "ring-rose-500", "border-rose-500");
+      }
+
 
       // Validasi: Cek apakah ada perubahan data sama sekali
       const initVals = activeMemberContext.initialFormValues;
