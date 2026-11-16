@@ -138,7 +138,7 @@
       animation: marqueeRTL 36s linear infinite;
       will-change: transform;
     }
-    /* Layar Kunci Keluarga: Anti-scroll atas bawah & pas 100dvh */
+    /* Layar Kunci Keluarga: Ringan, Anti-scroll & Bebas Lag */
     #familyLockScreen {
       overflow: hidden !important;
       overscroll-behavior: none !important;
@@ -150,12 +150,34 @@
       inset: 0 !important;
     }
 
-    /* Ukuran Foto Banner Otomatis Pas di Layar HP & Laptop (Anti-Crop & Anti-Ngebug) */
+    /* Ukuran Foto Banner Statis & Ringan (Bebas kalkulasi dinamis yang bikin layar kedip di HP) */
     #familyLockScreen .marquee-track-ltr img,
     #familyLockScreen .marquee-track-rtl img {
-      height: clamp(110px, calc((100dvh - 330px) / 2), 128px) !important;
-      width: auto !important;
-      aspect-ratio: 16 / 9 !important;
+      height: 128px;
+      width: auto;
+      aspect-ratio: 16 / 9;
+      transform: translateZ(0);
+    }
+    @media (min-width: 1024px) {
+      #familyLockScreen .marquee-track-ltr img,
+      #familyLockScreen .marquee-track-rtl img {
+        height: 120px !important;
+      }
+    }
+
+    /* Saat layar kunci tersembunyi, matikan total animasi & blur agar GPU HP 100% bebas beban */
+    #familyLockScreen.hidden,
+    #familyLockScreen[style*="display: none"] {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+    #familyLockScreen.hidden .marquee-track-ltr,
+    #familyLockScreen.hidden .marquee-track-rtl,
+    #familyLockScreen[style*="display: none"] .marquee-track-ltr,
+    #familyLockScreen[style*="display: none"] .marquee-track-rtl {
+      animation: none !important;
+      will-change: auto !important;
     }
 
     /* Efek Blur pada Banner Foto Bergerak di Layar Depan */
@@ -1793,16 +1815,6 @@
       return arr;
     }
 
-    // Cegah layar bergeser/ter-scroll saat keyboard virtual muncul di HP
-    window.addEventListener('scroll', () => {
-      const lockScreen = document.getElementById('familyLockScreen');
-      if (lockScreen && !lockScreen.classList.contains('hidden') && lockScreen.style.display !== 'none') {
-        if (window.scrollY !== 0 || window.scrollX !== 0) {
-          window.scrollTo(0, 0);
-        }
-      }
-    }, { passive: true });
-
     function randomizeLockScreenBanners() {
       const topTrack = document.getElementById('lockBannerTop');
       const bottomTrack = document.getElementById('lockBannerBottom');
@@ -1928,6 +1940,16 @@
       // 2. Kunci Default Setiap Halaman Dimuat / Di-refresh & Terapkan Efek Blur Banner
       randomizeLockScreenBanners();
       applyLockScreenBlur(getFamilyBannerBlur());
+      const topTrack = document.getElementById('lockBannerTop');
+      const bottomTrack = document.getElementById('lockBannerBottom');
+      if (topTrack) {
+        topTrack.style.animationPlayState = 'running';
+        topTrack.style.willChange = 'transform';
+      }
+      if (bottomTrack) {
+        bottomTrack.style.animationPlayState = 'running';
+        bottomTrack.style.willChange = 'transform';
+      }
       lockScreen.classList.remove('hidden', 'opacity-0');
       lockScreen.classList.add('opacity-100');
       lockScreen.style.display = 'flex';
@@ -1972,9 +1994,20 @@
 
         if (errorMsg) errorMsg.classList.add('hidden');
 
-        // Hilangkan overlay layar kunci dengan transisi halus
+        // Hilangkan overlay layar kunci & langsung matikan animasi marquee untuk membebaskan GPU HP
         const lockScreen = document.getElementById('familyLockScreen') || document.getElementById('family-lock-screen');
         if (lockScreen) {
+          const topTrack = document.getElementById('lockBannerTop');
+          const bottomTrack = document.getElementById('lockBannerBottom');
+          if (topTrack) {
+            topTrack.style.animationPlayState = 'paused';
+            topTrack.style.willChange = 'auto';
+          }
+          if (bottomTrack) {
+            bottomTrack.style.animationPlayState = 'paused';
+            bottomTrack.style.willChange = 'auto';
+          }
+
           lockScreen.classList.add('opacity-0');
           setTimeout(() => {
             lockScreen.style.display = 'none';
@@ -1982,7 +2015,7 @@
             document.body.classList.remove('overflow-hidden');
             document.body.style.overflow = '';
             document.body.style.touchAction = '';
-          }, 300);
+          }, 200);
         } else {
           document.body.classList.remove('overflow-hidden');
           document.body.style.overflow = '';
