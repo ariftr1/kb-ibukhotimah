@@ -864,6 +864,18 @@
           <p class="text-sm sm:text-base font-semibold text-slate-800" id="detailBirthDate">-</p>
         </div>
 
+        <!-- ALAMAT RUMAH -->
+        <div id="detailAddressContainer" class="pb-3 border-b border-slate-100 hidden">
+          <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase block mb-1">ALAMAT RUMAH</span>
+          <div class="flex items-start gap-2">
+            <svg class="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <p class="text-sm sm:text-base font-semibold text-slate-800 leading-snug break-words" id="detailAddress">-</p>
+          </div>
+        </div>
+
         <!-- KETURUNAN / ANAK -->
         <div class="pt-1">
           <div class="flex items-center justify-between mb-2">
@@ -1214,7 +1226,7 @@
         <div>
           <label for="form-edit-birthdate" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
             <span>Tanggal Lahir <span class="text-rose-500">*</span></span>
-            <span class="text-[10px] text-emerald-600 font-semibold normal-case">Wajib diisi sebelum edit foto</span>
+            <span class="text-[10px] text-emerald-600 font-semibold normal-case">Wajib diisi bersama foto profil</span>
           </label>
           <input 
             type="date" 
@@ -1286,6 +1298,92 @@
             placeholder="Nama pasangan..." 
             class="w-full px-3.5 py-2.5 bg-white text-slate-900 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" 
           />
+        </div>
+
+        <!-- ALAMAT RUMAH (KABUPATEN/KOTA, KECAMATAN, DESA/KELURAHAN BERJENJANG OTOMATIS) -->
+        <div class="space-y-3 pt-3 pb-1 border-t border-slate-100">
+          <div class="flex items-center justify-between">
+            <span class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span>Alamat Rumah</span>
+            </span>
+            <span class="text-[11px] text-slate-400 font-medium">(Opsional)</span>
+          </div>
+
+          <!-- 1. Provinsi -->
+          <div>
+            <label for="form-edit-address-province" class="block text-xs font-semibold text-slate-600 mb-1">
+              Provinsi
+            </label>
+            <select
+              id="form-edit-address-province"
+              class="w-full px-3.5 py-2.5 bg-white text-slate-900 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition cursor-pointer"
+              onchange="onAddressProvinceChange()"
+            >
+              <option value="">-- Pilih Provinsi --</option>
+            </select>
+          </div>
+
+          <!-- 2. Kabupaten / Kota -->
+          <div>
+            <label for="form-edit-address-regency" class="block text-xs font-semibold text-slate-600 mb-1">
+              Kabupaten / Kota
+            </label>
+            <select
+              id="form-edit-address-regency"
+              class="w-full px-3.5 py-2.5 bg-white text-slate-900 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition cursor-pointer disabled:bg-slate-50 disabled:text-slate-400"
+              onchange="onAddressRegencyChange()"
+              disabled
+            >
+              <option value="">-- Pilih Kabupaten / Kota --</option>
+            </select>
+          </div>
+
+          <!-- 3. Kecamatan -->
+          <div>
+            <label for="form-edit-address-district" class="block text-xs font-semibold text-slate-600 mb-1">
+              Kecamatan
+            </label>
+            <select
+              id="form-edit-address-district"
+              class="w-full px-3.5 py-2.5 bg-white text-slate-900 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition cursor-pointer disabled:bg-slate-50 disabled:text-slate-400"
+              onchange="onAddressDistrictChange()"
+              disabled
+            >
+              <option value="">-- Pilih Kecamatan --</option>
+            </select>
+          </div>
+
+          <!-- 4. Desa / Kelurahan -->
+          <div>
+            <label for="form-edit-address-village" class="block text-xs font-semibold text-slate-600 mb-1">
+              Desa / Kelurahan
+            </label>
+            <select
+              id="form-edit-address-village"
+              class="w-full px-3.5 py-2.5 bg-white text-slate-900 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition cursor-pointer disabled:bg-slate-50 disabled:text-slate-400"
+              disabled
+            >
+              <option value="">-- Pilih Desa / Kelurahan --</option>
+            </select>
+          </div>
+
+          <!-- 5. Detail Alamat: Jalan, RT/RW, No. Rumah (Opsional) -->
+          <div>
+            <label for="form-edit-address-detail" class="block text-xs font-semibold text-slate-600 mb-1 flex items-center justify-between">
+              <span>Detail Jalan, RT/RW, atau No. Rumah</span>
+              <span class="text-[10px] text-slate-400 font-normal">Opsional</span>
+            </label>
+            <input
+              type="text"
+              id="form-edit-address-detail"
+              placeholder="Contoh: Jl. Merpati No. 12, RT 02 / RW 05"
+              class="w-full px-3.5 py-2.5 bg-white text-slate-900 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
+            />
+          </div>
         </div>
 
         <!-- Status Keberadaan: Almarhum / Almarhumah Checkbox -->
@@ -2431,6 +2529,35 @@
           });
         } catch (e) {
           console.warn('Sinkronisasi data Supabase error:', e);
+        }
+
+        // Sinkronisasi data alamat rumah terpusat dari Supabase (__ADDRESS_REGISTRY__)
+        try {
+          const { data: addrRow } = await supabase
+            .from('family_members')
+            .select('photo_url')
+            .eq('name', '__ADDRESS_REGISTRY__')
+            .maybeSingle();
+
+          if (addrRow && addrRow.photo_url) {
+            try {
+              const remoteAddresses = JSON.parse(addrRow.photo_url);
+              const localAddresses = JSON.parse(localStorage.getItem('family_member_addresses') || '{}');
+              const mergedAddresses = { ...localAddresses, ...remoteAddresses };
+              localStorage.setItem('family_member_addresses', JSON.stringify(mergedAddresses));
+
+              rows.forEach(r => {
+                const addr = mergedAddresses[r.id] || (r.name ? (mergedAddresses[r.name.trim().toLowerCase()] || mergedAddresses[r.name.toLowerCase().replace(/\s*\(.*?\)\s*/g, '').trim()]) : null);
+                if (addr) {
+                  r.address = addr;
+                }
+              });
+            } catch(e) {
+              console.warn('Parsing __ADDRESS_REGISTRY__ error:', e);
+            }
+          }
+        } catch(e) {
+          console.warn('Fetch __ADDRESS_REGISTRY__ error:', e);
         }
 
         rawMembersList = rows;
@@ -3722,6 +3849,337 @@
       window.history.replaceState({ appRoot: true }, '', window.location.href);
     } catch(e) {}
 
+    // ============================================================
+    // SISTEM DATA WILAYAH INDONESIA & ALAMAT RUMAH
+    // Hierarki otomatis: Provinsi -> Kabupaten/Kota -> Kecamatan -> Desa/Kelurahan
+    // ============================================================
+    const DEFAULT_PROVINCES = [
+      {"id":"11","name":"ACEH"},{"id":"12","name":"SUMATERA UTARA"},{"id":"13","name":"SUMATERA BARAT"},{"id":"14","name":"RIAU"},{"id":"15","name":"JAMBI"},{"id":"16","name":"SUMATERA SELATAN"},{"id":"17","name":"BENGKULU"},{"id":"18","name":"LAMPUNG"},{"id":"19","name":"KEPULAUAN BANGKA BELITUNG"},{"id":"21","name":"KEPULAUAN RIAU"},{"id":"31","name":"DKI JAKARTA"},{"id":"32","name":"JAWA BARAT"},{"id":"33","name":"JAWA TENGAH"},{"id":"34","name":"DI YOGYAKARTA"},{"id":"35","name":"JAWA TIMUR"},{"id":"36","name":"BANTEN"},{"id":"51","name":"BALI"},{"id":"52","name":"NUSA TENGGARA BARAT"},{"id":"53","name":"NUSA TENGGARA TIMUR"},{"id":"61","name":"KALIMANTAN BARAT"},{"id":"62","name":"KALIMANTAN TENGAH"},{"id":"63","name":"KALIMANTAN SELATAN"},{"id":"64","name":"KALIMANTAN TIMUR"},{"id":"65","name":"KALIMANTAN UTARA"},{"id":"71","name":"SULAWESI UTARA"},{"id":"72","name":"SULAWESI TENGAH"},{"id":"73","name":"SULAWESI SELATAN"},{"id":"74","name":"SULAWESI TENGGARA"},{"id":"75","name":"GORONTALO"},{"id":"76","name":"SULAWESI BARAT"},{"id":"81","name":"MALUKU"},{"id":"82","name":"MALUKU UTARA"},{"id":"91","name":"PAPUA BARAT"},{"id":"94","name":"PAPUA"}
+    ];
+
+    const DEFAULT_JATENG_REGENCIES = [
+      {"id":"3301","province_id":"33","name":"KABUPATEN CILACAP"},{"id":"3302","province_id":"33","name":"KABUPATEN BANYUMAS"},{"id":"3303","province_id":"33","name":"KABUPATEN PURBALINGGA"},{"id":"3304","province_id":"33","name":"KABUPATEN BANJARNEGARA"},{"id":"3305","province_id":"33","name":"KABUPATEN KEBUMEN"},{"id":"3306","province_id":"33","name":"KABUPATEN PURWOREJO"},{"id":"3307","province_id":"33","name":"KABUPATEN WONOSOBO"},{"id":"3308","province_id":"33","name":"KABUPATEN MAGELANG"},{"id":"3309","province_id":"33","name":"KABUPATEN BOYOLALI"},{"id":"3310","province_id":"33","name":"KABUPATEN KLATEN"},{"id":"3311","province_id":"33","name":"KABUPATEN SUKOHARJO"},{"id":"3312","province_id":"33","name":"KABUPATEN WONOGIRI"},{"id":"3313","province_id":"33","name":"KABUPATEN KARANGANYAR"},{"id":"3314","province_id":"33","name":"KABUPATEN SRAGEN"},{"id":"3315","province_id":"33","name":"KABUPATEN GROBOGAN"},{"id":"3316","province_id":"33","name":"KABUPATEN BLORA"},{"id":"3317","province_id":"33","name":"KABUPATEN REMBANG"},{"id":"3318","province_id":"33","name":"KABUPATEN PATI"},{"id":"3319","province_id":"33","name":"KABUPATEN KUDUS"},{"id":"3320","province_id":"33","name":"KABUPATEN JEPARA"},{"id":"3321","province_id":"33","name":"KABUPATEN DEMAK"},{"id":"3322","province_id":"33","name":"KABUPATEN SEMARANG"},{"id":"3323","province_id":"33","name":"KABUPATEN TEMANGGUNG"},{"id":"3324","province_id":"33","name":"KABUPATEN KENDAL"},{"id":"3325","province_id":"33","name":"KABUPATEN BATANG"},{"id":"3326","province_id":"33","name":"KABUPATEN PEKALONGAN"},{"id":"3327","province_id":"33","name":"KABUPATEN PEMALANG"},{"id":"3328","province_id":"33","name":"KABUPATEN TEGAL"},{"id":"3329","province_id":"33","name":"KABUPATEN BREBES"},{"id":"3371","province_id":"33","name":"KOTA MAGELANG"},{"id":"3372","province_id":"33","name":"KOTA SURAKARTA"},{"id":"3373","province_id":"33","name":"KOTA SALATIGA"},{"id":"3374","province_id":"33","name":"KOTA SEMARANG"},{"id":"3375","province_id":"33","name":"KOTA PEKALONGAN"},{"id":"3376","province_id":"33","name":"KOTA TEGAL"}
+    ];
+
+    const WILAYAH_PRIMARY_BASE = 'https://kanglerian.github.io/api-wilayah-indonesia/api/';
+    const WILAYAH_FALLBACK_BASE = 'https://www.emsifa.com/api-wilayah-indonesia/api/';
+    const wilayahMemoryCache = {};
+
+    function formatWilayahName(name) {
+      if (!name) return '';
+      return name.toLowerCase().replace(/(?:^|\s|\/|-|\()\w/g, c => c.toUpperCase());
+    }
+
+    async function fetchWilayahData(endpoint) {
+      if (wilayahMemoryCache[endpoint]) return wilayahMemoryCache[endpoint];
+      const sKey = 'wilayah_cache_' + endpoint;
+      try {
+        const sData = sessionStorage.getItem(sKey);
+        if (sData) {
+          const parsed = JSON.parse(sData);
+          wilayahMemoryCache[endpoint] = parsed;
+          return parsed;
+        }
+      } catch(e) {}
+
+      let list = null;
+      try {
+        const res = await fetch(WILAYAH_PRIMARY_BASE + endpoint);
+        if (res.ok) list = await res.json();
+      } catch(e) {
+        console.warn('Primary wilayah fetch failed for ' + endpoint, e);
+      }
+
+      if (!list) {
+        try {
+          const res2 = await fetch(WILAYAH_FALLBACK_BASE + endpoint);
+          if (res2.ok) list = await res2.json();
+        } catch(e2) {
+          console.warn('Fallback wilayah fetch failed for ' + endpoint, e2);
+        }
+      }
+
+      if (list && Array.isArray(list)) {
+        wilayahMemoryCache[endpoint] = list;
+        try { sessionStorage.setItem(sKey, JSON.stringify(list)); } catch(e) {}
+        return list;
+      }
+      return [];
+    }
+
+    function formatFullAddress(addr) {
+      if (!addr) return '';
+      if (typeof addr === 'string') return addr;
+      const parts = [];
+      if (addr.detail && addr.detail.trim()) {
+        parts.push(addr.detail.trim());
+      }
+      if (addr.villageName && addr.villageName.trim()) {
+        const v = addr.villageName.trim();
+        parts.push((v.startsWith('Desa') || v.startsWith('Kelurahan')) ? v : 'Desa ' + v);
+      }
+      if (addr.districtName && addr.districtName.trim()) {
+        const d = addr.districtName.trim();
+        parts.push(d.startsWith('Kec.') ? d : 'Kec. ' + d);
+      }
+      if (addr.regencyName && addr.regencyName.trim()) {
+        parts.push(addr.regencyName.trim());
+      }
+      if (addr.provinceName && addr.provinceName.trim()) {
+        parts.push(addr.provinceName.trim());
+      }
+      return parts.join(', ');
+    }
+
+    function getMemberAddress(memberId, memberName) {
+      try {
+        const rawAddresses = JSON.parse(localStorage.getItem('family_member_addresses') || '{}');
+        if (memberId && rawAddresses[memberId]) return rawAddresses[memberId];
+        if (memberName) {
+          const clean = memberName.toLowerCase().replace(/\s*\(.*?\)\s*/g, '').trim();
+          if (rawAddresses[clean]) return rawAddresses[clean];
+          if (rawAddresses[memberName.toLowerCase().trim()]) return rawAddresses[memberName.toLowerCase().trim()];
+        }
+      } catch(e) {}
+
+      if (rawMembersList && rawMembersList.length > 0) {
+        const m = rawMembersList.find(r => (memberId && r.id === memberId) || (memberName && r.name && r.name.toLowerCase().trim() === memberName.toLowerCase().trim()));
+        if (m && (m.address || m.alamat)) {
+          return m.address || m.alamat;
+        }
+      }
+
+      try {
+        const localExtras = JSON.parse(localStorage.getItem('family_member_extras') || '{}');
+        const ext = (memberId && localExtras[memberId]) || (memberName && localExtras[memberName.toLowerCase().trim()]);
+        if (ext && (ext.address || ext.alamat)) return ext.address || ext.alamat;
+      } catch(e) {}
+
+      return null;
+    }
+
+    async function syncAddressRegistryToSupabase(registry) {
+      try {
+        if (!supabase) return;
+        const jsonStr = JSON.stringify(registry);
+        const { data: existing } = await supabase
+          .from('family_members')
+          .select('id')
+          .eq('name', '__ADDRESS_REGISTRY__')
+          .maybeSingle();
+
+        if (existing && existing.id) {
+          await supabase
+            .from('family_members')
+            .update({ photo_url: jsonStr })
+            .eq('id', existing.id);
+        } else {
+          await supabase
+            .from('family_members')
+            .insert([{
+              name: '__ADDRESS_REGISTRY__',
+              role: 'archived',
+              branch_id: 0,
+              generation: 0,
+              photo_url: jsonStr
+            }]);
+        }
+      } catch(e) {
+        console.warn('Gagal sinkronisasi alamat ke Supabase:', e);
+      }
+    }
+
+    async function saveMemberAddress(targetId, memberName, oldName, addressObj) {
+      try {
+        const rawAddresses = JSON.parse(localStorage.getItem('family_member_addresses') || '{}');
+        if (targetId) rawAddresses[targetId] = addressObj;
+        if (memberName) {
+          const clean = memberName.toLowerCase().replace(/\s*\(.*?\)\s*/g, '').trim();
+          rawAddresses[clean] = addressObj;
+          rawAddresses[memberName.toLowerCase().trim()] = addressObj;
+        }
+        if (oldName) {
+          const cleanOld = oldName.toLowerCase().replace(/\s*\(.*?\)\s*/g, '').trim();
+          rawAddresses[cleanOld] = addressObj;
+        }
+        localStorage.setItem('family_member_addresses', JSON.stringify(rawAddresses));
+
+        const localExtras = JSON.parse(localStorage.getItem('family_member_extras') || '{}');
+        if (targetId) {
+          if (!localExtras[targetId]) localExtras[targetId] = {};
+          localExtras[targetId].address = addressObj;
+        }
+        if (memberName) {
+          const mKey = memberName.toLowerCase().trim();
+          if (!localExtras[mKey]) localExtras[mKey] = {};
+          localExtras[mKey].address = addressObj;
+        }
+        localStorage.setItem('family_member_extras', JSON.stringify(localExtras));
+
+        if (rawMembersList && rawMembersList.length > 0) {
+          const m = rawMembersList.find(r => (targetId && r.id === targetId) || (memberName && r.name === memberName));
+          if (m) m.address = addressObj;
+        }
+
+        const fullFormatted = formatFullAddress(addressObj);
+        if (targetId && supabase) {
+          try {
+            await supabase.from('family_members').update({ address: fullFormatted }).eq('id', targetId);
+          } catch(e) {}
+        }
+
+        if (supabase) {
+          await syncAddressRegistryToSupabase(rawAddresses);
+        }
+      } catch(e) {
+        console.warn('Error saving member address:', e);
+      }
+    }
+
+    async function populateEditAddressFields(addressData = null) {
+      const provSelect = document.getElementById('form-edit-address-province');
+      const regSelect = document.getElementById('form-edit-address-regency');
+      const distSelect = document.getElementById('form-edit-address-district');
+      const villSelect = document.getElementById('form-edit-address-village');
+      const detailInput = document.getElementById('form-edit-address-detail');
+
+      if (!provSelect || !regSelect || !distSelect || !villSelect || !detailInput) return;
+
+      // Populate Provinsi jika belum terisi
+      if (provSelect.options.length <= 1) {
+        provSelect.innerHTML = '<option value="">-- Pilih Provinsi --</option>' +
+          DEFAULT_PROVINCES.map(p => `<option value="${p.id}">${formatWilayahName(p.name)}</option>`).join('');
+      }
+
+      const targetProvId = (addressData && addressData.provinceId) ? String(addressData.provinceId) : "33";
+      provSelect.value = targetProvId;
+
+      regSelect.disabled = true;
+      regSelect.innerHTML = '<option value="">Memuat kabupaten / kota...</option>';
+      distSelect.disabled = true;
+      distSelect.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+      villSelect.disabled = true;
+      villSelect.innerHTML = '<option value="">-- Pilih Desa / Kelurahan --</option>';
+
+      let regencies = (targetProvId === "33") ? DEFAULT_JATENG_REGENCIES : await fetchWilayahData(`regencies/${targetProvId}.json`);
+      if (!regencies || regencies.length === 0) {
+        regencies = await fetchWilayahData(`regencies/${targetProvId}.json`);
+      }
+
+      regSelect.innerHTML = '<option value="">-- Pilih Kabupaten / Kota --</option>' +
+        regencies.map(r => `<option value="${r.id}">${formatWilayahName(r.name)}</option>`).join('');
+      regSelect.disabled = false;
+
+      const targetRegId = (addressData && addressData.regencyId) ? String(addressData.regencyId) : "";
+      if (targetRegId) {
+        regSelect.value = targetRegId;
+
+        distSelect.disabled = true;
+        distSelect.innerHTML = '<option value="">Memuat kecamatan...</option>';
+        const districts = await fetchWilayahData(`districts/${targetRegId}.json`);
+        distSelect.innerHTML = '<option value="">-- Pilih Kecamatan --</option>' +
+          districts.map(d => `<option value="${d.id}">${formatWilayahName(d.name)}</option>`).join('');
+        distSelect.disabled = false;
+
+        const targetDistId = (addressData && addressData.districtId) ? String(addressData.districtId) : "";
+        if (targetDistId) {
+          distSelect.value = targetDistId;
+
+          villSelect.disabled = true;
+          villSelect.innerHTML = '<option value="">Memuat desa / kelurahan...</option>';
+          const villages = await fetchWilayahData(`villages/${targetDistId}.json`);
+          villSelect.innerHTML = '<option value="">-- Pilih Desa / Kelurahan --</option>' +
+            villages.map(v => `<option value="${v.id}">${formatWilayahName(v.name)}</option>`).join('');
+          villSelect.disabled = false;
+
+          const targetVillId = (addressData && addressData.villageId) ? String(addressData.villageId) : "";
+          if (targetVillId) {
+            villSelect.value = targetVillId;
+          }
+        }
+      }
+
+      detailInput.value = (addressData && addressData.detail) ? addressData.detail : '';
+    }
+
+    async function onAddressProvinceChange() {
+      const provSelect = document.getElementById('form-edit-address-province');
+      const regSelect = document.getElementById('form-edit-address-regency');
+      const distSelect = document.getElementById('form-edit-address-district');
+      const villSelect = document.getElementById('form-edit-address-village');
+      if (!provSelect || !regSelect) return;
+
+      const provId = provSelect.value;
+      distSelect.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+      distSelect.disabled = true;
+      villSelect.innerHTML = '<option value="">-- Pilih Desa / Kelurahan --</option>';
+      villSelect.disabled = true;
+
+      if (!provId) {
+        regSelect.innerHTML = '<option value="">-- Pilih Kabupaten / Kota --</option>';
+        regSelect.disabled = true;
+        return;
+      }
+
+      regSelect.disabled = true;
+      regSelect.innerHTML = '<option value="">Memuat kabupaten / kota...</option>';
+
+      let regencies = (provId === "33") ? DEFAULT_JATENG_REGENCIES : await fetchWilayahData(`regencies/${provId}.json`);
+      if (!regencies || regencies.length === 0) {
+        regencies = await fetchWilayahData(`regencies/${provId}.json`);
+      }
+
+      regSelect.innerHTML = '<option value="">-- Pilih Kabupaten / Kota --</option>' +
+        regencies.map(r => `<option value="${r.id}">${formatWilayahName(r.name)}</option>`).join('');
+      regSelect.disabled = false;
+    }
+
+    async function onAddressRegencyChange() {
+      const regSelect = document.getElementById('form-edit-address-regency');
+      const distSelect = document.getElementById('form-edit-address-district');
+      const villSelect = document.getElementById('form-edit-address-village');
+      if (!regSelect || !distSelect) return;
+
+      const regId = regSelect.value;
+      villSelect.innerHTML = '<option value="">-- Pilih Desa / Kelurahan --</option>';
+      villSelect.disabled = true;
+
+      if (!regId) {
+        distSelect.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+        distSelect.disabled = true;
+        return;
+      }
+
+      distSelect.disabled = true;
+      distSelect.innerHTML = '<option value="">Memuat kecamatan...</option>';
+
+      const districts = await fetchWilayahData(`districts/${regId}.json`);
+      distSelect.innerHTML = '<option value="">-- Pilih Kecamatan --</option>' +
+        districts.map(d => `<option value="${d.id}">${formatWilayahName(d.name)}</option>`).join('');
+      distSelect.disabled = false;
+    }
+
+    async function onAddressDistrictChange() {
+      const distSelect = document.getElementById('form-edit-address-district');
+      const villSelect = document.getElementById('form-edit-address-village');
+      if (!distSelect || !villSelect) return;
+
+      const distId = distSelect.value;
+      if (!distId) {
+        villSelect.innerHTML = '<option value="">-- Pilih Desa / Kelurahan --</option>';
+        villSelect.disabled = true;
+        return;
+      }
+
+      villSelect.disabled = true;
+      villSelect.innerHTML = '<option value="">Memuat desa / kelurahan...</option>';
+
+      const villages = await fetchWilayahData(`villages/${distId}.json`);
+      villSelect.innerHTML = '<option value="">-- Pilih Desa / Kelurahan --</option>' +
+        villages.map(v => `<option value="${v.id}">${formatWilayahName(v.name)}</option>`).join('');
+      villSelect.disabled = false;
+    }
+
     function showMemberDetail(branchId, type, memberName, memberId = null) {
       if (typeof branchId === 'object' && branchId !== null) {
         const obj = branchId;
@@ -3938,6 +4396,19 @@
         }
       } else {
         if (birthVal) birthVal.textContent = '-';
+      }
+
+      // ALAMAT RUMAH
+      const addressContainer = document.getElementById('detailAddressContainer');
+      const addressVal = document.getElementById('detailAddress');
+      const memberAddress = getMemberAddress(memberId, name);
+      const formattedAddr = formatFullAddress(memberAddress);
+      if (formattedAddr && formattedAddr.trim() !== '') {
+        if (addressContainer) addressContainer.classList.remove('hidden');
+        if (addressVal) addressVal.textContent = formattedAddr;
+      } else {
+        if (addressContainer) addressContainer.classList.add('hidden');
+        if (addressVal) addressVal.textContent = '-';
       }
 
       // KETURUNAN / ANAK
@@ -4309,24 +4780,10 @@
         }
       }
 
-      // Pasang validasi 5 MB & preview saat file dipilih
-      // Pasang validasi: Cegah memilih foto jika tanggal lahir masih kosong
+      // Tidak memblokir pemilihan foto; user bebas memilih foto lebih dulu atau tanggal lahir lebih dulu
       const editPhotoFileLabel = document.querySelector('label[for="editPhotoFile"]');
       if (editPhotoFileLabel) {
-        editPhotoFileLabel.onclick = function(e) {
-          const bDate = birthdateInput ? birthdateInput.value.trim() : "";
-          if (!bDate) {
-            e.preventDefault();
-            showToast("Harap isi tanggal lahir terlebih dahulu sebelum memilih foto profil.", "warning");
-            if (birthdateInput) {
-              birthdateInput.classList.add("ring-2", "ring-rose-500", "border-rose-500");
-              birthdateInput.focus();
-            }
-            return false;
-          } else if (birthdateInput) {
-            birthdateInput.classList.remove("ring-2", "ring-rose-500", "border-rose-500");
-          }
-        };
+        editPhotoFileLabel.onclick = null;
       }
 
       if (birthdateInput) {
@@ -4340,19 +4797,6 @@
       // Pasang validasi 5 MB & preview saat file dipilih (menampilkan resolusi & rasio asli)
       if (editPhotoFile) {
         editPhotoFile.onchange = function() {
-          const bDate = birthdateInput ? birthdateInput.value.trim() : "";
-          if (!bDate) {
-            showToast("Harap isi tanggal lahir terlebih dahulu sebelum memilih foto profil.", "warning");
-            if (birthdateInput) {
-              birthdateInput.classList.add("ring-2", "ring-rose-500", "border-rose-500");
-              birthdateInput.focus();
-            }
-            editPhotoFile.value = "";
-            if (editPhotoFileName) editPhotoFileName.textContent = "";
-            if (photoPreviewContainer) { photoPreviewContainer.classList.add("hidden"); photoPreviewContainer.classList.remove("flex"); }
-            return;
-          }
-
           const file = editPhotoFile.files[0];
           if (!file) {
             if (editPhotoFileName) editPhotoFileName.textContent = "";
@@ -4429,13 +4873,18 @@
         deceasedCheckbox.checked = foundGc ? Boolean(foundGc.isDeceased) : (currentMember ? Boolean(currentMember.is_deceased) : false);
       }
 
+      // Muat data alamat anggota ke dropdown berjenjang (Provinsi, Kabupaten/Kota, Kecamatan, Desa/Kelurahan)
+      const currentAddress = getMemberAddress(memberId, memberName);
+      populateEditAddressFields(currentAddress);
+
       // Simpan nilai awal form untuk mendeteksi apakah ada perubahan data
       activeMemberContext.initialFormValues = {
         name: nameInput.value.trim(),
         nickname: nicknameInput ? nicknameInput.value.trim() : '',
         birthdate: birthdateInput ? birthdateInput.value : '',
         spouse: spouseInput ? spouseInput.value.trim() : '',
-        deceased: deceasedCheckbox ? Boolean(deceasedCheckbox.checked) : false
+        deceased: deceasedCheckbox ? Boolean(deceasedCheckbox.checked) : false,
+        address: currentAddress
       };
 
       // Animasi Buka Modal Edit
@@ -4630,10 +5079,8 @@
       }
       // ============================================================
       // VALIDASI TANGGAL LAHIR & FOTO PROFIL
-      // 1. Saat edit foto, harus isi tanggal lahir dulu.
-      // 2. Kalau sudah ada tanggal lahir, tetap bisa ubah foto profil.
-      // 3. Kalau profil tidak ada tapi tanggal lahir ada, harus isi foto profil.
-      // 4. Jika profil dan tanggal lahir kosong, harus diisi semua.
+      // User: "untuk profil gak harus isi tanggal lahir dulu intinya selagi masih ada yang kosong harus di isi"
+      // Keduanya wajib terisi saat data disimpan (tidak boleh ada yang kosong).
       // ============================================================
       const currentMemberDataForVal = findMemberData(memberId, oldName);
       const existingPhotoVal = currentMemberDataForVal ? (currentMemberDataForVal.photo_url || currentMemberDataForVal.foto_url) : null;
@@ -4643,9 +5090,9 @@
       const hasBirthDateVal = Boolean(newBirthDate && String(newBirthDate).trim() !== "");
       const birthdateInputEl = document.getElementById("form-edit-birthdate");
 
-      // Aturan 4: Jika profil dan tanggal lahir kosong, harus diisi semua
+      // Jika keduanya kosong
       if (!hasPhotoVal && !hasBirthDateVal) {
-        showToast("Tanggal lahir dan foto profil wajib diisi semua.", "error");
+        showToast("Foto profil dan tanggal lahir wajib diisi semua.", "error");
         if (birthdateInputEl) {
           birthdateInputEl.classList.add("ring-2", "ring-rose-500", "border-rose-500");
           birthdateInputEl.focus();
@@ -4653,9 +5100,9 @@
         return;
       }
 
-      // Aturan 1 & 2: Saat edit foto, harus isi tanggal lahir dulu (kalau sudah ada tanggal lahir, tetap bisa ubah foto profil)
-      if (hasPhotoVal && !hasBirthDateVal) {
-        showToast("Harap isi tanggal lahir terlebih dahulu sebelum mengubah atau menyimpan foto profil.", "error");
+      // Jika tanggal lahir kosong
+      if (!hasBirthDateVal) {
+        showToast("Tanggal lahir masih kosong. Harap isi tanggal lahir terlebih dahulu.", "error");
         if (birthdateInputEl) {
           birthdateInputEl.classList.add("ring-2", "ring-rose-500", "border-rose-500");
           birthdateInputEl.focus();
@@ -4663,8 +5110,8 @@
         return;
       }
 
-      // Aturan 3: Kalau profil tidak ada tapi tanggal lahir ada, harus isi profil
-      if (hasBirthDateVal && !hasPhotoVal) {
+      // Jika foto profil kosong
+      if (!hasPhotoVal) {
         showToast("Foto profil belum ada. Harap pilih dan unggah foto profil terlebih dahulu.", "error");
         if (birthdateInputEl) {
           birthdateInputEl.classList.remove("ring-2", "ring-rose-500", "border-rose-500");
@@ -4676,6 +5123,37 @@
         birthdateInputEl.classList.remove("ring-2", "ring-rose-500", "border-rose-500");
       }
 
+      // Ambil nilai alamat rumah dari dropdown & input detail
+      const provEl = document.getElementById('form-edit-address-province');
+      const regEl = document.getElementById('form-edit-address-regency');
+      const distEl = document.getElementById('form-edit-address-district');
+      const villEl = document.getElementById('form-edit-address-village');
+      const detailEl = document.getElementById('form-edit-address-detail');
+
+      const provId = provEl ? provEl.value : '';
+      const provName = provEl && provEl.selectedIndex > 0 ? provEl.options[provEl.selectedIndex].text : '';
+      const regId = regEl ? regEl.value : '';
+      const regName = regEl && regEl.selectedIndex > 0 ? regEl.options[regEl.selectedIndex].text : '';
+      const distId = distEl ? distEl.value : '';
+      const distName = distEl && distEl.selectedIndex > 0 ? distEl.options[distEl.selectedIndex].text : '';
+      const villId = villEl ? villEl.value : '';
+      const villName = villEl && villEl.selectedIndex > 0 ? villEl.options[villEl.selectedIndex].text : '';
+      const detailText = detailEl ? detailEl.value.trim() : '';
+
+      let addressObjToSave = null;
+      if (regId || distId || villId || detailText) {
+        addressObjToSave = {
+          provinceId: provId || "33",
+          provinceName: provName || "Jawa Tengah",
+          regencyId: regId,
+          regencyName: regName,
+          districtId: distId,
+          districtName: distName,
+          villageId: villId,
+          villageName: villName,
+          detail: detailText
+        };
+      }
 
       // Validasi: Cek apakah ada perubahan data sama sekali
       const initVals = activeMemberContext.initialFormValues;
@@ -4687,6 +5165,11 @@
       const prevSpouse = initVals ? initVals.spouse : (currentMemberData && currentMemberData.spouse_name ? currentMemberData.spouse_name : '');
       const prevDeceased = initVals ? initVals.deceased : (currentMemberData ? Boolean(currentMemberData.is_deceased) : false);
 
+      const prevAddress = initVals ? initVals.address : (currentMemberData ? (currentMemberData.address || currentMemberData.alamat) : null);
+      const prevAddrFormatted = formatFullAddress(prevAddress);
+      const newAddrFormatted = formatFullAddress(addressObjToSave);
+      const hasAddressChange = newAddrFormatted !== prevAddrFormatted;
+
       const hasPhotoChange = Boolean(photoFileSelected);
       const hasNameChange = newName !== prevName;
       const hasNicknameChange = newNickname !== prevNickname;
@@ -4694,7 +5177,7 @@
       const hasSpouseChange = newSpouse !== prevSpouse;
       const hasDeceasedChange = isDeceased !== prevDeceased;
 
-      if (!hasPhotoChange && !hasNameChange && !hasNicknameChange && !hasBirthDateChange && !hasSpouseChange && !hasDeceasedChange) {
+      if (!hasPhotoChange && !hasNameChange && !hasNicknameChange && !hasBirthDateChange && !hasSpouseChange && !hasDeceasedChange && !hasAddressChange) {
         showToast('Belum ada data perubahan', 'warning');
         return;
       }
@@ -4903,7 +5386,8 @@
           const extObj = {
             nickname: newNickname || null,
             birth_date: newBirthDate || null,
-            photo_url: finalPhotoUrl
+            photo_url: finalPhotoUrl,
+            address: addressObjToSave
           };
           if (targetId) localExtras[targetId] = extObj;
           if (newName) localExtras[newName.trim().toLowerCase()] = extObj;
@@ -4911,6 +5395,11 @@
           localStorage.setItem('family_member_extras', JSON.stringify(localExtras));
         } catch (e) {
           console.warn('Cache local extras error:', e);
+        }
+
+        // Simpan alamat rumah & sinkronisasi terpusat ke Supabase (__ADDRESS_REGISTRY__)
+        if (hasAddressChange || addressObjToSave) {
+          await saveMemberAddress(targetId || memberId, newName, oldName, addressObjToSave);
         }
 
         // Panggil kembali fungsi pemuatan data dari Supabase agar state lokal dan tampilan ter-update seketika
@@ -5214,7 +5703,16 @@
             async (payload) => {
               console.log('Perubahan real-time terdeteksi di Supabase:', payload);
               // Jika perubahan adalah konfigurasi blur atau sandi terpusat
-              if (payload && payload.new && payload.new.name === '__SYSTEM_CONFIG__') {
+              if (payload && payload.new && payload.new.name === '__ADDRESS_REGISTRY__') {
+            if (payload.new.photo_url) {
+              try {
+                const remoteAddresses = JSON.parse(payload.new.photo_url);
+                const localAddresses = JSON.parse(localStorage.getItem('family_member_addresses') || '{}');
+                localStorage.setItem('family_member_addresses', JSON.stringify({ ...localAddresses, ...remoteAddresses }));
+              } catch(e) {}
+            }
+          }
+          if (payload && payload.new && payload.new.name === '__SYSTEM_CONFIG__') {
                 if (payload.new.nickname !== null && payload.new.nickname !== undefined && !isNaN(Number(payload.new.nickname))) {
                   const remoteBlur = parseInt(payload.new.nickname, 10);
                   localStorage.setItem('family_banner_blur', remoteBlur.toString());
