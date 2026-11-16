@@ -4870,14 +4870,31 @@
       if (type === 'head') {
         const head = branch.heads.find(h => (memberId && h.id === memberId) || h.name === memberName);
         genBadge.textContent = 'G2 • Anak';
-        spouseContainer.classList.remove('hidden');
-        spouseInput.value = head && head.spouse ? head.spouse : '';
+        const otherHeads = branch.heads.filter(h => (memberId && h.id !== memberId) || h.name !== memberName);
+        let sVal = otherHeads.length > 0 ? otherHeads.map(h => h.name).join(', ') : (head && head.spouse ? head.spouse : '');
+        if (!sVal && currentMember && currentMember.spouse_name) sVal = currentMember.spouse_name;
+        const hasSpouse = Boolean(sVal && sVal.trim() !== '' && sVal !== '-' && !sVal.toLowerCase().includes('belum') && !sVal.toLowerCase().includes('tidak'));
+        if (hasSpouse) {
+          spouseContainer.classList.remove('hidden');
+          spouseInput.value = sVal;
+        } else {
+          spouseContainer.classList.add('hidden');
+          spouseInput.value = '';
+        }
         deceasedCheckbox.checked = head ? Boolean(head.isDeceased) : (currentMember ? Boolean(currentMember.is_deceased) : false);
       } else if (type === 'child') {
         const child = branch.children.find(c => (memberId && c.id === memberId) || c.name === memberName);
         genBadge.textContent = 'G3 • Cucu';
-        spouseContainer.classList.remove('hidden');
-        spouseInput.value = child && child.spouse ? child.spouse : '';
+        let sVal = child && child.spouse ? child.spouse : '';
+        if (!sVal && currentMember && currentMember.spouse_name) sVal = currentMember.spouse_name;
+        const hasSpouse = Boolean(sVal && sVal.trim() !== '' && sVal !== '-' && !sVal.toLowerCase().includes('belum') && !sVal.toLowerCase().includes('tidak'));
+        if (hasSpouse) {
+          spouseContainer.classList.remove('hidden');
+          spouseInput.value = sVal;
+        } else {
+          spouseContainer.classList.add('hidden');
+          spouseInput.value = '';
+        }
         deceasedCheckbox.checked = child ? Boolean(child.isDeceased) : (currentMember ? Boolean(currentMember.is_deceased) : false);
       } else if (type === 'spouse') {
         const child = branch.children.find(c => c.spouse === memberName || (memberId && c.id === memberId));
@@ -4900,6 +4917,7 @@
         }
         genBadge.textContent = 'G4 • Cicit';
         spouseContainer.classList.add('hidden');
+        spouseInput.value = '';
         deceasedCheckbox.checked = foundGc ? Boolean(foundGc.isDeceased) : (currentMember ? Boolean(currentMember.is_deceased) : false);
       }
 
