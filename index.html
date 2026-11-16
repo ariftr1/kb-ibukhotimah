@@ -4075,7 +4075,6 @@
       const regSelect = document.getElementById('form-edit-address-regency');
       const distSelect = document.getElementById('form-edit-address-district');
       const villSelect = document.getElementById('form-edit-address-village');
-      const detailInput = document.getElementById('form-edit-address-detail');
 
       if (!provSelect || !regSelect || !distSelect || !villSelect) return;
 
@@ -4133,9 +4132,7 @@
         }
       }
 
-      if (detailInput) {
-        detailInput.value = (addressData && addressData.detail) ? addressData.detail : '';
-      }
+
     }
 
     async function onAddressProvinceChange() {
@@ -5161,7 +5158,6 @@
       const regEl = document.getElementById('form-edit-address-regency');
       const distEl = document.getElementById('form-edit-address-district');
       const villEl = document.getElementById('form-edit-address-village');
-      const detailEl = document.getElementById('form-edit-address-detail');
 
       const provId = provEl ? provEl.value : '';
       const provName = provEl && provEl.selectedIndex > 0 ? provEl.options[provEl.selectedIndex].text : '';
@@ -5171,10 +5167,9 @@
       const distName = distEl && distEl.selectedIndex > 0 ? distEl.options[distEl.selectedIndex].text : '';
       const villId = villEl ? villEl.value : '';
       const villName = villEl && villEl.selectedIndex > 0 ? villEl.options[villEl.selectedIndex].text : '';
-      const detailText = detailEl ? detailEl.value.trim() : '';
 
       let addressObjToSave = null;
-      if (regId || distId || villId || detailText) {
+      if (regId || distId || villId) {
         addressObjToSave = {
           provinceId: provId || "33",
           provinceName: provName || "Jawa Tengah",
@@ -5183,8 +5178,7 @@
           districtId: distId,
           districtName: distName,
           villageId: villId,
-          villageName: villName,
-          detail: detailText
+          villageName: villName
         };
       }
 
