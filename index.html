@@ -146,6 +146,63 @@
       -webkit-overflow-scrolling: auto !important;
       height: 100dvh !important;
       max-height: 100dvh !important;
+      position: fixed !important;
+      inset: 0 !important;
+    }
+
+    /* Penyesuaian Khusus Laptop & Layar Horizontal agar tidak ke-crop sama sekali */
+    @media (min-width: 1024px), (orientation: landscape) and (max-height: 820px) {
+      #familyLockScreen {
+        padding-top: 6px !important;
+        padding-bottom: 8px !important;
+      }
+      #familyLockScreen .marquee-track-ltr img,
+      #familyLockScreen .marquee-track-rtl img {
+        height: 94px !important; /* Proporsional & utuh di laptop tanpa ke-crop */
+      }
+      #family-lock-card {
+        padding: 1.25rem 2rem !important; /* Lega dan nyaman */
+        max-width: 26rem !important;
+        border-radius: 1.25rem !important;
+      }
+      #family-lock-card h2 {
+        font-size: 1.25rem !important; /* 20px */
+        line-height: 1.35 !important;
+      }
+      #family-lock-card p.text-slate-500 {
+        margin-top: 0.25rem !important;
+        margin-bottom: 0.875rem !important;
+        font-size: 0.8125rem !important;
+      }
+      #familyLoginForm {
+        gap: 0.625rem !important;
+      }
+      #familyLoginForm > * + * {
+        margin-top: 0.625rem !important;
+      }
+      #familyLoginForm .liquid-glass-input {
+        padding-top: 0.625rem !important;
+        padding-bottom: 0.625rem !important;
+      }
+      #familyLoginForm .liquid-glass-btn {
+        height: 2.625rem !important; /* 42px */
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+      }
+      #family-lock-card > p:nth-of-type(2) {
+        margin-top: 0.75rem !important;
+      }
+      #family-lock-card > div:last-child {
+        margin-top: 0.75rem !important;
+        padding-top: 0.625rem !important;
+      }
+      #lockBannerBottom {
+        margin-bottom: 0 !important;
+      }
+      #familyLockScreen > div:last-child {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+      }
     }
     /* Efek Blur pada Banner Foto Bergerak di Layar Depan */
     .marquee-track-ltr img,
